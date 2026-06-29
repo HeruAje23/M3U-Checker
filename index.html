@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="en" class="dark">
 <head><style>
 @font-face {
   font-family: "Optimistic";
@@ -24,1102 +24,1017 @@
 </style>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Opsi 2 - IPTV M3U Checker HLS.js</title>
+<title>M3U IPTV Checker Pro v2.2</title>
 <script src="https://cdn.tailwindcss.com"></script>
-<script src="https://cdn.jsdelivr.net/npm/hls.js@1.5.15/dist/hls.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/lucide@0.441.0/dist/umd/lucide.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/hls.js@1.5.8/dist/hls.min.js"></script>
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
 <style>
     :root {
         --bg-primary: #0f172a;
         --bg-secondary: #1e293b;
-        --bg-card: #334155;
+        --bg-card: #1e293b;
         --text-primary: #f1f5f9;
-        --text-secondary: #cbd5e1;
-        --border-color: #475569;
+        --text-secondary: #94a3b8;
+        --border: #334155;
         --accent: #3b82f6;
-        --success: #10b981;
+        --success: #22c55e;
         --warning: #f59e0b;
         --danger: #ef4444;
+        --info: #0ea5e9;
     }
     
-    [data-theme="light"] {
+    .light {
         --bg-primary: #f8fafc;
         --bg-secondary: #ffffff;
-        --bg-card: #f1f5f9;
+        --bg-card: #ffffff;
         --text-primary: #0f172a;
-        --text-secondary: #475569;
-        --border-color: #cbd5e1;
+        --text-secondary: #64748b;
+        --border: #e2e8f0;
         --accent: #2563eb;
-        --success: #059669;
-        --warning: #d97706;
-        --danger: #dc2626;
     }
-
-    * { scrollbar-width: thin; scrollbar-color: var(--border-color) var(--bg-secondary); }
-    *::-webkit-scrollbar { width: 8px; height: 8px; }
-    *::-webkit-scrollbar-track { background: var(--bg-secondary); }
-    *::-webkit-scrollbar-thumb { background-color: var(--border-color); border-radius: 4px; }
     
     body {
-        background: var(--bg-primary);
+        background-color: var(--bg-primary);
         color: var(--text-primary);
-        font-family: 'Inter', system-ui, -apple-system, sans-serif;
-        transition: background 0.3s ease, color 0.3s ease;
-    }
-    
-    .card {
-        background: var(--bg-secondary);
-        border: 1px solid var(--border-color);
         transition: all 0.3s ease;
     }
     
-    .status-badge {
-        display: inline-flex;
-        align-items: center;
-        gap: 0.375rem;
-        padding: 0.25rem 0.75rem;
-        border-radius: 9999px;
-        font-size: 0.75rem;
-        font-weight: 600;
-        white-space: nowrap;
+    .card {
+        background-color: var(--bg-card);
+        border: 1px solid var(--border);
+        transition: all 0.3s ease;
     }
     
-    .pulse {
-        animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+    .card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 25px -5px rgba(0,0,0,0.2);
+    }
+    
+    .gradient-bg {
+        background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+    }
+    
+    .stat-card {
+        background: linear-gradient(135deg, rgba(59,130,246,0.1) 0%, rgba(139,92,246,0.1) 100%);
+        backdrop-filter: blur(10px);
+    }
+    
+    .toast {
+        animation: slideIn 0.3s ease forwards;
+    }
+    
+    @keyframes slideIn {
+        from { transform: translateX(400px); opacity: 0; }
+        to { transform: translateX(0); opacity: 1; }
     }
     
     @keyframes pulse {
         0%, 100% { opacity: 1; }
-        50% { opacity: .5; }
+        50% { opacity: 0.5; }
     }
     
-    .fade-in {
-        animation: fadeIn 0.3s ease-in;
-    }
-    
-    @keyframes fadeIn {
-        from { opacity: 0; transform: translateY(10px); }
-        to { opacity: 1; transform: translateY(0); }
+    .testing {
+        animation: pulse 1.5s infinite;
     }
     
     .progress-bar {
         transition: width 0.3s ease;
     }
     
-    input[type="checkbox"]:checked {
-        background-color: var(--accent);
-        border-color: var(--accent);
+    input[type="file"]::file-selector-button {
+        background: var(--accent);
+        color: white;
+        border: none;
+        padding: 0.5rem 1rem;
+        border-radius: 0.5rem;
+        cursor: pointer;
+        margin-right: 1rem;
+    }
+    
+    .channel-row:hover {
+        background-color: rgba(59,130,246,0.05);
+    }
+    
+    .status-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.25rem;
+        font-size: 0.75rem;
+        font-weight: 600;
+        padding: 0.25rem 0.625rem;
+        border-radius: 9999px;
+    }
+    
+    video {
+        background: #000;
+    }
+    
+    ::-webkit-scrollbar {
+        width: 8px;
+        height: 8px;
+    }
+    
+    ::-webkit-scrollbar-track {
+        background: var(--bg-secondary);
+    }
+    
+    ::-webkit-scrollbar-thumb {
+        background: var(--border);
+        border-radius: 4px;
+    }
+    
+    ::-webkit-scrollbar-thumb:hover {
+        background: var(--accent);
+    }
+
+    .logo-thumbnail {
+        width: 32px;
+        height: 32px;
+        object-fit: cover;
+        border-radius: 0.375rem;
+        background: var(--bg-secondary);
+        border: 1px solid var(--border);
     }
 </style>
 </head>
-<body data-theme="dark">
-<div id="app" class="min-h-screen pb-20">
+<body class="min-h-screen">
     <!-- Header -->
-    <header class="sticky top-0 z-50 card border-b backdrop-blur-lg bg-opacity-90">
+    <header class="gradient-bg text-white shadow-lg sticky top-0 z-40">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
             <div class="flex items-center justify-between flex-wrap gap-4">
                 <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 rounded-lg flex items-center justify-center" style="background: var(--accent)">
-                        <i data-lucide="tv" class="w-6 h-6 text-white"></i>
+                    <div class="bg-white/20 p-2 rounded-lg backdrop-blur">
+                        <i data-lucide="tv" class="w-6 h-6"></i>
                     </div>
                     <div>
                         <h1 class="text-xl sm:text-2xl font-bold">M3U IPTV Checker Pro</h1>
-                        <p class="text-xs" style="color: var(--text-secondary)">HLS.js Stream Tester v2.0</p>
+                        <p class="text-xs text-white/80">v2.2 - Auto Retry + Logo Detection</p>
                     </div>
+                <div class="flex items-center gap-2">
+                    <button id="themeToggle" class="p-2 rounded-lg bg-white/20 hover:bg-white/30 transition">
+                        <i data-lucide="moon" class="w-5 h-5 theme-icon"></i>
+                    </button>
+                    <button id="settingsBtn" class="p-2 rounded-lg bg-white/20 hover:bg-white/30 transition">
+                        <i data-lucide="settings" class="w-5 h-5"></i>
+                    </button>
                 </div>
-                <button id="themeToggle" class="p-2 rounded-lg card hover:opacity-80 transition">
-                    <i data-lucide="sun" class="w-5 h-5 hidden" id="sunIcon"></i>
-                    <i data-lucide="moon" class="w-5 h-5" id="moonIcon"></i>
-                </button>
             </div>
         </div>
     </header>
 
-    <!-- CORS Warning -->
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-6">
-        <div class="card rounded-xl p-4 border-l-4" style="border-left-color: var(--warning); background: var(--bg-card)">
-            <div class="flex gap-3">
-                <i data-lucide="alert-triangle" class="w-5 h-5 flex-shrink-0 mt-0.5" style="color: var(--warning)"></i>
-                <div class="flex-1">
-                    <h3 class="font-semibold mb-1">Penting: Batasan CORS Browser</h3>
-                    <p class="text-sm" style="color: var(--text-secondary)">
-                        Beberapa stream yang sebenarnya aktif mungkin ditampilkan sebagai "Mati" karena kebijakan CORS browser. 
-                        Ini adalah alat pengecekan client-side 100% yang berjalan di browser Anda. Untuk hasil 100% akurat, 
-                        gunakan tools server-side atau aplikasi IPTV player langsung.
-                    </p>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Upload Section -->
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-6">
-        <div class="card rounded-xl p-6">
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
+        <!-- Upload Section -->
+        <div class="card rounded-xl p-4 sm:p-6">
             <h2 class="text-lg font-semibold mb-4 flex items-center gap-2">
-                <i data-lucide="upload" class="w-5 h-5"></i>
-                Input Playlist M3U/M3U8
+                <i data-lucide="upload-cloud" class="w-5 h-5 text-blue-500"></i>
+                Load M3U Playlist
             </h2>
-            
-            <div class="grid md:grid-cols-2 gap-4 mb-4">
-                <div>
-                    <label class="block text-sm font-medium mb-2">Upload File</label>
-                    <input type="file" id="fileInput" accept=".m3u,.m3u8,.txt" 
-                        class="w-full text-sm rounded-lg card p-3 border cursor-pointer file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-blue-500 file:text-white hover:file:bg-blue-600">
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+                <!-- File Upload -->
+                <div class="space-y-2">
+                    <label class="text-sm font-medium" style="color: var(--text-secondary)">Upload File</label>
+                    <input type="file" id="fileInput" accept=".m3u,.m3u8,.txt" class="w-full text-sm rounded-lg border px-3 py-2 cursor-pointer" style="background: var(--bg-secondary); border-color: var(--border); color: var(--text-primary)">
                 </div>
-                <div>
-                    <label class="block text-sm font-medium mb-2">Atau Paste URL Playlist</label>
+                
+                <!-- URL Input -->
+                <div class="space-y-2">
+                    <label class="text-sm font-medium" style="color: var(--text-secondary)">From URL</label>
                     <div class="flex gap-2">
-                        <input type="url" id="urlInput" placeholder="https://example.com/playlist.m3u8" 
-                            class="flex-1 rounded-lg card p-3 border text-sm">
-                        <button id="loadUrlBtn" class="px-4 py-2 rounded-lg text-white font-medium transition hover:opacity-90" style="background: var(--accent)">
-                            Muat
+                        <input type="text" id="urlInput" placeholder="https://example.com/playlist.m3u" class="flex-1 text-sm rounded-lg border px-3 py-2" style="background: var(--bg-secondary); border-color: var(--border); color: var(--text-primary)">
+                        <button id="loadUrlBtn" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition flex items-center gap-2">
+                            <i data-lucide="download" class="w-4 h-4"></i>
+                            <span class="hidden sm:inline">Load</span>
                         </button>
                     </div>
                 </div>
+                
+                <!-- Paste Content -->
+                <div class="space-y-2">
+                    <label class="text-sm font-medium" style="color: var(--text-secondary)">Paste M3U</label>
+                    <button id="pasteBtn" class="w-full px-4 py-2 border rounded-lg transition flex items-center justify-center gap-2" style="border-color: var(--border); background: var(--bg-secondary);">
+                        <i data-lucide="clipboard-paste" class="w-4 h-4"></i>
+                        Paste & Parse
+                    </button>
+                </div>
             </div>
-
-            <div>
-                <label class="block text-sm font-medium mb-2">Atau Paste Langsung Text M3U</label>
-                <textarea id="playlistInput" rows="6" placeholder="#EXTM3U&#10;#EXTINF:-1 tvg-id=&quot;&quot; tvg-name=&quot;Channel Name&quot; tvg-logo=&quot;&quot; group-title=&quot;Group&quot;,Channel Name&#10;http://example.com/stream.m3u8" 
-                    class="w-full rounded-lg card p-3 border text-sm font-mono"></textarea>
-            </div>
-
-            <div class="flex flex-wrap gap-3 mt-4">
-                <button id="parseBtn" class="px-6 py-2.5 rounded-lg text-white font-medium transition hover:opacity-90 flex items-center gap-2" style="background: var(--accent)">
-                    <i data-lucide="file-search" class="w-4 h-4"></i>
-                    Parse Playlist
+            
+            <div class="mt-4 flex flex-wrap gap-2">
+                <button id="loadSampleBtn" class="text-sm px-3 py-1.5 rounded-lg border transition" style="border-color: var(--border);">
+                    <i data-lucide="file-text" class="w-4 h-4 inline mr-1"></i>Load Sample
                 </button>
-                <button id="clearBtn" class="px-6 py-2.5 rounded-lg card font-medium transition hover:opacity-80 flex items-center gap-2">
-                    <i data-lucide="trash-2" class="w-4 h-4"></i>
-                    Bersihkan
-                </button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Settings Section -->
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-6">
-        <div class="card rounded-xl p-6">
-            <h2 class="text-lg font-semibold mb-4 flex items-center gap-2">
-                <i data-lucide="settings" class="w-5 h-5"></i>
-                Pengaturan Testing
-            </h2>
-            <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                <div>
-                    <label class="block text-sm font-medium mb-2">Timeout (detik)</label>
-                    <input type="number" id="timeoutInput" value="10" min="3" max="60" class="w-full rounded-lg card p-2.5 border text-sm">
-                </div>
-                <div>
-                    <label class="block text-sm font-medium mb-2">Batch Size</label>
-                    <input type="number" id="batchSizeInput" value="5" min="1" max="20" class="w-full rounded-lg card p-2.5 border text-sm">
-                </div>
-                <div>
-                    <label class="block text-sm font-medium mb-2">Delay Antar Stream (ms)</label>
-                    <input type="number" id="delayInput" value="1000" min="0" max="8000" step="100" class="w-full rounded-lg card p-2.5 border text-sm">
-                </div>
-                <div class="flex items-end">
-                    <label class="flex items-center gap-2 cursor-pointer">
-                        <input type="checkbox" id="testVideoEl" checked class="w-4 h-4 rounded">
-                        <span class="text-sm">Test Video Playback</span>
-                    </label>
+                <label class="text-sm flex items-center gap-2 px-3 py-1.5 rounded-lg border cursor-pointer" style="border-color: var(--border);">
+                    <input type="checkbox" id="proxyToggle" class="rounded" checked>
+                    <span>CORS Proxy</span>
+                </label>
+                <label class="text-sm flex items-center gap-2 px-3 py-1.5 rounded-lg border cursor-pointer" style="border-color: var(--border);">
+                    <input type="checkbox" id="autoProxyFallback" class="rounded" checked>
+                    <span>Auto Fallback</span>
+                </label>
+                <label class="text-sm flex items-center gap-2 px-3 py-1.5 rounded-lg border cursor-pointer" style="border-color: var(--border);">
+                    <input type="checkbox" id="showLogosToggle" class="rounded" checked>
+                    <span>Show Channel Logos</span>
+                </label>
+                <div class="flex items-center gap-2 px-3 py-1.5 rounded-lg border" style="border-color: var(--border);">
+                    <span class="text-sm">Max Retry:</span>
+                    <input type="number" id="maxRetryInput" min="0" max="10" value="2" class="w-12 text-sm rounded border px-2 py-1" style="background: var(--bg-secondary); border-color: var(--border); color: var(--text-primary)">
                 </div>
             </div>
         </div>
-    </div>
 
-    <!-- Stats Dashboard -->
-    <div id="statsSection" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-6 hidden">
-        <div class="grid grid-cols-2 lg:grid-cols-5 gap-4">
-            <div class="card rounded-xl p-4">
-                <div class="flex items-center justify-between mb-2">
-                    <span class="text-sm" style="color: var(--text-secondary)">Total</span>
-                    <i data-lucide="list" class="w-4 h-4" style="color: var(--accent)"></i>
+        <!-- Stats Dashboard -->
+        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 sm:gap-4" id="statsGrid">
+            <div class="stat-card card rounded-xl p-4">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-xs" style="color: var(--text-secondary)">Total</p>
+                        <p class="text-2xl font-bold" id="statTotal">0</p>
+                    </div>
+                    <i data-lucide="list" class="w-8 h-8 text-blue-500 opacity-50"></i>
                 </div>
-                <p class="text-2xl font-bold" id="statTotal">0</p>
             </div>
-            <div class="card rounded-xl p-4">
-                <div class="flex items-center justify-between mb-2">
-                    <span class="text-sm" style="color: var(--text-secondary)">Lancar</span>
-                    <i data-lucide="check-circle" class="w-4 h-4" style="color: var(--success)"></i>
+            <div class="stat-card card rounded-xl p-4">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-xs" style="color: var(--text-secondary)">Lancar</p>
+                        <p class="text-2xl font-bold text-green-500" id="statOnline">0</p>
+                    </div>
+                    <i data-lucide="check-circle" class="w-8 h-8 text-green-500 opacity-50"></i>
                 </div>
-                <p class="text-2xl font-bold" style="color: var(--success)" id="statWorking">0</p>
+            <div class="stat-card card rounded-xl p-4">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-xs" style="color: var(--text-secondary)">Buffering</p>
+                        <p class="text-2xl font-bold text-yellow-500" id="statBuffering">0</p>
+                    </div>
+                    <i data-lucide="loader" class="w-8 h-8 text-yellow-500 opacity-50"></i>
+                </div>
             </div>
-            <div class="card rounded-xl p-4">
-                <div class="flex items-center justify-between mb-2">
-                    <span class="text-sm" style="color: var(--text-secondary)">Buffering</span>
-                    <i data-lucide="loader" class="w-4 h-4" style="color: var(--warning)"></i>
+            <div class="stat-card card rounded-xl p-4">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-xs" style="color: var(--text-secondary)">Mati</p>
+                        <p class="text-2xl font-bold text-red-500" id="statOffline">0</p>
+                    </div>
+                    <i data-lucide="x-circle" class="w-8 h-8 text-red-500 opacity-50"></i>
                 </div>
-                <p class="text-2xl font-bold" style="color: var(--warning)" id="statBuffering">0</p>
             </div>
-            <div class="card rounded-xl p-4">
-                <div class="flex items-center justify-between mb-2">
-                    <span class="text-sm" style="color: var(--text-secondary)">Mati</span>
-                    <i data-lucide="x-circle" class="w-4 h-4" style="color: var(--danger)"></i>
+            <div class="stat-card card rounded-xl p-4">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-xs" style="color: var(--text-secondary)">CORS Error</p>
+                        <p class="text-2xl font-bold text-orange-500" id="statCors">0</p>
+                    </div>
+                    <i data-lucide="shield-off" class="w-8 h-8 text-orange-500 opacity-50"></i>
                 </div>
-                <p class="text-2xl font-bold" style="color: var(--danger)" id="statDead">0</p>
-            </div>
-            <div class="card rounded-xl p-4 col-span-2 lg:col-span-1">
-                <div class="flex items-center justify-between mb-2">
-                    <span class="text-sm" style="color: var(--text-secondary)">HD+</span>
-                    <i data-lucide="hd" class="w-4 h-4" style="color: var(--accent)"></i>
+            <div class="stat-card card rounded-xl p-4">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-xs" style="color: var(--text-secondary)">HD+</p>
+                        <p class="text-2xl font-bold text-purple-500" id="statHD">0</p>
+                    </div>
+                    <i data-lucide="hd" class="w-8 h-8 text-purple-500 opacity-50"></i>
                 </div>
-                <p class="text-2xl font-bold" style="color: var(--accent)" id="statHD">0</p>
             </div>
         </div>
-    </div>
 
-    <!-- Controls -->
-    <div id="controlsSection" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-6 hidden">
-        <div class="card rounded-xl p-6">
-            <div class="flex flex-wrap items-center gap-3 mb-4">
-                <button id="startTestBtn" class="px-6 py-2.5 rounded-lg text-white font-medium transition hover:opacity-90 flex items-center gap-2" style="background: var(--success)">
-                    <i data-lucide="play" class="w-4 h-4"></i>
-                    Mulai Test
-                </button>
-                <button id="stopTestBtn" class="px-6 py-2.5 rounded-lg text-white font-medium transition hover:opacity-90 flex items-center gap-2 hidden" style="background: var(--danger)">
-                    <i data-lucide="square" class="w-4 h-4"></i>
-                    Stop
-                </button>
-                <button id="exportBtn" class="px-6 py-2.5 rounded-lg card font-medium transition hover:opacity-80 flex items-center gap-2">
-                    <i data-lucide="download" class="w-4 h-4"></i>
-                    Export M3U
-                </button>
-            </div>
-
-            <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
-                <div>
-                    <label class="block text-sm font-medium mb-2">Filter Status</label>
-                    <select id="statusFilter" class="w-full rounded-lg card p-2.5 border text-sm">
-                        <option value="all">Semua Channel</option>
-                        <option value="working">Hanya Lancar</option>
-                        <option value="buffering">Hanya Buffering</option>
-                        <option value="dead">Hanya Mati</option>
-                        <option value="hd">Hanya HD (≥720p)</option>
+        <!-- Control Panel -->
+        <div class="card rounded-xl p-4 sm:p-6">
+            <div class="flex flex-col lg:flex-row gap-4 items-start lg:items-center justify-between mb-4">
+                <div class="flex flex-wrap gap-2 w-full lg:w-auto">
+                    <button id="checkAllBtn" class="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg transition flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed">
+                        <i data-lucide="play-circle" class="w-4 h-4"></i>
+                        <span>Test All</span>
+                    </button>
+                    <button id="stopTestBtn" class="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition flex items-center gap-2 disabled:opacity-50" disabled>
+                        <i data-lucide="stop-circle" class="w-4 h-4"></i>
+                        <span>Stop</span>
+                    </button>
+                    <button id="removeDupBtn" class="px-4 py-2 border rounded-lg transition flex items-center gap-2" style="border-color: var(--border);">
+                        <i data-lucide="copy-x" class="w-4 h-4"></i>
+                        <span class="hidden sm:inline">Remove Duplicates</span>
+                        <span class="sm:hidden">Dedup</span>
+                    </button>
+                    <button id="exportBtn" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition flex items-center gap-2">
+                        <i data-lucide="download" class="w-4 h-4"></i>
+                        <span>Export M3U</span>
+                    </button>
+                </div>
+                <div class="flex gap-2 w-full lg:w-auto">
+                    <select id="concurrencySelect" class="text-sm rounded-lg border px-3 py-2" style="background: var(--bg-secondary); border-color: var(--border); color: var(--text-primary)">
+                        <option value="1">1 Concurrent</option>
+                        <option value="3" selected>3 Concurrent</option>
+                        <option value="5">5 Concurrent</option>
+                        <option value="10">10 Concurrent</option>
                     </select>
-                </div>
-                <div>
-                    <label class="block text-sm font-medium mb-2">Filter Group</label>
-                    <select id="groupFilter" class="w-full rounded-lg card p-2.5 border text-sm">
-                        <option value="all">Semua Group</option>
-                    </select>
-                </div>
-                <div>
-                    <label class="block text-sm font-medium mb-2">Search</label>
-                    <input type="text" id="searchInput" placeholder="Cari channel..." class="w-full rounded-lg card p-2.5 border text-sm">
-                </div>
-                <div class="flex items-end">
-                    <label class="flex items-center gap-2 cursor-pointer">
-                        <input type="checkbox" id="removeDupes" class="w-4 h-4 rounded">
-                        <span class="text-sm">Hapus Duplikat</span>
-                    </label>
                 </div>
             </div>
 
             <!-- Progress Bar -->
-            <div id="progressSection" class="hidden">
-                <div class="flex items-center justify-between mb-2">
-                    <span class="text-sm font-medium">Progress Testing</span>
-                    <span class="text-sm" id="progressText">0 / 0</span>
+            <div id="progressContainer" class="hidden mb-4">
+                <div class="flex justify-between text-sm mb-2" style="color: var(--text-secondary)">
+                    <span id="progressText">Testing channels...</span>
+                    <span id="progressPercent">0%</span>
                 </div>
-                <div class="w-full rounded-full h-2.5" style="background: var(--bg-card)">
-                    <div id="progressBar" class="progress-bar h-2.5 rounded-full" style="width: 0%; background: var(--accent)"></div>
+                <div class="w-full rounded-full h-2" style="background: var(--bg-secondary)">
+                    <div id="progressBar" class="progress-bar h-2 rounded-full bg-blue-600" style="width: 0%"></div>
+                </div>
+            </div>
+
+            <!-- Filters -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+                <input type="text" id="searchInput" placeholder="Search channel name..." class="text-sm rounded-lg border px-3 py-2" style="background: var(--bg-secondary); border-color: var(--border); color: var(--text-primary)">
+                <select id="statusFilter" class="text-sm rounded-lg border px-3 py-2" style="background: var(--bg-secondary); border-color: var(--border); color: var(--text-primary)">
+                    <option value="all">All Status</option>
+                    <option value="online">Lancar</option>
+                    <option value="buffering">Buffering</option>
+                    <option value="offline">Mati</option>
+                    <option value="cors">CORS Error</option>
+                    <option value="untested">Untested</option>
+                </select>
+                <select id="groupFilter" class="text-sm rounded-lg border px-3 py-2" style="background: var(--bg-secondary); border-color: var(--border); color: var(--text-primary)">
+                    <option value="all">All Groups</option>
+                </select>
+                <select id="qualityFilter" class="text-sm rounded-lg border px-3 py-2" style="background: var(--bg-secondary); border-color: var(--border); color: var(--text-primary)">
+                    <option value="all">All Quality</option>
+                    <option value="hd">HD+</option>
+                    <option value="sd">SD</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Results Table -->
+        <div class="card rounded-xl overflow-hidden">
+            <div class="overflow-x-auto">
+                <table class="w-full">
+                    <thead style="background: var(--bg-secondary); border-bottom: 1px solid var(--border)">
+                        <tr class="text-left text-xs font-semibold uppercase" style="color: var(--text-secondary)">
+                            <th class="px-4 py-3 min-w-[50px]">#</th>
+                            <th class="px-4 py-3 min-w-[200px]">Channel</th>
+                            <th class="px-4 py-3 min-w-[120px] hidden md:table-cell">Group</th>
+                            <th class="px-4 py-3 min-w-[100px]">Status</th>
+                            <th class="px-4 py-3 min-w-[80px] hidden sm:table-cell">Quality</th>
+                            <th class="px-4 py-3 min-w-[80px] hidden lg:table-cell">Latency</th>
+                            <th class="px-4 py-3 min-w-[100px]">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="channelTableBody">
+                        <tr>
+                            <td colspan="7" class="text-center py-12" style="color: var(--text-secondary)">
+                                <i data-lucide="inbox" class="w-12 h-12 mx-auto mb-3 opacity-50"></i>
+                                <p>No channels loaded. Upload an M3U file to start.</p>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+
+    <!-- Preview Modal -->
+    <div id="previewModal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm">
+        <div class="card rounded-xl max-w-4xl w-full max-h-[90vh] overflow-hidden">
+            <div class="flex items-center justify-between p-4 border-b" style="border-color: var(--border)">
+                <h3 class="text-lg font-semibold flex items-center gap-2">
+                    <i data-lucide="play" class="w-5 h-5 text-blue-500"></i>
+                    <span id="previewTitle">Preview</span>
+                </h3>
+                <button id="closePreviewBtn" class="p-2 rounded-lg hover:bg-gray-500/20 transition">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+            <div class="p-4">
+                <video id="previewPlayer" controls class="w-full rounded-lg" style="max-height: 60vh"></video>
+                <div id="previewInfo" class="mt-4 text-sm" style="color: var(--text-secondary)"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Export Modal -->
+    <div id="exportModal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm">
+        <div class="card rounded-xl max-w-md w-full p-6">
+            <h3 class="text-lg font-semibold mb-4 flex items-center gap-2">
+                <i data-lucide="download" class="w-5 h-5 text-blue-500"></i>
+                Export M3U Playlist
+            </h3>
+            <div class="space-y-4">
+                <div>
+                    <label class="text-sm font-medium mb-2 block" style="color: var(--text-secondary)">Export Options</label>
+                    <div class="space-y-2">
+                        <label class="flex items-center gap-2 cursor-pointer">
+                            <input type="radio" name="exportType" value="all" checked class="rounded">
+                            <span>All Channels</span>
+                        </label>
+                        <label class="flex items-center gap-2 cursor-pointer">
+                            <input type="radio" name="exportType" value="online" class="rounded">
+                            <span>Only Online (Lancar)</span>
+                        </label>
+                        <label class="flex items-center gap-2 cursor-pointer">
+                            <input type="radio" name="exportType" value="filtered" class="rounded">
+                            <span>Current Filtered View</span>
+                        </label>
+                    </div>
+                <label class="flex items-center gap-2 cursor-pointer">
+                    <input type="checkbox" id="includeMetadata" checked class="rounded">
+                    <span class="text-sm">Include Extended Metadata</span>
+                </label>
+                <div class="flex gap-2 pt-2">
+                    <button id="confirmExportBtn" class="flex-1 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition">
+                        Export
+                    </button>
+                    <button id="cancelExportBtn" class="px-4 py-2 border rounded-lg transition" style="border-color: var(--border);">
+                        Cancel
+                    </button>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Results -->
-    <div id="resultsSection" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-6 hidden">
-        <div id="channelsList" class="space-y-4"></div>
-    </div>
-
-    <!-- Empty State -->
-    <div id="emptyState" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-12">
-        <div class="card rounded-xl p-12 text-center">
-            <i data-lucide="inbox" class="w-16 h-16 mx-auto mb-4 opacity-50"></i>
-            <h3 class="text-xl font-semibold mb-2">Belum Ada Playlist</h3>
-            <p style="color: var(--text-secondary)">Upload file M3U atau paste playlist untuk mulai testing</p>
-        </div>
-    </div>
-</div>
-
-<!-- Video element for testing - hidden -->
-<video id="testVideo" style="display:none;" muted></video>
-
-<!-- Export Modal -->
-<div id="exportModal" class="fixed inset-0 z-50 hidden items-center justify-center p-4" style="background: rgba(0,0,0,0.7)">
-    <div class="card rounded-xl p-6 max-w-md w-full">
-        <h3 class="text-lg font-semibold mb-4">Export Playlist</h3>
-        <div class="space-y-3 mb-6">
-            <label class="flex items-center gap-2 cursor-pointer">
-                <input type="checkbox" id="exportWorking" checked class="w-4 h-4 rounded">
-                <span class="text-sm">Hanya channel Lancar</span>
-            </label>
-            <label class="flex items-center gap-2 cursor-pointer">
-                <input type="checkbox" id="exportKeepGroups" checked class="w-4 h-4 rounded">
-                <span class="text-sm">Pertahankan struktur Group</span>
-            </label>
-            <label class="flex items-center gap-2 cursor-pointer">
-                <input type="checkbox" id="exportSortName" class="w-4 h-4 rounded">
-                <span class="text-sm">Urutkan berdasarkan Nama</span>
-            </label>
-            <label class="flex items-center gap-2 cursor-pointer">
-                <input type="checkbox" id="exportRemoveDupes" checked class="w-4 h-4 rounded">
-                <span class="text-sm">Hapus duplikat URL</span>
-            </label>
-        </div>
-        <div class="flex gap-3">
-            <button id="confirmExport" class="flex-1 px-4 py-2.5 rounded-lg text-white font-medium" style="background: var(--accent)">
-                Download M3U
-            </button>
-            <button id="cancelExport" class="flex-1 px-4 py-2.5 rounded-lg card font-medium">
-                Batal
-            </button>
-        </div>
-    </div>
-</div>
+    <!-- Toast Container -->
+    <div id="toastContainer" class="fixed top-4 right-4 z-50 space-y-2"></div>
 
 <script>
-/**
- * M3U IPTV Checker Pro - HLS.js Stream Tester
- * Advanced client-side M3U playlist validator using HLS.js
- * @version 2.0.0
- * @license MIT
- */
+let channels = [];
+let filteredChannels = [];
+let isTesting = false;
+let testQueue = [];
+let hlsInstances = [];
+const CORS_PROXIES = [
+    'https://corsproxy.io/?',
+    'https://api.allorigins.win/raw?url=',
+    'https://api.codetabs.com/v1/proxy?quest='
+];
+let currentProxyIndex = 0;
 
-class M3UChecker {
-    constructor() {
-        this.channels = [];
-        this.filteredChannels = [];
-        this.groups = new Set();
-        this.isTesting = false;
-        this.shouldStop = false;
-        this.testedCount = 0;
-        this.hlsInstances = new Map();
-        
-        this.stats = {
-            total: 0,
-            working: 0,
-            buffering: 0,
-            dead: 0,
-            hd: 0
-        };
-        
-        this.initEventListeners();
-        this.initTheme();
-        lucide.createIcons();
+// Initialize
+document.addEventListener('DOMContentLoaded', () => {
+    lucide.createIcons();
+    initTheme();
+    attachEventListeners();
+    loadSettings();
+});
+
+function initTheme() {
+    const savedTheme = localStorage.getItem('theme') || 'dark';
+    document.documentElement.className = savedTheme;
+    updateThemeIcon(savedTheme);
+}
+
+function updateThemeIcon(theme) {
+    const icon = document.querySelector('.theme-icon');
+    icon.setAttribute('data-lucide', theme === 'dark' ? 'sun' : 'moon');
+    lucide.createIcons();
+}
+
+function loadSettings() {
+    const showLogos = localStorage.getItem('showLogos');
+    if (showLogos !== null) {
+        document.getElementById('showLogosToggle').checked = showLogos === 'true';
     }
-
-    /**
-     * Initialize all event listeners
-     */
-    initEventListeners() {
-        document.getElementById('fileInput').addEventListener('change', (e) => this.handleFileUpload(e));
-        document.getElementById('loadUrlBtn').addEventListener('click', () => this.handleUrlLoad());
-        document.getElementById('parseBtn').addEventListener('click', () => this.parsePlaylist());
-        document.getElementById('clearBtn').addEventListener('click', () => this.clearAll());
-        document.getElementById('startTestBtn').addEventListener('click', () => this.startTesting());
-        document.getElementById('stopTestBtn').addEventListener('click', () => this.stopTesting());
-        document.getElementById('exportBtn').addEventListener('click', () => this.showExportModal());
-        document.getElementById('confirmExport').addEventListener('click', () => this.exportPlaylist());
-        document.getElementById('cancelExport').addEventListener('click', () => this.hideExportModal());
-        document.getElementById('themeToggle').addEventListener('click', () => this.toggleTheme());
-        
-        document.getElementById('statusFilter').addEventListener('change', () => this.applyFilters());
-        document.getElementById('groupFilter').addEventListener('change', () => this.applyFilters());
-        document.getElementById('searchInput').addEventListener('input', () => this.applyFilters());
-        document.getElementById('removeDupes').addEventListener('change', () => this.applyFilters());
-    }
-
-    /**
-     * Theme management
-     */
-    initTheme() {
-        const saved = localStorage.getItem('theme') || 'dark';
-        this.setTheme(saved);
-    }
-
-    setTheme(theme) {
-        document.body.setAttribute('data-theme', theme);
-        localStorage.setItem('theme', theme);
-        document.getElementById('sunIcon').classList.toggle('hidden', theme === 'dark');
-        document.getElementById('moonIcon').classList.toggle('hidden', theme === 'light');
-    }
-
-    toggleTheme() {
-        const current = document.body.getAttribute('data-theme');
-        this.setTheme(current === 'dark' ? 'light' : 'dark');
-    }
-
-    /**
-     * Handle file upload
-     */
-    async handleFileUpload(e) {
-        const file = e.target.files[0];
-        if (!file) return;
-        
-        try {
-            const text = await file.text();
-            document.getElementById('playlistInput').value = text;
-            this.parsePlaylist();
-        } catch (err) {
-            this.showToast('Error membaca file: ' + err.message, 'error');
-        }
-    }
-
-    /**
-     * Handle URL load
-     */
-    async handleUrlLoad() {
-        const url = document.getElementById('urlInput').value.trim();
-        if (!url) {
-            this.showToast('Masukkan URL playlist terlebih dahulu', 'warning');
-            return;
-        }
-
-        try {
-            this.showToast('Memuat playlist dari URL...', 'info');
-            const response = await fetch(url);
-            if (!response.ok) throw new Error(`HTTP ${response.status}`);
-            const text = await response.text();
-            document.getElementById('playlistInput').value = text;
-            this.parsePlaylist();
-        } catch (err) {
-            this.showToast('Gagal memuat URL: ' + err.message + ' (mungkin diblokir CORS)', 'error');
-        }
-    }
-
-    /**
-     * Parse M3U playlist content
-     * Supports EXTINF with attributes: tvg-id, tvg-name, tvg-logo, group-title
-     */
-    parsePlaylist() {
-        const content = document.getElementById('playlistInput').value.trim();
-        if (!content) {
-            this.showToast('Playlist kosong', 'warning');
-            return;
-        }
-
-        if (!content.includes('#EXTM3U') && !content.includes('#EXTINF')) {
-            this.showToast('Format M3U tidak valid', 'error');
-            return;
-        }
-
-        this.channels = [];
-        this.groups.clear();
-        const lines = content.split('\n').map(l => l.trim()).filter(l => l);
-
-        let currentInfo = null;
-        
-        for (let i = 0; i < lines.length; i++) {
-            const line = lines[i];
-            
-            if (line.startsWith('#EXTINF:')) {
-                currentInfo = this.parseExtinf(line);
-            } else if (line && !line.startsWith('#') && currentInfo) {
-                this.channels.push({
-                    id: this.channels.length,
-                    ...currentInfo,
-                    url: line,
-                    status: 'pending',
-                    responseTime: null,
-                    resolution: null,
-                    bitrate: null,
-                    error: null,
-                    tested: false
-                });
-                
-                if (currentInfo.group) this.groups.add(currentInfo.group);
-                currentInfo = null;
-            }
-        }
-
-        this.updateStats();
-        this.updateGroupFilter();
-        this.showSections();
-        this.applyFilters();
-        this.showToast(`Berhasil parse ${this.channels.length} channel`, 'success');
-    }
-
-    /**
-     * Parse EXTINF line to extract metadata
-     * Format: #EXTINF:-1 tvg-id="id" tvg-name="name" tvg-logo="logo" group-title="group",Channel Name
-     */
-    parseExtinf(line) {
-        const info = {
-            name: '',
-            tvgId: '',
-            tvgName: '',
-            logo: '',
-            group: 'Undefined'
-        };
-
-        // Extract attributes
-        const idMatch = line.match(/tvg-id="([^"]*)"/i);
-        const nameMatch = line.match(/tvg-name="([^"]*)"/i);
-        const logoMatch = line.match(/tvg-logo="([^"]*)"/i);
-        const groupMatch = line.match(/group-title="([^"]*)"/i);
-
-        if (idMatch) info.tvgId = idMatch[1];
-        if (nameMatch) info.tvgName = nameMatch[1];
-        if (logoMatch) info.logo = logoMatch[1];
-        if (groupMatch) info.group = groupMatch[1];
-
-        // Extract channel name after last comma
-        const namePart = line.split(',').pop();
-        info.name = namePart ? namePart.trim() : info.tvgName || 'Unknown';
-
-        return info;
-    }
-
-    /**
-     * Start testing all channels
-     */
-    async startTesting() {
-        if (this.isTesting) return;
-        if (this.channels.length === 0) {
-            this.showToast('Tidak ada channel untuk ditest', 'warning');
-            return;
-        }
-
-        if (!Hls.isSupported()) {
-            this.showToast('Browser Anda tidak support HLS.js', 'error');
-            return;
-        }
-
-        this.isTesting = true;
-        this.shouldStop = false;
-        this.testedCount = 0;
-        
-        document.getElementById('startTestBtn').classList.add('hidden');
-        document.getElementById('stopTestBtn').classList.remove('hidden');
-        document.getElementById('progressSection').classList.remove('hidden');
-
-        const timeout = parseInt(document.getElementById('timeoutInput').value) * 1000;
-        const batchSize = parseInt(document.getElementById('batchSizeInput').value);
-        const delay = parseInt(document.getElementById('delayInput').value);
-        const testVideo = document.getElementById('testVideoEl').checked;
-
-        // Reset all to pending
-        this.channels.forEach(ch => {
-            if (ch.status !== 'pending') {
-                ch.status = 'pending';
-                ch.tested = false;
-            }
-        });
-        this.applyFilters();
-
-        // Process in batches to avoid overwhelming browser
-        for (let i = 0; i < this.channels.length; i += batchSize) {
-            if (this.shouldStop) break;
-
-            const batch = this.channels.slice(i, i + batchSize);
-            await Promise.all(batch.map(ch => this.testStream(ch, timeout, testVideo)));
-            
-            if (delay > 0 && i + batchSize < this.channels.length) {
-                await this.sleep(delay);
-            }
-        }
-
-        this.isTesting = false;
-        document.getElementById('startTestBtn').classList.remove('hidden');
-        document.getElementById('stopTestBtn').classList.add('hidden');
-        this.showToast('Testing selesai!', 'success');
-    }
-
-    /**
-     * Test single stream using HLS.js
-     * Status logic:
-     * - Lancar: Manifest loaded + video can play
-     * - Buffering: Manifest loaded but video stalls/slow
-     * - Mati: Failed to load manifest / network error / CORS
-     */
-    async testStream(channel, timeout, testVideo) {
-        if (this.shouldStop) return;
-        
-        const startTime = Date.now();
-        channel.status = 'testing';
-        this.updateChannelCard(channel.id);
-
-        return new Promise((resolve) => {
-            const hls = new Hls({
-                debug: false,
-                enableWorker: true,
-                lowLatencyMode: false,
-                backBufferLength: 90,
-                manifestLoadingTimeOut: timeout,
-                manifestLoadingMaxRetry: 2,
-                levelLoadingTimeOut: timeout,
-                fragLoadingTimeOut: timeout
-            });
-
-            const timeoutId = setTimeout(() => {
-                hls.destroy();
-                channel.status = 'dead';
-                channel.error = 'Timeout';
-                channel.responseTime = timeout;
-                this.finishTest(channel, resolve);
-            }, timeout);
-
-            let manifestLoaded = false;
-            let levelLoaded = false;
-            let videoPlaying = false;
-
-            hls.on(Hls.Events.MANIFEST_PARSED, (event, data) => {
-                manifestLoaded = true;
-                channel.responseTime = Date.now() - startTime;
-                
-                // Get quality info
-                if (data.levels && data.levels.length > 0) {
-                    const bestLevel = data.levels.reduce((max, cur) => 
-                        cur.height > max.height ? cur : max, data.levels[0]);
-                    channel.resolution = `${bestLevel.width}x${bestLevel.height}`;
-                    channel.bitrate = Math.round(bestLevel.bitrate / 1000) + ' kbps';
-                }
-
-                if (!testVideo) {
-                    // If not testing video playback, consider working after manifest load
-                    channel.status = 'working';
-                    clearTimeout(timeoutId);
-                    hls.destroy();
-                    this.finishTest(channel, resolve);
-                } else {
-                    // Try to play video
-                    const video = document.getElementById('testVideo');
-                    video.src = '';
-                    hls.attachMedia(video);
-                    video.play().catch(() => {});
-                }
-            });
-
-            hls.on(Hls.Events.LEVEL_LOADED, () => {
-                levelLoaded = true;
-            });
-
-            // Check video playback
-            const video = document.getElementById('testVideo');
-            const onPlaying = () => {
-                videoPlaying = true;
-                channel.status = 'working';
-                clearTimeout(timeoutId);
-                hls.destroy();
-                video.removeEventListener('playing', onPlaying);
-                video.removeEventListener('waiting', onWaiting);
-                this.finishTest(channel, resolve);
-            };
-
-            const onWaiting = () => {
-                if (manifestLoaded && !videoPlaying) {
-                    channel.status = 'buffering';
-                }
-            };
-
-            if (testVideo) {
-                video.addEventListener('playing', onPlaying);
-                video.addEventListener('waiting', onWaiting);
-            }
-
-            hls.on(Hls.Events.ERROR, (event, data) => {
-                if (data.fatal) {
-                    clearTimeout(timeoutId);
-                    hls.destroy();
-                    
-                    if (manifestLoaded) {
-                        channel.status = 'buffering';
-                        channel.error = data.type;
-                    } else {
-                        channel.status = 'dead';
-                        channel.error = data.details || 'Network Error';
-                    }
-                    
-                    channel.responseTime = Date.now() - startTime;
-                    video.removeEventListener('playing', onPlaying);
-                    video.removeEventListener('waiting', onWaiting);
-                    this.finishTest(channel, resolve);
-                }
-            });
-
-            try {
-                hls.loadSource(channel.url);
-                this.hlsInstances.set(channel.id, hls);
-            } catch (err) {
-                clearTimeout(timeoutId);
-                channel.status = 'dead';
-                channel.error = err.message;
-                channel.responseTime = Date.now() - startTime;
-                this.finishTest(channel, resolve);
-            }
-        });
-    }
-
-    finishTest(channel, resolve) {
-        channel.tested = true;
-        this.testedCount++;
-        this.updateStats();
-        this.updateProgress();
-        this.updateChannelCard(channel.id);
-        
-        // Cleanup HLS instance
-        const hls = this.hlsInstances.get(channel.id);
-        if (hls) {
-            hls.destroy();
-            this.hlsInstances.delete(channel.id);
-        }
-        
-        resolve();
-    }
-
-    stopTesting() {
-        this.shouldStop = true;
-        this.isTesting = false;
-        this.showToast('Testing dihentikan', 'warning');
-        
-        // Destroy all active HLS instances
-        this.hlsInstances.forEach(hls => hls.destroy());
-        this.hlsInstances.clear();
-    }
-
-    /**
-     * UI Updates
-     */
-    updateStats() {
-        this.stats.total = this.channels.length;
-        this.stats.working = this.channels.filter(c => c.status === 'working').length;
-        this.stats.buffering = this.channels.filter(c => c.status === 'buffering').length;
-        this.stats.dead = this.channels.filter(c => c.status === 'dead').length;
-        this.stats.hd = this.channels.filter(c => {
-            if (!c.resolution) return false;
-            const height = parseInt(c.resolution.split('x')[1]);
-            return height >= 720;
-        }).length;
-
-        document.getElementById('statTotal').textContent = this.stats.total;
-        document.getElementById('statWorking').textContent = this.stats.working;
-        document.getElementById('statBuffering').textContent = this.stats.buffering;
-        document.getElementById('statDead').textContent = this.stats.dead;
-        document.getElementById('statHD').textContent = this.stats.hd;
-    }
-
-    updateProgress() {
-        const percent = (this.testedCount / this.channels.length) * 100;
-        document.getElementById('progressBar').style.width = percent + '%';
-        document.getElementById('progressText').textContent = `${this.testedCount} / ${this.channels.length}`;
-    }
-
-    updateGroupFilter() {
-        const select = document.getElementById('groupFilter');
-        select.innerHTML = '<option value="all">Semua Group</option>';
-        Array.from(this.groups).sort().forEach(group => {
-            select.innerHTML += `<option value="${group}">${group}</option>`;
-        });
-    }
-
-    applyFilters() {
-        const statusFilter = document.getElementById('statusFilter').value;
-        const groupFilter = document.getElementById('groupFilter').value;
-        const searchQuery = document.getElementById('searchInput').value.toLowerCase();
-        const removeDupes = document.getElementById('removeDupes').checked;
-
-        let filtered = [...this.channels];
-
-        // Status filter
-        if (statusFilter !== 'all') {
-            if (statusFilter === 'hd') {
-                filtered = filtered.filter(c => {
-                    if (!c.resolution) return false;
-                    const height = parseInt(c.resolution.split('x')[1]);
-                    return height >= 720;
-                });
-            } else {
-                filtered = filtered.filter(c => c.status === statusFilter);
-            }
-        }
-
-        // Group filter
-        if (groupFilter !== 'all') {
-            filtered = filtered.filter(c => c.group === groupFilter);
-        }
-
-        // Search
-        if (searchQuery) {
-            filtered = filtered.filter(c => 
-                c.name.toLowerCase().includes(searchQuery) ||
-                c.group.toLowerCase().includes(searchQuery) ||
-                c.url.toLowerCase().includes(searchQuery)
-            );
-        }
-
-        // Remove duplicates
-        if (removeDupes) {
-            const seen = new Set();
-            filtered = filtered.filter(c => {
-                if (seen.has(c.url)) return false;
-                seen.add(c.url);
-                return true;
-            });
-        }
-
-        this.filteredChannels = filtered;
-        this.renderChannels();
-    }
-
-    renderChannels() {
-        const container = document.getElementById('channelsList');
-        
-        if (this.filteredChannels.length === 0) {
-            container.innerHTML = `
-                <div class="card rounded-xl p-8 text-center">
-                    <i data-lucide="search-x" class="w-12 h-12 mx-auto mb-3 opacity-50"></i>
-                    <p style="color: var(--text-secondary)">Tidak ada channel yang cocok dengan filter</p>
-                </div>
-            `;
-            lucide.createIcons();
-            return;
-        }
-
-        // Group by category
-        const grouped = {};
-        this.filteredChannels.forEach(ch => {
-            if (!grouped[ch.group]) grouped[ch.group] = [];
-            grouped[ch.group].push(ch);
-        });
-
-        container.innerHTML = Object.entries(grouped).map(([group, channels]) => `
-            <div class="card rounded-xl overflow-hidden fade-in">
-                <div class="px-6 py-3 border-b flex items-center justify-between" style="background: var(--bg-card); border-color: var(--border-color)">
-                    <div class="flex items-center gap-2">
-                        <i data-lucide="folder" class="w-4 h-4"></i>
-                        <h3 class="font-semibold">${group}</h3>
-                    </div>
-                    <span class="text-sm" style="color: var(--text-secondary)">${channels.length} channel</span>
-                </div>
-                <div class="divide-y" style="border-color: var(--border-color)">
-                    ${channels.map(ch => this.renderChannelCard(ch)).join('')}
-                </div>
-            </div>
-        `).join('');
-
-        lucide.createIcons();
-    }
-
-    renderChannelCard(channel) {
-        const statusConfig = {
-            pending: { color: 'var(--text-secondary)', icon: 'clock', label: 'Belum Ditest', bg: 'var(--bg-card)' },
-            testing: { color: 'var(--accent)', icon: 'loader', label: 'Testing...', bg: 'var(--bg-card)', pulse: true },
-            working: { color: 'var(--success)', icon: 'check-circle', label: 'Lancar', bg: 'var(--success)' },
-            buffering: { color: 'var(--warning)', icon: 'alert-circle', label: 'Buffering', bg: 'var(--warning)' },
-            dead: { color: 'var(--danger)', icon: 'x-circle', label: 'Mati', bg: 'var(--danger)' }
-        };
-
-        const status = statusConfig[channel.status];
-        const isHD = channel.resolution && parseInt(channel.resolution.split('x')[1]) >= 720;
-
-        return `
-            <div id="channel-${channel.id}" class="p-4 hover:bg-opacity-50 transition" style="background: var(--bg-secondary)">
-                <div class="flex items-start gap-3">
-                    ${channel.logo ? `
-                        <img src="${channel.logo}" alt="${channel.name}" class="w-12 h-12 rounded object-cover flex-shrink-0" onerror="this.style.display='none'">
-                    ` : `
-                        <div class="w-12 h-12 rounded flex items-center justify-center flex-shrink-0" style="background: var(--bg-card)">
-                            <i data-lucide="tv" class="w-6 h-6 opacity-50"></i>
-                        </div>
-                    `}
-                    <div class="flex-1 min-w-0">
-                        <div class="flex items-start justify-between gap-2 mb-2">
-                            <div class="flex-1 min-w-0">
-                                <h4 class="font-semibold truncate">${channel.name}</h4>
-                                <p class="text-xs truncate" style="color: var(--text-secondary)">${channel.url}</p>
-                            </div>
-                            <div class="status-badge ${status.pulse ? 'pulse' : ''}" style="background: ${status.bg}20; color: ${status.color}; border: 1px solid ${status.color}40">
-                                <i data-lucide="${status.icon}" class="w-3 h-3"></i>
-                                ${status.label}
-                            </div>
-                        </div>
-                        <div class="flex flex-wrap gap-2 text-xs">
-                            ${channel.responseTime ? `
-                                <span class="px-2 py-1 rounded" style="background: var(--bg-card)">
-                                    <i data-lucide="zap" class="w-3 h-3 inline"></i> ${channel.responseTime}ms
-                                </span>
-                            ` : ''}
-                            ${channel.resolution ? `
-                                <span class="px-2 py-1 rounded" style="background: var(--bg-card)">
-                                    <i data-lucide="monitor" class="w-3 h-3 inline"></i> ${channel.resolution}
-                                </span>
-                            ` : ''}
-                            ${channel.bitrate ? `
-                                <span class="px-2 py-1 rounded" style="background: var(--bg-card)">
-                                    <i data-lucide="activity" class="w-3 h-3 inline"></i> ${channel.bitrate}
-                                </span>
-                            ` : ''}
-                            ${isHD ? `
-                                <span class="px-2 py-1 rounded font-semibold" style="background: var(--accent)20; color: var(--accent)">
-                                    HD
-                                </span>
-                            ` : ''}
-                            ${channel.error ? `
-                                <span class="px-2 py-1 rounded" style="background: var(--danger)20; color: var(--danger)">
-                                    ${channel.error}
-                                </span>
-                            ` : ''}
-                        </div>
-                    </div>
-                </div>
-            </div>
-        `;
-    }
-
-    updateChannelCard(channelId) {
-        const channel = this.channels.find(c => c.id === channelId);
-        if (!channel) return;
-        
-        const element = document.getElementById(`channel-${channelId}`);
-        if (element) {
-            const newHTML = this.renderChannelCard(channel);
-            const temp = document.createElement('div');
-            temp.innerHTML = newHTML;
-            element.replaceWith(temp.firstElementChild);
-            lucide.createIcons();
-        }
-    }
-
-    showSections() {
-        document.getElementById('emptyState').classList.add('hidden');
-        document.getElementById('statsSection').classList.remove('hidden');
-        document.getElementById('controlsSection').classList.remove('hidden');
-        document.getElementById('resultsSection').classList.remove('hidden');
-    }
-
-    clearAll() {
-        this.channels = [];
-        this.filteredChannels = [];
-        this.groups.clear();
-        this.stopTesting();
-        document.getElementById('playlistInput').value = '';
-        document.getElementById('fileInput').value = '';
-        document.getElementById('urlInput').value = '';
-        document.getElementById('emptyState').classList.remove('hidden');
-        document.getElementById('statsSection').classList.add('hidden');
-        document.getElementById('controlsSection').classList.add('hidden');
-        document.getElementById('resultsSection').classList.add('hidden');
-        this.showToast('Data dibersihkan', 'info');
-    }
-
-    /**
-     * Export functionality
-     */
-    showExportModal() {
-        if (this.channels.length === 0) {
-            this.showToast('Tidak ada data untuk diexport', 'warning');
-            return;
-        }
-        document.getElementById('exportModal').classList.remove('hidden');
-        document.getElementById('exportModal').classList.add('flex');
-    }
-
-    hideExportModal() {
-        document.getElementById('exportModal').classList.add('hidden');
-        document.getElementById('exportModal').classList.remove('flex');
-    }
-
-    exportPlaylist() {
-        let channels = [...this.channels];
-        
-        const onlyWorking = document.getElementById('exportWorking').checked;
-        const keepGroups = document.getElementById('exportKeepGroups').checked;
-        const sortName = document.getElementById('exportSortName').checked;
-        const removeDupes = document.getElementById('exportRemoveDupes').checked;
-
-        if (onlyWorking) {
-            channels = channels.filter(c => c.status === 'working');
-        }
-
-        if (removeDupes) {
-            const seen = new Set();
-            channels = channels.filter(c => {
-                if (seen.has(c.url)) return false;
-                seen.add(c.url);
-                return true;
-            });
-        }
-
-        if (sortName) {
-            channels.sort((a, b) => a.name.localeCompare(b.name));
-        }
-
-        // Generate M3U content
-        let m3u = '#EXTM3U\n';
-        
-        if (keepGroups) {
-            const grouped = {};
-            channels.forEach(ch => {
-                if (!grouped[ch.group]) grouped[ch.group] = [];
-                grouped[ch.group].push(ch);
-            });
-
-            Object.entries(grouped).forEach(([group, chs]) => {
-                chs.forEach(ch => {
-                    m3u += `#EXTINF:-1 tvg-id="${ch.tvgId}" tvg-name="${ch.tvgName}" tvg-logo="${ch.logo}" group-title="${group}",${ch.name}\n`;
-                    m3u += `${ch.url}\n`;
-                });
-            });
-        } else {
-            channels.forEach(ch => {
-                m3u += `#EXTINF:-1 tvg-id="${ch.tvgId}" tvg-name="${ch.tvgName}" tvg-logo="${ch.logo}" group-title="${ch.group}",${ch.name}\n`;
-                m3u += `${ch.url}\n`;
-            });
-        }
-
-        // Download
-        const blob = new Blob([m3u], { type: 'application/x-mpegurl' });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = `playlist_checked_${Date.now()}.m3u`;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        URL.revokeObjectURL(url);
-
-        this.hideExportModal();
-        this.showToast(`Export berhasil: ${channels.length} channel`, 'success');
-    }
-
-    /**
-     * Utility functions
-     */
-    sleep(ms) {
-        return new Promise(resolve => setTimeout(resolve, ms));
-    }
-
-    showToast(message, type = 'info') {
-        const colors = {
-            success: 'var(--success)',
-            error: 'var(--danger)',
-            warning: 'var(--warning)',
-            info: 'var(--accent)'
-        };
-
-        const toast = document.createElement('div');
-        toast.className = 'fixed top-20 right-4 z-50 card rounded-lg px-4 py-3 shadow-lg fade-in flex items-center gap-3 max-w-sm';
-        toast.style.borderLeft = `4px solid ${colors[type]}`;
-        toast.innerHTML = `
-            <i data-lucide="${type === 'success' ? 'check-circle' : type === 'error' ? 'x-circle' : type === 'warning' ? 'alert-triangle' : 'info'}" class="w-5 h-5 flex-shrink-0" style="color: ${colors[type]}"></i>
-            <span class="text-sm">${message}</span>
-        `;
-        
-        document.body.appendChild(toast);
-        lucide.createIcons();
-        
-        setTimeout(() => {
-            toast.style.opacity = '0';
-            setTimeout(() => toast.remove(), 300);
-        }, 3000);
+    const maxRetry = localStorage.getItem('maxRetry');
+    if (maxRetry !== null) {
+        document.getElementById('maxRetryInput').value = maxRetry;
     }
 }
 
-// Initialize app
-const app = new M3UChecker();
+function saveSettings() {
+    localStorage.setItem('showLogos', document.getElementById('showLogosToggle').checked);
+    localStorage.setItem('maxRetry', document.getElementById('maxRetryInput').value);
+}
+
+function attachEventListeners() {
+    document.getElementById('themeToggle').addEventListener('click', toggleTheme);
+    document.getElementById('fileInput').addEventListener('change', handleFileUpload);
+    document.getElementById('loadUrlBtn').addEventListener('click', handleUrlLoad);
+    document.getElementById('pasteBtn').addEventListener('click', handlePaste);
+    document.getElementById('loadSampleBtn').addEventListener('click', loadSamplePlaylist);
+    document.getElementById('checkAllBtn').addEventListener('click', startBatchTest);
+    document.getElementById('stopTestBtn').addEventListener('click', stopBatchTest);
+    document.getElementById('removeDupBtn').addEventListener('click', removeDuplicates);
+    document.getElementById('exportBtn').addEventListener('click', () => toggleModal('exportModal', true));
+    document.getElementById('cancelExportBtn').addEventListener('click', () => toggleModal('exportModal', false));
+    document.getElementById('confirmExportBtn').addEventListener('click', exportM3U);
+    document.getElementById('closePreviewBtn').addEventListener('click', closePreview);
+    document.getElementById('searchInput').addEventListener('input', filterChannels);
+    document.getElementById('statusFilter').addEventListener('change', filterChannels);
+    document.getElementById('groupFilter').addEventListener('change', filterChannels);
+    document.getElementById('qualityFilter').addEventListener('change', filterChannels);
+    document.getElementById('showLogosToggle').addEventListener('change', () => {
+        saveSettings();
+        renderTable();
+    });
+    document.getElementById('maxRetryInput').addEventListener('change', saveSettings);
+}
+
+function toggleTheme() {
+    const html = document.documentElement;
+    const current = html.classList.contains('dark') ? 'dark' : 'light';
+    const newTheme = current === 'dark' ? 'light' : 'dark';
+    html.className = newTheme;
+    localStorage.setItem('theme', newTheme);
+    updateThemeIcon(newTheme);
+}
+
+function showToast(message, type = 'info') {
+    const colors = {
+        success: 'bg-green-600',
+        error: 'bg-red-600',
+        warning: 'bg-yellow-600',
+        info: 'bg-blue-600'
+    };
+    const icons = {
+        success: 'check-circle',
+        error: 'x-circle',
+        warning: 'alert-triangle',
+        info: 'info'
+    };
+    
+    const toast = document.createElement('div');
+    toast.className = `toast ${colors[type]} text-white px-4 py-3 rounded-lg shadow-lg flex items-center gap-3 min-w-[300px]`;
+    toast.innerHTML = `
+        <i data-lucide="${icons[type]}" class="w-5 h-5"></i>
+        <span class="flex-1 text-sm">${message}</span>
+        <button onclick="this.parentElement.remove()" class="hover:bg-white/20 p-1 rounded">
+            <i data-lucide="x" class="w-4 h-4"></i>
+        </button>
+    `;
+    document.getElementById('toastContainer').appendChild(toast);
+    lucide.createIcons();
+    setTimeout(() => toast.remove(), 5000);
+}
+
+function toggleModal(id, show) {
+    document.getElementById(id).classList.toggle('hidden', !show);
+}
+
+async function handleFileUpload(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+    try {
+        const content = await file.text();
+        parseM3U(content);
+        showToast(`Loaded ${channels.length} channels from file`, 'success');
+    } catch (err) {
+        showToast('Error reading file: ' + err.message, 'error');
+    }
+}
+
+async function handleUrlLoad() {
+    const url = document.getElementById('urlInput').value.trim();
+    if (!url) return showToast('Please enter a URL', 'warning');
+    
+    try {
+        showToast('Loading playlist from URL...', 'info');
+        const useProxy = document.getElementById('proxyToggle').checked;
+        const fetchUrl = useProxy ? CORS_PROXIES[0] + encodeURIComponent(url) : url;
+        const res = await fetch(fetchUrl);
+        const content = await res.text();
+        parseM3U(content);
+        showToast(`Loaded ${channels.length} channels from URL`, 'success');
+    } catch (err) {
+        showToast('Error loading URL: ' + err.message, 'error');
+    }
+}
+
+async function handlePaste() {
+    try {
+        const text = await navigator.clipboard.readText();
+        if (!text) return showToast('Clipboard is empty', 'warning');
+        parseM3U(text);
+        showToast(`Loaded ${channels.length} channels from clipboard`, 'success');
+    } catch (err) {
+        showToast('Error reading clipboard: ' + err.message, 'error');
+    }
+}
+
+function loadSamplePlaylist() {
+    const sample = `#EXTM3U
+#EXTINF:-1 tvg-id="Test1" tvg-name="Sample HD" tvg-logo="https://via.placeholder.com/100/3b82f6/ffffff?text=HD" group-title="Entertainment",Sample HD Channel
+http://sample.vodobox.com/skate_phantom_flex_4k/skate_phantom_flex_4k.m3u8
+#EXTINF:-1 tvg-id="Test2" tvg-name="Big Buck Bunny" tvg-logo="https://upload.wikimedia.org/wikipedia/commons/thumb/c/c5/Big_buck_bunny_poster_big.jpg/200px-Big_buck_bunny_poster_big.jpg" group-title="Movies",Big Buck Bunny
+https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8
+#EXTINF:-1 tvg-id="Test3" tvg-name="Sintel" tvg-logo="https://via.placeholder.com/100/8b5cf6/ffffff?text=Sintel" group-title="Movies",Sintel HD
+https://bitdash-a.akamaihd.net/content/sintel/hls/playlist.m3u8
+#EXTINF:-1 tvg-id="Test4" tvg-name="Test Pattern" group-title="Test",Test Pattern
+https://cph-p2p-msl.akamaized.net/hls/live/2000341/test/master.m3u8`;
+    parseM3U(sample);
+    showToast('Sample playlist loaded', 'success');
+}
+
+function parseM3U(content) {
+    channels = [];
+    const lines = content.split('\n').map(l => l.trim()).filter(l => l);
+    let currentChannel = null;
+    
+    for (let i = 0; i < lines.length; i++) {
+        const line = lines[i];
+        if (line.startsWith('#EXTINF:')) {
+            const match = line.match(/#EXTINF:(-?\d+)\s*(.*),(.*)$/);
+            if (match) {
+                const attrs = match[2];
+                const name = match[3].trim();
+                currentChannel = {
+                    id: channels.length,
+                    name: name,
+                    tvgId: attrs.match(/tvg-id="([^"]*)"/)?.[1] || '',
+                    tvgName: attrs.match(/tvg-name="([^"]*)"/)?.[1] || '',
+                    tvgLogo: attrs.match(/tvg-logo="([^"]*)"/)?.[1] || '',
+                    group: attrs.match(/group-title="([^"]*)"/)?.[1] || 'Uncategorized',
+                    url: '',
+                    status: 'untested',
+                    latency: null,
+                    quality: null,
+                    resolution: null,
+                    tested: false,
+                    retryCount: 0
+                };
+            }
+        } else if (currentChannel && !line.startsWith('#')) {
+            currentChannel.url = line;
+            channels.push(currentChannel);
+            currentChannel = null;
+        }
+    }
+    
+    updateGroupFilter();
+    filterChannels();
+    updateStats();
+}
+
+function updateGroupFilter() {
+    const groups = [...new Set(channels.map(c => c.group))].sort();
+    const select = document.getElementById('groupFilter');
+    select.innerHTML = '<option value="all">All Groups</option>' + 
+        groups.map(g => `<option value="${g}">${g}</option>`).join('');
+}
+
+function filterChannels() {
+    const search = document.getElementById('searchInput').value.toLowerCase();
+    const status = document.getElementById('statusFilter').value;
+    const group = document.getElementById('groupFilter').value;
+    const quality = document.getElementById('qualityFilter').value;
+    
+    filteredChannels = channels.filter(c => {
+        if (search && !c.name.toLowerCase().includes(search)) return false;
+        if (status !== 'all' && c.status !== status) return false;
+        if (group !== 'all' && c.group !== group) return false;
+        if (quality === 'hd' && !c.quality?.includes('HD')) return false;
+        if (quality === 'sd' && c.quality?.includes('HD')) return false;
+        return true;
+    });
+    
+    renderTable();
+}
+
+function renderTable() {
+    const tbody = document.getElementById('channelTableBody');
+    const showLogos = document.getElementById('showLogosToggle').checked;
+    
+    if (filteredChannels.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="7" class="text-center py-12" style="color: var(--text-secondary)">
+            <i data-lucide="search-x" class="w-12 h-12 mx-auto mb-3 opacity-50"></i>
+            <p>No channels found</p></td></tr>`;
+        lucide.createIcons();
+        return;
+    }
+    
+    tbody.innerHTML = filteredChannels.map((ch, idx) => {
+        const statusConfig = {
+            online: { color: 'text-green-500 bg-green-500/20', icon: 'check-circle', label: 'Lancar' },
+            buffering: { color: 'text-yellow-500 bg-yellow-500/20', icon: 'loader', label: 'Buffering' },
+            offline: { color: 'text-red-500 bg-red-500/20', icon: 'x-circle', label: 'Mati' },
+            cors: { color: 'text-orange-500 bg-orange-500/20', icon: 'shield-off', label: 'CORS' },
+            untested: { color: 'text-gray-500 bg-gray-500/20', icon: 'help-circle', label: 'Untested' }
+        };
+        const sc = statusConfig[ch.status];
+        const retryInfo = ch.retryCount > 0 ? `<span class="text-xs ml-1" style="color: var(--text-secondary)">(${ch.retryCount} retries)</span>` : '';
+        
+        return `<tr class="channel-row border-b" style="border-color: var(--border)">
+            <td class="px-4 py-3 text-sm">${idx + 1}</td>
+            <td class="px-4 py-3">
+                <div class="flex items-center gap-3">
+                    ${showLogos && ch.tvgLogo ? `
+                        <img src="${ch.tvgLogo}" 
+                             class="logo-thumbnail" 
+                             alt="${ch.name}"
+                             onerror="this.outerHTML='<div class=\\'logo-thumbnail flex items-center justify-center\\'><i data-lucide=\\'tv\\' class=\\'w-4 h-4\\' style=\\'color: var(--text-secondary)\\'></i></div>'; lucide.createIcons();">
+                    ` : showLogos ? `
+                        <div class="logo-thumbnail flex items-center justify-center">
+                            <i data-lucide="tv" class="w-4 h-4" style="color: var(--text-secondary)"></i>
+                        </div>
+                    ` : ''}
+                    <div>
+                        <p class="font-medium text-sm">${ch.name}</p>
+                        <p class="text-xs hidden md:block" style="color: var(--text-secondary)">${ch.url.substring(0, 50)}...${retryInfo}</p>
+                    </div>
+                </div>
+            </td>
+            <td class="px-4 py-3 text-sm hidden md:table-cell">${ch.group}</td>
+            <td class="px-4 py-3">
+                <span class="status-badge ${sc.color}">
+                    <i data-lucide="${sc.icon}" class="w-3 h-3"></i>
+                    <span class="hidden sm:inline">${sc.label}</span>
+                </span>
+            </td>
+            <td class="px-4 py-3 text-sm hidden sm:table-cell">${ch.quality || '-'}</td>
+            <td class="px-4 py-3 text-sm hidden lg:table-cell">${ch.latency ? ch.latency + 'ms' : '-'}</td>
+            <td class="px-4 py-3">
+                <div class="flex gap-1">
+                    <button onclick="testChannel(${ch.id}, true)" class="p-1.5 rounded hover:bg-blue-500/20 text-blue-500 transition" title="Test">
+                        <i data-lucide="play" class="w-4 h-4"></i>
+                    </button>
+                    <button onclick="previewChannel(${ch.id})" class="p-1.5 rounded hover:bg-green-500/20 text-green-500 transition" title="Preview">
+                        <i data-lucide="eye" class="w-4 h-4"></i>
+                    </button>
+                    <button onclick="copyUrl(${ch.id})" class="p-1.5 rounded hover:bg-gray-500/20 transition" style="color: var(--text-secondary)" title="Copy URL">
+                        <i data-lucide="copy" class="w-4 h-4"></i>
+                    </button>
+                </div>
+            </td>
+        </tr>`;
+    }).join('');
+    lucide.createIcons();
+}
+
+function updateStats() {
+    document.getElementById('statTotal').textContent = channels.length;
+    document.getElementById('statOnline').textContent = channels.filter(c => c.status === 'online').length;
+    document.getElementById('statBuffering').textContent = channels.filter(c => c.status === 'buffering').length;
+    document.getElementById('statOffline').textContent = channels.filter(c => c.status === 'offline').length;
+    document.getElementById('statCors').textContent = channels.filter(c => c.status === 'cors').length;
+    document.getElementById('statHD').textContent = channels.filter(c => c.quality?.includes('HD')).length;
+}
+
+async function testChannel(id, allowRetry = true) {
+    const channel = channels.find(c => c.id === id);
+    if (!channel) return;
+    
+    const startTime = Date.now();
+    const useProxy = document.getElementById('proxyToggle').checked;
+    const autoFallback = document.getElementById('autoProxyFallback').checked;
+    const maxRetry = parseInt(document.getElementById('maxRetryInput').value) || 2;
+    
+    let proxyIdx = 0;
+    if (useProxy) {
+        proxyIdx = channel.retryCount > 0 ? (channel.retryCount - 1) % CORS_PROXIES.length : 0;
+    }
+    
+    try {
+        const proxy = useProxy ? CORS_PROXIES[proxyIdx] : null;
+        const result = await testStream(channel.url, proxy);
+        channel.latency = Date.now() - startTime;
+        channel.status = result.status;
+        channel.quality = result.quality;
+        channel.resolution = result.resolution;
+        channel.tested = true;
+    } catch (err) {
+        channel.latency = Date.now() - startTime;
+        const isCorsOrNetwork = err.message.includes('CORS') || err.message.includes('Network') || err.message.includes('Timeout');
+        
+        if (isCorsOrNetwork && allowRetry && channel.retryCount < maxRetry) {
+            channel.retryCount++;
+            updateStats();
+            filterChannels();
+            await new Promise(resolve => setTimeout(resolve, 500));
+            return testChannel(id, true);
+        }
+        
+        channel.status = err.message.includes('CORS') ? 'cors' : 'offline';
+    }
+    
+    updateStats();
+    filterChannels();
+}
+
+function testStream(url, proxy = null) {
+    return new Promise((resolve, reject) => {
+        const video = document.createElement('video');
+        video.muted = true;
+        const testUrl = proxy ? proxy + encodeURIComponent(url) : url;
+        let resolved = false;
+        const timeout = setTimeout(() => {
+            if (!resolved) {
+                resolved = true;
+                cleanup();
+                reject(new Error('Timeout'));
+            }
+        }, 10000);
+        
+        const cleanup = () => {
+            if (video.hls) {
+                video.hls.destroy();
+                const idx = hlsInstances.indexOf(video.hls);
+                if (idx > -1) hlsInstances.splice(idx, 1);
+            }
+            video.remove();
+            clearTimeout(timeout);
+        };
+        
+        if (Hls.isSupported()) {
+            const hls = new Hls({ 
+                debug: false, 
+                maxBufferLength: 5,
+                enableWorker: true,
+                lowLatencyMode: false
+            });
+            hlsInstances.push(hls);
+            video.hls = hls;
+            
+            hls.on(Hls.Events.MANIFEST_PARSED, (event, data) => {
+                if (resolved) return;
+                const levels = data.levels;
+                const maxLevel = levels.reduce((max, l) => l.height > max.height ? l : max, levels[0]);
+                const quality = maxLevel.height >= 720 ? 'HD' : 'SD';
+                resolved = true;
+                cleanup();
+                resolve({ 
+                    status: 'online', 
+                    quality: quality,
+                    resolution: `${maxLevel.width}x${maxLevel.height}`
+                });
+            });
+            
+            hls.on(Hls.Events.ERROR, (event, data) => {
+                if (resolved) return;
+                if (data.fatal) {
+                    resolved = true;
+                    cleanup();
+                    if (data.type === Hls.ErrorTypes.NETWORK_ERROR) {
+                        reject(new Error('CORS Error / Network Error'));
+                    } else {
+                        reject(new Error('Stream Error'));
+                    }
+                }
+            });
+            
+            hls.loadSource(testUrl);
+            hls.attachMedia(video);
+        } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
+            video.src = testUrl;
+            video.onloadedmetadata = () => {
+                if (resolved) return;
+                resolved = true;
+                cleanup();
+                resolve({ status: 'online', quality: 'Unknown', resolution: 'Unknown' });
+            };
+            video.onerror = () => {
+                if (resolved) return;
+                resolved = true;
+                cleanup();
+                reject(new Error('Load Error'));
+            };
+        } else {
+            resolved = true;
+            cleanup();
+            reject(new Error('HLS not supported'));
+        }
+    });
+}
+
+async function startBatchTest() {
+    if (isTesting) return;
+    if (channels.length === 0) return showToast('No channels to test', 'warning');
+    
+    isTesting = true;
+    channels.forEach(c => c.retryCount = 0);
+    currentProxyIndex = 0;
+    document.getElementById('checkAllBtn').disabled = true;
+    document.getElementById('stopTestBtn').disabled = false;
+    document.getElementById('progressContainer').classList.remove('hidden');
+    
+    testQueue = [...channels];
+    const concurrency = parseInt(document.getElementById('concurrencySelect').value);
+    let completed = 0;
+    
+    const workers = Array(concurrency).fill(null).map(async () => {
+        while (testQueue.length > 0 && isTesting) {
+            const channel = testQueue.shift();
+            await testChannel(channel.id, true);
+            completed++;
+            const percent = Math.round((completed / channels.length) * 100);
+            document.getElementById('progressBar').style.width = percent + '%';
+            document.getElementById('progressPercent').textContent = percent + '%';
+            document.getElementById('progressText').textContent = `Testing ${completed}/${channels.length} channels...`;
+        }
+    });
+    
+    await Promise.all(workers);
+    stopBatchTest();
+    showToast('Batch testing completed', 'success');
+}
+
+function stopBatchTest() {
+    isTesting = false;
+    testQueue = [];
+    hlsInstances.forEach(hls => hls.destroy());
+    hlsInstances = [];
+    document.getElementById('checkAllBtn').disabled = false;
+    document.getElementById('stopTestBtn').disabled = true;
+    document.getElementById('progressContainer').classList.add('hidden');
+}
+
+function previewChannel(id) {
+    const channel = channels.find(c => c.id === id);
+    if (!channel) return;
+    
+    const useProxy = document.getElementById('proxyToggle').checked;
+    const url = useProxy ? CORS_PROXIES[0] + encodeURIComponent(channel.url) : channel.url;
+    
+    document.getElementById('previewTitle').textContent = channel.name;
+    document.getElementById('previewInfo').innerHTML = `
+        <p><strong>Group:</strong> ${channel.group}</p>
+        <p><strong>URL:</strong> <span class="break-all">${channel.url}</span></p>
+        <p><strong>Status:</strong> ${channel.status} | <strong>Quality:</strong> ${channel.quality || 'Unknown'} | <strong>Retries:</strong> ${channel.retryCount}</p>
+    `;
+    
+    const video = document.getElementById('previewPlayer');
+    if (video.hls) video.hls.destroy();
+    
+    if (Hls.isSupported()) {
+        const hls = new Hls();
+        hls.loadSource(url);
+        hls.attachMedia(video);
+        video.hls = hls;
+    } else {
+        video.src = url;
+    }
+    
+    toggleModal('previewModal', true);
+}
+
+function closePreview() {
+    const video = document.getElementById('previewPlayer');
+    video.pause();
+    if (video.hls) {
+        video.hls.destroy();
+        video.hls = null;
+    }
+    toggleModal('previewModal', false);
+}
+
+function copyUrl(id) {
+    const channel = channels.find(c => c.id === id);
+    if (!channel) return;
+    navigator.clipboard.writeText(channel.url);
+    showToast('URL copied to clipboard', 'success');
+}
+
+function removeDuplicates() {
+    const seen = new Set();
+    const original = channels.length;
+    channels = channels.filter(c => {
+        if (seen.has(c.url)) return false;
+        seen.add(c.url);
+        return true;
+    });
+    const removed = original - channels.length;
+    filterChannels();
+    updateStats();
+    showToast(`Removed ${removed} duplicate channels`, 'success');
+}
+
+function exportM3U() {
+    const exportType = document.querySelector('input[name="exportType"]:checked').value;
+    const includeMetadata = document.getElementById('includeMetadata').checked;
+    
+    let exportChannels = channels;
+    if (exportType === 'online') {
+        exportChannels = channels.filter(c => c.status === 'online');
+    } else if (exportType === 'filtered') {
+        exportChannels = filteredChannels;
+    }
+    
+    if (exportChannels.length === 0) {
+        showToast('No channels to export', 'warning');
+        return;
+    }
+    
+    let m3u = '#EXTM3U\n';
+    exportChannels.forEach(ch => {
+        if (includeMetadata) {
+            m3u += `#EXTINF:-1 tvg-id="${ch.tvgId}" tvg-name="${ch.tvgName}" tvg-logo="${ch.tvgLogo}" group-title="${ch.group}",${ch.name}\n`;
+        } else {
+            m3u += `#EXTINF:-1,${ch.name}\n`;
+        }
+        m3u += `${ch.url}\n`;
+    });
+    
+    const blob = new Blob([m3u], { type: 'application/x-mpegurl' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `iptv_playlist_${Date.now()}.m3u`;
+    a.click();
+    URL.revokeObjectURL(url);
+    
+    toggleModal('exportModal', false);
+    showToast(`Exported ${exportChannels.length} channels`, 'success');
+}
+
+window.testChannel = testChannel;
+window.previewChannel = previewChannel;
+window.copyUrl = copyUrl;
 </script>
+<script>(function(){document.addEventListener("click",function(e){var a=e.target.closest("[data-product-id]");if(!a)return;e.preventDefault();var pid=a.getAttribute("data-product-id");if(pid)parent.postMessage({type:"ecto-artifact-link-click",productId:pid},"*")})})();</script>
 <script>(function(){document.addEventListener("click",function(e){var a=e.target.closest("[data-product-id]");if(!a)return;e.preventDefault();var pid=a.getAttribute("data-product-id");if(pid)parent.postMessage({type:"ecto-artifact-link-click",productId:pid},"*")})})();</script>
 <script>(function(){var loc=location.href.replace(/#.*$/,"");var ATTR_NAMES=["data-product-id","data-productid","data-product_id","product-id","productid","product_id","data-source-entity-id","source-entity-id","source_entity_id","data-product","data-metadata","data-meta"];var DATASET_KEYS=["productId","productid","product_id","sourceEntityId","sourceentityid","source_entity_id","product","metadata","meta"];function readProductId(value){if(typeof value!=="string"||value.length===0)return null;if(/^[0-9]{6,}$/.test(value))return value;var match=value.match(/(?:product(?:_|-)?id|source(?:_|-)?entity(?:_|-)?id)["'=:\s]+([0-9]{6,})/i);return match?match[1]:null}function extractProductId(start){for(var node=start;node&&node!==document.body;node=node.parentElement){for(var i=0;i<ATTR_NAMES.length;i++){var attrValue=node.getAttribute&&node.getAttribute(ATTR_NAMES[i]);var attrProductId=readProductId(attrValue);if(attrProductId)return attrProductId}var dataset=node.dataset||null;if(dataset){for(var j=0;j<DATASET_KEYS.length;j++){var dataValue=dataset[DATASET_KEYS[j]];var dataProductId=readProductId(dataValue);if(dataProductId)return dataProductId}}}return null}document.addEventListener("click",function(e){var target=e.target instanceof Element?e.target:null;if(!target)return;var a=target.closest?target.closest("a[href]"):null;if(!a||!a.href||!/^https?:\/\//.test(a.href))return;if(a.href.replace(/#.*$/,"")===loc)return;var productId=extractProductId(target)||extractProductId(a);if(!productId)return;e.preventDefault();parent.postMessage({type:"ecto-artifact-link-click",productId:productId},"*")},true)})();</script></body>
 </html>
