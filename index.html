@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" class="dark">
+<html lang="en">
 <head><style>
 @font-face {
   font-family: "Optimistic";
@@ -24,602 +24,920 @@
 </style>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>M3U IPTV Checker Pro v2.4 - Full Resolution + Auto Retry</title>
+<title>M3U IPTV Checker Pro v2.5 - Smart CORS + 3D Realistic UI</title>
 <script src="https://cdn.tailwindcss.com"></script>
-<script>
-  tailwind.config = { darkMode: 'class', theme: { extend: { fontFamily: { sans: ['Inter','system-ui','-apple-system','Segoe UI','Roboto'] } } } }
-</script>
-<script src="https://cdn.jsdelivr.net/npm/hls.js@1.5.8/dist/hls.min.js"></script>
-<script src="https://unpkg.com/lucide@latest"></script>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 <style>
-  ::-webkit-scrollbar{width:8px;height:8px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:#475569;border-radius:4px}.dark ::-webkit-scrollbar-thumb{background:#334155}
-  .glass{background:rgba(15,23,42,.7);backdrop-filter:blur(16px)} .light .glass{background:rgba(255,255,255,.7)}
-  
-  /* FIX TOGGLE ANTI GAGAL */
-  #proxyToggle:checked + div { background-color: rgb(124 58 237) !important; }
-  #proxyToggle:checked + div > div { transform: translateX(1rem) !important; }
-  #logoToggle:checked + div { background-color: rgb(124 58 237) !important; }
-  #logoToggle:checked + div > div { transform: translateX(1rem) !important; }
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+        
+* {
+    font-family: 'Inter', sans-serif;
+}
+
+body {
+    background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0f172a 100%);
+    min-height: 100vh;
+}
+
+.glass {
+    background: rgba(30, 41, 59, 0.6);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+/* 3D Realistic Button Base */
+.btn-3d {
+    position: relative;
+    transform-style: preserve-3d;
+    transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 
+        0 4px 0 0 rgba(0, 0, 0, 0.3),
+        0 6px 15px -3px rgba(0, 0, 0, 0.4),
+        inset 0 1px 0 0 rgba(255, 255, 255, 0.15),
+        inset 0 -2px 0 0 rgba(0, 0, 0, 0.2);
+    border: 1px solid rgba(0, 0, 0, 0.2);
+    overflow: hidden;
+}
+
+.btn-3d::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 50%;
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.15) 0%, transparent 100%);
+    border-radius: inherit;
+    pointer-events: none;
+}
+
+.btn-3d:hover {
+    transform: translateY(-2px);
+    box-shadow: 
+        0 6px 0 0 rgba(0, 0, 0, 0.3),
+        0 10px 20px -3px rgba(0, 0, 0, 0.5),
+        inset 0 1px 0 0 rgba(255, 255, 255, 0.2),
+        inset 0 -2px 0 0 rgba(0, 0, 0, 0.2);
+}
+
+.btn-3d:active {
+    transform: translateY(2px);
+    box-shadow: 
+        0 1px 0 0 rgba(0, 0, 0, 0.3),
+        0 2px 5px -1px rgba(0, 0, 0, 0.4),
+        inset 0 3px 5px 0 rgba(0, 0, 0, 0.3),
+        inset 0 1px 0 0 rgba(0, 0, 0, 0.2);
+}
+
+.btn-3d:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: translateY(0) !important;
+    box-shadow: 
+        0 2px 0 0 rgba(0, 0, 0, 0.2),
+        0 3px 8px -3px rgba(0, 0, 0, 0.3),
+        inset 0 1px 0 0 rgba(255, 255, 255, 0.1);
+}
+
+/* Ripple Effect */
+.ripple {
+    position: absolute;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.6);
+    transform: scale(0);
+    animation: ripple-animation 0.6s ease-out;
+    pointer-events: none;
+}
+
+@keyframes ripple-animation {
+    to {
+        transform: scale(4);
+        opacity: 0;
+    }
+}
+
+/* Toggle Switch Fix with !important */
+.toggle-switch {
+    position: relative;
+    width: 52px !important;
+    height: 28px !important;
+    background: #334155 !important;
+    border-radius: 14px !important;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    cursor: pointer;
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.3) !important;
+    border: 1px solid rgba(0, 0, 0, 0.2) !important;
+}
+
+.toggle-switch.active {
+    background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%) !important;
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.2), 0 0 15px rgba(59, 130, 246, 0.4) !important;
+}
+
+.toggle-knob {
+    position: absolute !important;
+    top: 2px !important;
+    left: 2px !important;
+    width: 24px !important;
+    height: 24px !important;
+    background: linear-gradient(180deg, #ffffff 0%, #e2e8f0 100%) !important;
+    border-radius: 50% !important;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3), inset 0 -1px 2px rgba(0, 0, 0, 0.1) !important;
+}
+
+.toggle-switch.active .toggle-knob {
+    transform: translateX(24px) !important;
+}
+
+.status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    padding: 0.375rem 0.75rem;
+    border-radius: 0.5rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+.status-checking { background: rgba(251, 191, 36, 0.15); color: #fbbf24; border: 1px solid rgba(251, 191, 36, 0.3); }
+.status-online { background: rgba(34, 197, 94, 0.15); color: #4ade80; border: 1px solid rgba(34, 197, 94, 0.3); }
+.status-offline { background: rgba(239, 68, 68, 0.15); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.3); }
+.status-cors { background: rgba(168, 85, 247, 0.15); color: #c084fc; border: 1px solid rgba(168, 85, 247, 0.3); }
+
+.channel-card {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.channel-card:hover {
+    background: rgba(51, 65, 85, 0.5);
+    border-color: rgba(59, 130, 246, 0.3);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 16px -4px rgba(0, 0, 0, 0.4);
+}
+
+.quality-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.25rem 0.625rem;
+    border-radius: 0.375rem;
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.025em;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+.quality-sd { background: linear-gradient(135deg, #64748b 0%, #475569 100%); color: white; }
+.quality-hd { background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%); color: white; }
+.quality-fhd { background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%); color: white; }
+.quality-2k { background: linear-gradient(135deg, #ec4899 0%, #db2777 100%); color: white; }
+.quality-4k { background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); color: white; }
+
+.progress-bar {
+    height: 6px;
+    background: rgba(51, 65, 85, 0.8);
+    border-radius: 3px;
+    overflow: hidden;
+    box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+.progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #3b82f6 0%, #8b5cf6 100%);
+    transition: width 0.3s ease;
+    box-shadow: 0 0 10px rgba(59, 130, 246, 0.6);
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: rgba(15, 23, 42, 0.5);
+}
+
+::-webkit-scrollbar-thumb {
+    background: rgba(59, 130, 246, 0.5);
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: rgba(59, 130, 246, 0.7);
+}
+
+@keyframes pulse-glow {
+    0%, 100% { box-shadow: 0 0 10px rgba(59, 130, 246, 0.3); }
+    50% { box-shadow: 0 0 20px rgba(59, 130, 246, 0.6); }
+}
+
+.pulse-glow {
+    animation: pulse-glow 2s ease-in-out infinite;
+}
+
+@media (max-width: 640px) {
+    .btn-3d {
+        font-size: 0.875rem;
+        padding: 0.625rem 1rem;
+    }
+}
 </style>
 </head>
-<body class="bg-slate-50 dark:bg-[#020617] text-slate-900 dark:text-slate-100 font-sans antialiased min-h-screen selection:bg-violet-500/30">
-<!-- Header -->
-<header class="relative">
-  <div class="absolute inset-0 bg-gradient-to-r from-violet-600 via-indigo-600 to-blue-600"></div>
-  <div class="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_rgba(255,255,255,0.2),transparent_60%)]"></div>
-  <div class="absolute inset-0 opacity-[0.08]" style="background-image:linear-gradient(white 1px,transparent 1px),linear-gradient(90deg,white 1px,transparent 1px);background-size:40px 40px"></div>
-  <div class="relative max-w-7xl mx-auto px-4 py-6 sm:py-8">
-    <div class="flex items-center justify-between">
-      <div class="flex items-center gap-3">
-        <div class="w-11 h-11 rounded-2xl bg-white/15 backdrop-blur-xl flex items-center justify-center ring-1 ring-white/20 shadow-lg shadow-violet-900/20">
-          <i data-lucide="antenna" class="w-5 h-5 text-white"></i>
+<body class="text-slate-100">
+<div class="container mx-auto px-4 py-6 max-w-7xl">
+    <!-- Header -->
+    <header class="glass rounded-2xl p-6 mb-6 shadow-2xl">
+        <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+            <div class="flex items-center gap-4">
+                <div class="w-14 h-14 rounded-xl bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center shadow-lg">
+                    <i class="fas fa-tv text-2xl text-white"></i>
+                </div>
+                <div>
+                    <h1 class="text-2xl md:text-3xl font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
+                        M3U IPTV Checker Pro
+                    </h1>
+                    <p class="text-sm text-slate-400 mt-1">v2.5 - Smart CORS + 3D Realistic UI</p>
+                </div>
+            </div>
+            <div class="flex items-center gap-4 w-full md:w-auto">
+                <div class="flex items-center gap-2 text-sm">
+                    <i class="fas fa-check-circle text-green-400"></i>
+                    <span id="statsOnline" class="font-bold text-green-400">0</span>
+                    <span class="text-slate-400">Online</span>
+                </div>
+                <div class="flex items-center gap-2 text-sm">
+                    <i class="fas fa-times-circle text-red-400"></i>
+                    <span id="statsOffline" class="font-bold text-red-400">0</span>
+                    <span class="text-slate-400">Offline</span>
+                </div>
+            </div>
         </div>
-        <div>
-          <h1 class="text-xl sm:text-2xl font-bold text-white tracking-tight">M3U IPTV Checker Pro</h1>
-          <p class="text-xs sm:text-sm text-white/80 font-medium">v2.4 - Full Resolution + Auto Retry</p>
+    </header>
+
+    <!-- Control Panel -->
+    <div class="glass rounded-2xl p-6 mb-6 shadow-2xl">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+            <!-- M3U Input -->
+            <div>
+                <label class="block text-sm font-semibold mb-2 text-slate-300">
+                    <i class="fas fa-file-code mr-2 text-blue-400"></i>M3U Playlist
+                </label>
+                <textarea id="m3uInput" rows="6" placeholder="#EXTM3U&#10;#EXTINF:-1,Channel Name&#10;http://example.com/stream.m3u8" 
+                    class="w-full px-4 py-3 bg-slate-800/50 border border-slate-700 rounded-xl text-sm focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all"></textarea>
+                <div class="flex gap-2 mt-3">
+                    <button id="loadFileBtn" class="btn-3d flex-1 bg-slate-700 hover:bg-slate-600 text-white px-4 py-2.5 rounded-xl font-medium text-sm">
+                        <i class="fas fa-upload mr-2"></i>Load File
+                    </button>
+                    <input type="file" id="fileInput" accept=".m3u,.m3u8" class="hidden">
+                    <button id="loadUrlBtn" class="btn-3d flex-1 bg-slate-700 hover:bg-slate-600 text-white px-4 py-2.5 rounded-xl font-medium text-sm">
+                        <i class="fas fa-link mr-2"></i>Load URL
+                    </button>
+                </div>
+            </div>
+
+            <!-- Settings -->
+            <div class="space-y-4">
+                <div>
+                    <label class="flex items-center justify-between mb-3">
+                        <span class="text-sm font-semibold text-slate-300">
+                            <i class="fas fa-sliders-h mr-2 text-purple-400"></i>Concurrent Checks
+                        </span>
+                        <span id="concurrencyValue" class="text-sm font-bold text-blue-400">3</span>
+                    </label>
+                    <input type="range" id="concurrencySlider" min="1" max="10" value="3" 
+                        class="w-full h-2 bg-slate-700 rounded-lg appearance-none cursor-pointer accent-blue-500">
+                </div>
+
+                <div>
+                    <label class="flex items-center justify-between mb-3">
+                        <span class="text-sm font-semibold text-slate-300">
+                            <i class="fas fa-clock mr-2 text-orange-400"></i>Timeout (seconds)
+                        </span>
+                        <span id="timeoutValue" class="text-sm font-bold text-blue-400">15s</span>
+                    </label>
+                    <input type="range" id="timeoutSlider" min="5" max="60" value="15" 
+                        class="w-full h-2 bg-slate-700 rounded-lg appearance-none cursor-pointer accent-blue-500">
+                </div>
+
+                <div class="space-y-3 pt-2">
+                    <div class="flex items-center justify-between">
+                        <label class="text-sm font-semibold text-slate-300">
+                            <i class="fas fa-shield-alt mr-2 text-green-400"></i>Smart CORS Fallback
+                        </label>
+                        <div class="toggle-switch active" id="smartCorsToggle">
+                            <div class="toggle-knob"></div>
+                        </div>
+                    </div>
+                    <div class="flex items-center justify-between">
+                        <label class="text-sm font-semibold text-slate-300">
+                            <i class="fas fa-video mr-2 text-pink-400"></i>Full Resolution Detection
+                        </label>
+                        <div class="toggle-switch active" id="resolutionToggle">
+                            <div class="toggle-knob"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
-      </div>
-      <div class="flex items-center gap-2">
-        <button id="themeToggle" class="w-10 h-10 rounded-xl bg-white/10 hover:bg-white/15 text-white ring-1 ring-white/20 flex items-center justify-center transition">
-          <i data-lucide="sun" class="w-4 h-4 hidden dark:block"></i>
-          <i data-lucide="moon" class="w-4 h-4 block dark:hidden"></i>
-        </button>
-      </div>
-    </div>
-  </div>
-</header>
 
-<main class="max-w-7xl mx-auto px-4 pb-24">
-  <!-- Loader -->
-  <div class="grid lg:grid-cols-3 gap-4 -mt-4 relative z-10">
-    <div class="lg:col-span-2 bg-white dark:bg-slate-900/80 backdrop-blur-2xl border border-slate-200/70 dark:border-slate-800 rounded-3xl p-5 shadow-xl shadow-slate-900/5">
-      <h2 class="font-semibold flex items-center gap-2 mb-4 text-slate-900 dark:text-white"><i data-lucide="list-video" class="w-4 h-4 text-violet-500"></i> Load Playlist</h2>
-      <div class="grid sm:grid-cols-2 gap-3">
-        <label class="group relative">
-          <input id="fileInput" type="file" accept=".m3u,.m3u8,.txt" class="sr-only">
-          <div class="h-[46px] flex items-center justify-center gap-2 rounded-xl border border-dashed border-slate-300 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-800/50 hover:bg-violet-50 dark:hover:bg-violet-950/30 hover:border-violet-400 dark:hover:border-violet-700 cursor-pointer transition">
-            <i data-lucide="upload" class="w-4 h-4"></i><span class="text-sm font-medium">Upload M3U</span>
-          </div>
-        </label>
-        <div class="flex gap-2">
-          <input id="urlInput" placeholder="https://.../playlist.m3u8" class="flex-1 h-[46px] px-3 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm outline-none focus:ring-2 focus:ring-violet-500/30">
-          <button id="loadUrlBtn" class="h-[46px] px-4 rounded-xl bg-slate-900 dark:bg-white text-white dark:text-slate-900 text-sm font-medium hover:opacity-90">Load</button>
+        <!-- Action Buttons -->
+        <div class="flex flex-wrap gap-3">
+            <button id="parseBtn" class="btn-3d bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-500 hover:to-blue-400 text-white px-6 py-3 rounded-xl font-semibold text-sm">
+                <i class="fas fa-code mr-2"></i>Parse Playlist
+            </button>
+            <button id="checkBtn" class="btn-3d bg-gradient-to-r from-green-600 to-emerald-500 hover:from-green-500 hover:to-emerald-400 text-white px-6 py-3 rounded-xl font-semibold text-sm" disabled>
+                <i class="fas fa-play mr-2"></i>Check All
+            </button>
+            <button id="stopBtn" class="btn-3d bg-gradient-to-r from-red-600 to-red-500 hover:from-red-500 hover:to-red-400 text-white px-6 py-3 rounded-xl font-semibold text-sm" disabled>
+                <i class="fas fa-stop mr-2"></i>Stop
+            </button>
+            <button id="exportBtn" class="btn-3d bg-gradient-to-r from-purple-600 to-purple-500 hover:from-purple-500 hover:to-purple-400 text-white px-6 py-3 rounded-xl font-semibold text-sm" disabled>
+                <i class="fas fa-download mr-2"></i>Export Online
+            </button>
+            <button id="clearBtn" class="btn-3d bg-slate-700 hover:bg-slate-600 text-white px-6 py-3 rounded-xl font-semibold text-sm">
+                <i class="fas fa-trash mr-2"></i>Clear
+            </button>
         </div>
-      </div>
-      <div class="mt-3">
-        <textarea id="pasteArea" rows="3" placeholder="Paste M3U content here... #EXTM3U" class="w-full px-3 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm outline-none focus:ring-2 focus:ring-violet-500/30"></textarea>
-        <div class="flex gap-2 mt-2">
-          <button id="parsePasteBtn" class="px-3 py-2 rounded-lg bg-violet-600 text-white text-sm font-medium hover:bg-violet-500">Parse</button>
-          <button id="sampleBtn" class="px-3 py-2 rounded-lg bg-slate-100 dark:bg-slate-800 text-sm font-medium hover:bg-slate-200 dark:hover:bg-slate-700">Load Sample</button>
-          <button id="clearBtn" class="px-3 py-2 rounded-lg text-sm font-medium text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 ml-auto">Clear</button>
+    </div>
+
+    <!-- Progress Bar -->
+    <div id="progressContainer" class="glass rounded-2xl p-4 mb-6 shadow-2xl hidden">
+        <div class="flex items-center justify-between mb-2">
+            <span class="text-sm font-semibold text-slate-300">
+                <i class="fas fa-spinner fa-spin mr-2"></i>Checking channels...
+            </span>
+            <span id="progressText" class="text-sm font-bold text-blue-400">0 / 0</span>
         </div>
-      </div>
-    </div>
-
-    <div class="bg-white dark:bg-slate-900/80 backdrop-blur-2xl border border-slate-200/70 dark:border-slate-800 rounded-3xl p-5 shadow-xl shadow-slate-900/5">
-      <h3 class="font-semibold flex items-center gap-2 mb-4"><i data-lucide="settings-2" class="w-4 h-4 text-violet-500"></i> Test Settings</h3>
-      <div class="space-y-3.5">
-        <label class="flex items-center justify-between">
-          <span class="text-sm flex items-center gap-2"><i data-lucide="shield" class="w-3.5 h-3.5"></i> CORS Proxy Auto</span>
-          <input id="proxyToggle" type="checkbox" checked class="peer sr-only">
-          <!-- Toggle CORS Proxy: kasih animasi geser + ganti warna -->
-          <div class="w-10 h-6 rounded-full bg-slate-200 dark:bg-slate-700 peer-checked:bg-violet-600 relative transition-colors duration-200"><div class="absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full transition-transform duration-200 peer-checked:translate-x-4"></div></div>
-        </label>
-        <label class="flex items-center justify-between">
-          <span class="text-sm flex items-center gap-2"><i data-lucide="image" class="w-3.5 h-3.5"></i> Show Logos</span>
-          <input id="logoToggle" type="checkbox" checked class="peer sr-only">
-          <!-- Toggle Show Logos: kasih animasi geser + ganti warna -->
-          <div class="w-10 h-6 rounded-full bg-slate-200 dark:bg-slate-700 peer-checked:bg-violet-600 relative transition-colors duration-200"><div class="absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full transition-transform duration-200 peer-checked:translate-x-4"></div></div>
-        </label>
-        <div class="flex items-center justify-between">
-          <span class="text-sm flex items-center gap-2"><i data-lucide="repeat-2" class="w-3.5 h-3.5"></i> Max Retry</span>
-          <input id="maxRetry" type="number" min="0" max="5" value="2" class="w-16 h-8 text-center rounded-lg bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm">
+        <div class="progress-bar">
+            <div id="progressFill" class="progress-fill" style="width: 0%"></div>
         </div>
-      <p class="text-[11px] text-slate-500 dark:text-slate-400 mt-3">Auto retry uses proxy on 2nd attempt if enabled.</p>
     </div>
-  </div>
 
-  <!-- Stats -->
-  <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 mt-4">
-    <div class="bg-white dark:bg-slate-900/80 border border-slate-200/70 dark:border-slate-800 rounded-2xl p-4"><div class="text-[11px] uppercase tracking-wide text-slate-500">Total</div><div id="statTotal" class="text-2xl font-bold mt-1">0</div></div>
-    <div class="bg-white dark:bg-slate-900/80 border border-slate-200/70 dark:border-slate-800 rounded-2xl p-4"><div class="text-[11px] uppercase tracking-wide text-emerald-600">Lancar</div><div id="statOnline" class="text-2xl font-bold mt-1 text-emerald-600">0</div></div>
-    <div class="bg-white dark:bg-slate-900/80 border border-slate-200/70 dark:border-slate-800 rounded-2xl p-4"><div class="text-[11px] uppercase tracking-wide text-amber-600">Buffering</div><div id="statBuffer" class="text-2xl font-bold mt-1 text-amber-600">0</div></div>
-    <div class="bg-white dark:bg-slate-900/80 border border-slate-200/70 dark:border-slate-800 rounded-2xl p-4"><div class="text-[11px] uppercase tracking-wide text-red-600">Mati</div><div id="statOffline" class="text-2xl font-bold mt-1 text-red-600">0</div></div>
-    <div class="bg-white dark:bg-slate-900/80 border border-slate-200/70 dark:border-slate-800 rounded-2xl p-4"><div class="text-[11px] uppercase tracking-wide text-violet-600">CORS Error</div><div id="statCors" class="text-2xl font-bold mt-1 text-violet-600">0</div></div>
-    <div class="bg-white dark:bg-slate-900/80 border border-slate-200/70 dark:border-slate-800 rounded-2xl p-4"><div class="text-[11px] uppercase tracking-wide text-blue-600">HD+</div><div id="statHD" class="text-2xl font-bold mt-1 text-blue-600">0</div></div>
-  </div>
-
-  <!-- Controls -->
-  <div class="bg-white dark:bg-slate-900/80 border border-slate-200/70 dark:border-slate-800 rounded-2xl p-3 mt-4 flex flex-wrap items-center gap-2">
-    <button id="testAllBtn" class="px-4 h-9 rounded-xl bg-violet-600 hover:bg-violet-500 text-white text-sm font-medium flex items-center gap-1.5"><i data-lucide="play" class="w-3.5 h-3.5"></i> Test All</button>
-    <button id="stopBtn" class="px-3 h-9 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-sm font-medium flex items-center gap-1.5"><i data-lucide="square" class="w-3.5 h-3.5"></i> Stop</button>
-    <button id="dupBtn" class="px-3 h-9 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-sm font-medium flex items-center gap-1.5"><i data-lucide="copy-minus" class="w-3.5 h-3.5"></i> Remove Duplicates</button>
-    <button id="exportBtn" class="px-3 h-9 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-sm font-medium flex items-center gap-1.5"><i data-lucide="download" class="w-3.5 h-3.5"></i> Export M3U</button>
-    <div class="ml-auto flex items-center gap-2">
-      <span class="text-xs text-slate-500">Concurrency</span>
-      <select id="concurrency" class="h-9 px-2 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm">
-        <option>1</option><option selected>3</option><option>5</option><option>10</option>
-      </select>
-    </div>
-  </div>
-
-  <!-- Filters -->
-  <div class="flex flex-wrap gap-2 mt-3">
-    <div class="relative flex-1 min-w-[200px]"><i data-lucide="search" class="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"></i><input id="searchInput" placeholder="Search channel..." class="w-full h-9 pl-8 pr-3 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-sm outline-none focus:ring-2 focus:ring-violet-500/30"></div>
-    <select id="statusFilter" class="h-9 px-2 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-sm"><option value="">All Status</option><option value="online">Lancar</option><option value="buffering">Buffering</option><option value="offline">Mati</option><option value="cors">CORS</option><option value="untested">Untested</option></select>
-    <select id="groupFilter" class="h-9 px-2 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-sm"><option value="">All Groups</option></select>
-    <select id="qualityFilter" class="h-9 px-2 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-sm"><option value="">All Quality</option><option>4K</option><option>2K</option><option>FHD</option><option>HD</option><option>SD</option></select>
-  </div>
-
-  <!-- Table -->
-  <div class="mt-3 bg-white dark:bg-slate-900/80 border border-slate-200/70 dark:border-slate-800 rounded-2xl overflow-hidden shadow-sm">
-    <div class="overflow-x-auto">
-      <table class="w-full text-sm">
-        <thead class="bg-slate-50/80 dark:bg-slate-800/50 backdrop-blur text-[11px] uppercase tracking-wider text-slate-500 dark:text-slate-400 border-b border-slate-200 dark:border-slate-800">
-          <tr>
-            <th class="text-left py-2.5 px-3 w-12">#</th>
-            <th class="text-left py-2.5 px-3 min-w-[220px]">Channel</th>
-            <th class="text-left py-2.5 px-3 hidden sm:table-cell">Group</th>
-            <th class="text-left py-2.5 px-3">Status</th>
-            <th class="text-left py-2.5 px-3">Quality</th>
-            <th class="text-left py-2.5 px-3 hidden md:table-cell">Latency</th>
-            <th class="text-right py-2.5 px-3 w-28">Actions</th>
-          </tr>
-        </thead>
-        <tbody id="tableBody" class="divide-y divide-slate-100 dark:divide-slate-800/70"></tbody>
-      </table>
-    </div>
-    <div id="emptyState" class="py-20 text-center">
-      <div class="w-14 h-14 mx-auto rounded-2xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center mb-3"><i data-lucide="tv" class="w-7 h-7 text-slate-400"></i></div>
-      <p class="font-medium">No channels loaded</p>
-      <p class="text-sm text-slate-500 mt-1">Upload M3U, paste, or load sample to start</p>
-    </div>
-  </div>
-</main>
-
-<!-- Preview Modal -->
-<div id="previewModal" class="fixed inset-0 z-50 hidden">
-  <div class="absolute inset-0 bg-slate-950/80 backdrop-blur-md" onclick="closePreview()"></div>
-  <div class="relative max-w-5xl mx-auto p-4 mt-6">
-    <div class="bg-slate-900 rounded-3xl overflow-hidden border border-slate-800 shadow-2xl">
-      <div class="aspect-video bg-black relative">
-        <video id="previewVideo" class="w-full h-full" controls playsinline></video>
-        <div class="absolute top-3 left-3 px-2.5 py-1 rounded-lg bg-black/70 text-white text-xs flex items-center gap-1.5"><i data-lucide="radio" class="w-3 h-3"></i> LIVE PREVIEW</div>
-      </div>
-      <div class="p-4 flex items-center justify-between">
-        <div>
-          <h3 id="previewTitle" class="font-semibold text-white"></h3>
-          <p id="previewInfo" class="text-xs text-slate-400 mt-0.5"></p>
+    <!-- Stats Cards -->
+    <div id="statsContainer" class="grid grid-cols-2 md:grid-cols-5 gap-4 mb-6 hidden">
+        <div class="glass rounded-xl p-4 text-center">
+            <div class="text-2xl font-bold text-white" id="totalChannels">0</div>
+            <div class="text-xs text-slate-400 mt-1">Total</div>
         </div>
-        <button onclick="closePreview()" class="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-white text-sm">Close</button>
-      </div>
+        <div class="glass rounded-xl p-4 text-center">
+            <div class="text-2xl font-bold text-green-400" id="onlineCount">0</div>
+            <div class="text-xs text-slate-400 mt-1">Online</div>
+        </div>
+        <div class="glass rounded-xl p-4 text-center">
+            <div class="text-2xl font-bold text-red-400" id="offlineCount">0</div>
+            <div class="text-xs text-slate-400 mt-1">Offline</div>
+        </div>
+        <div class="glass rounded-xl p-4 text-center">
+            <div class="text-2xl font-bold text-purple-400" id="corsCount">0</div>
+            <div class="text-xs text-slate-400 mt-1">CORS Fixed</div>
+        </div>
+        <div class="glass rounded-xl p-4 text-center">
+            <div class="text-2xl font-bold text-yellow-400" id="checkingCount">0</div>
+            <div class="text-xs text-slate-400 mt-1">Checking</div>
+        </div>
     </div>
-  </div>
+
+    <!-- Filters -->
+    <div id="filterContainer" class="glass rounded-2xl p-4 mb-6 shadow-2xl hidden">
+        <div class="flex flex-wrap items-center gap-3">
+            <div class="flex items-center gap-2">
+                <i class="fas fa-filter text-slate-400"></i>
+                <span class="text-sm font-semibold text-slate-300">Filter:</span>
+            </div>
+            <button class="btn-3d filter-btn active bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium" data-filter="all">
+                All
+            </button>
+            <button class="btn-3d filter-btn bg-slate-700 text-white px-4 py-2 rounded-lg text-sm font-medium" data-filter="online">
+                <i class="fas fa-check-circle text-green-400 mr-1"></i>Online
+            </button>
+            <button class="btn-3d filter-btn bg-slate-700 text-white px-4 py-2 rounded-lg text-sm font-medium" data-filter="offline">
+                <i class="fas fa-times-circle text-red-400 mr-1"></i>Offline
+            </button>
+            <div class="flex-1"></div>
+            <div class="relative w-full sm:w-auto">
+                <input type="text" id="searchInput" placeholder="Search channels..." 
+                    class="w-full sm:w-64 px-4 py-2 bg-slate-800/50 border border-slate-700 rounded-lg text-sm focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 pl-10">
+                <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-sm"></i>
+            </div>
+        </div>
+    </div>
+
+    <!-- Results Container -->
+    <div id="resultsContainer" class="space-y-3"></div>
+
+    <!-- Empty State -->
+    <div id="emptyState" class="glass rounded-2xl p-12 text-center shadow-2xl">
+        <i class="fas fa-satellite-dish text-6xl text-slate-600 mb-4"></i>
+        <h3 class="text-xl font-bold text-slate-300 mb-2">No Channels Loaded</h3>
+        <p class="text-slate-400 text-sm">Parse an M3U playlist to start checking channels</p>
+    </div>
 </div>
 
-<!-- Export Modal -->
-<div id="exportModal" class="fixed inset-0 z-50 hidden">
-  <div class="absolute inset-0 bg-slate-950/70 backdrop-blur" onclick="closeExport()"></div>
-  <div class="relative max-w-md mx-auto mt-24 p-4">
-    <div class="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 p-5 shadow-2xl">
-      <h3 class="font-semibold text-lg mb-4">Export M3U</h3>
-      <div class="space-y-3">
-        <label class="flex items-center gap-2"><input type="radio" name="exp" value="all" checked class="text-violet-600"> <span class="text-sm">All channels</span></label>
-        <label class="flex items-center gap-2"><input type="radio" name="exp" value="online" class="text-violet-600"> <span class="text-sm">Only Lancar (online)</span></label>
-        <label class="flex items-center gap-2"><input type="radio" name="exp" value="filtered" class="text-violet-600"> <span class="text-sm">Current filtered view</span></label>
-        <label class="flex items-center gap-2 mt-2"><input id="includeMeta" type="checkbox" checked class="rounded text-violet-600"> <span class="text-sm">Include metadata (tvg-id, logo, group)</span></label>
-      </div>
-      <div class="flex gap-2 mt-5">
-        <button onclick="closeExport()" class="flex-1 h-10 rounded-xl bg-slate-100 dark:bg-slate-800 font-medium text-sm">Cancel</button>
-        <button onclick="doExport()" class="flex-1 h-10 rounded-xl bg-violet-600 text-white font-medium text-sm hover:bg-violet-500">Download</button>
-      </div>
-    </div>
-  </div>
-</div>
-
-<div id="toast" class="fixed bottom-5 right-5 z-[100] space-y-2"></div>
+<!-- Hidden video element for resolution detection -->
+<video id="hiddenVideo" playsinline muted style="position: absolute; left: -9999px; width: 1px; height: 1px;"></video>
 
 <script>
-lucide.createIcons();
-const $ = s => document.querySelector(s);
-const $$ = s => document.querySelectorAll(s);
+const CORS_PROXIES = [
+    'https://corsproxy.io/?',
+    'https://api.allorigins.win/raw?url=',
+    'https://proxy.cors.sh/'
+];
 
-// Theme
-const themeToggle = $('#themeToggle');
-function setTheme(dark){ document.documentElement.classList.toggle('dark', dark); localStorage.setItem('theme', dark?'dark':'light'); lucide.createIcons(); }
-setTheme(localStorage.getItem('theme') !== 'light');
-themeToggle.onclick = () => setTheme(!document.documentElement.classList.contains('dark'));
-
-// State
 let channels = [];
-let testing = false;
-let stopFlag = false;
-let previewHls = null;
-let currentPreview = null;
+let isChecking = false;
+let abortController = null;
+let stats = { total: 0, online: 0, offline: 0, cors: 0, checking: 0 };
+let settings = {
+    concurrency: 3,
+    timeout: 15,
+    smartCors: true,
+    fullResolution: true
+};
 
-// Utils
-function toast(msg, type='info'){
-  const icons = {info:'info',success:'check-circle-2',error:'alert-triangle',warn:'alert-circle'};
-  const colors = {info:'slate',success:'emerald',error:'red',warn:'amber'};
-  const el = document.createElement('div');
-  el.className = `flex items-center gap-2 px-3 py-2.5 rounded-xl shadow-lg border bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-sm animate-in slide-in-from-bottom-2`;
-  el.innerHTML = `<i data-lucide="${icons[type]}" class="w-4 h-4 text-${colors[type]}-500"></i><span>${msg}</span>`;
-  $('#toast').appendChild(el); lucide.createIcons(); setTimeout(()=>{el.classList.add('opacity-0','translate-y-2','transition'); setTimeout(()=>el.remove(),300)}, 3000);
-}
-function getQualityLabel(h){
-  if(!h || h<=0) return '-';
-  if(h>=2160) return '4K';
-  if(h>=1440) return '2K';
-  if(h>=1080) return 'FHD';
-  if(h>=720) return 'HD';
-  return 'SD';
-}
+const m3uInput = document.getElementById('m3uInput');
+const fileInput = document.getElementById('fileInput');
+const resultsContainer = document.getElementById('resultsContainer');
+const emptyState = document.getElementById('emptyState');
+const progressContainer = document.getElementById('progressContainer');
+const statsContainer = document.getElementById('statsContainer');
+const filterContainer = document.getElementById('filterContainer');
+const hiddenVideo = document.getElementById('hiddenVideo');
+
+// Ripple effect for all 3D buttons
+document.addEventListener('click', function(e) {
+    if (e.target.closest('.btn-3d')) {
+        const btn = e.target.closest('.btn-3d');
+        const ripple = document.createElement('span');
+        const rect = btn.getBoundingClientRect();
+        const size = Math.max(rect.width, rect.height);
+        const x = e.clientX - rect.left - size / 2;
+        const y = e.clientY - rect.top - size / 2;
+        
+        ripple.style.width = ripple.style.height = size + 'px';
+        ripple.style.left = x + 'px';
+        ripple.style.top = y + 'px';
+        ripple.classList.add('ripple');
+        
+        btn.appendChild(ripple);
+        setTimeout(() => ripple.remove(), 600);
+    }
+});
+
+// Toggle switches
+document.getElementById('smartCorsToggle').addEventListener('click', function() {
+    this.classList.toggle('active');
+    settings.smartCors = this.classList.contains('active');
+});
+
+document.getElementById('resolutionToggle').addEventListener('click', function() {
+    this.classList.toggle('active');
+    settings.fullResolution = this.classList.contains('active');
+});
+
+// Sliders
+document.getElementById('concurrencySlider').addEventListener('input', function() {
+    settings.concurrency = parseInt(this.value);
+    document.getElementById('concurrencyValue').textContent = this.value;
+});
+
+document.getElementById('timeoutSlider').addEventListener('input', function() {
+    settings.timeout = parseInt(this.value);
+    document.getElementById('timeoutValue').textContent = this.value + 's';
+});
+
+// File input
+document.getElementById('loadFileBtn').addEventListener('click', () => fileInput.click());
+fileInput.addEventListener('change', function(e) {
+    const file = e.target.files[0];
+    if (file) {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            m3uInput.value = e.target.result;
+        };
+        reader.readAsText(file);
+    }
+});
+
+// Load URL
+document.getElementById('loadUrlBtn').addEventListener('click', async function() {
+    const url = prompt('Enter M3U playlist URL:');
+    if (url) {
+        try {
+            const response = await fetch(url);
+            const text = await response.text();
+            m3uInput.value = text;
+        } catch (err) {
+            alert('Failed to load URL: ' + err.message);
+        }
+    }
+});
 
 // Parse M3U
-function parseM3U(text){
-  const lines = text.split(/\r?\n/);
-  const out = [];
-  let cur = null;
-  let idx = 1;
-  for(let i=0;i<lines.length;i++){
-    const line = lines[i].trim();
-    if(line.startsWith('#EXTINF')){
-      cur = {id: idx++, raw: line};
-      const attrs = {};
-      const attrRegex = /([a-zA-Z0-9-]+)="([^"]*)"/g;
-      let m; while((m=attrRegex.exec(line))!==null){ attrs[m[1].toLowerCase()]=m[2]; }
-      const name = line.split(',').pop()?.trim() || 'Channel';
-      cur.name = attrs['tvg-name'] || name;
-      cur.tvgId = attrs['tvg-id'] || '';
-      cur.tvgName = attrs['tvg-name'] || '';
-      cur.tvgLogo = attrs['tvg-logo'] || '';
-      cur.group = attrs['group-title'] || 'General';
-      cur.url = '';
-      cur.status = 'untested';
-      cur.quality = '-';
-      cur.resolution = '';
-      cur.bitrate = '';
-      cur.latency = '-';
-      cur.height = 0;
-      cur.width = 0;
-      cur.retries = 0;
-      cur.usedProxy = false;
-    } else if(line && !line.startsWith('#') && cur){
-      cur.url = line;
-      out.push(cur);
-      cur = null;
+document.getElementById('parseBtn').addEventListener('click', parseM3U);
+document.getElementById('checkBtn').addEventListener('click', startChecking);
+document.getElementById('stopBtn').addEventListener('click', stopChecking);
+document.getElementById('clearBtn').addEventListener('click', clearAll);
+document.getElementById('exportBtn').addEventListener('click', exportOnline);
+
+function parseM3U() {
+    const content = m3uInput.value.trim();
+    if (!content) {
+        alert('Please enter M3U playlist content');
+        return;
     }
-  }
-  return out;
-}
 
-// Loaders
-$('#fileInput').addEventListener('change', async e=>{
-  const f = e.target.files[0]; if(!f) return;
-  const txt = await f.text();
-  channels = parseM3U(txt);
-  renderAll(); toast(`Loaded ${channels.length} channels`,'success');
-});
-$('#loadUrlBtn').onclick = async ()=>{
-  const url = $('#urlInput').value.trim(); if(!url) return;
-  try{ const res = await fetch(url); const txt = await res.text(); channels = parseM3U(txt); renderAll(); toast('Playlist loaded','success'); }
-  catch{ toast('Failed to fetch (CORS?). Try upload.', 'error'); }
-};
-$('#parsePasteBtn').onclick = ()=>{
-  const txt = $('#pasteArea').value.trim(); if(!txt) return;
-  channels = parseM3U(txt); renderAll(); toast(`Parsed ${channels.length} channels`,'success');
-};
-$('#sampleBtn').onclick = ()=>{
-  const sample = `#EXTM3U
-#EXTINF:-1 tvg-id="mux1080" tvg-name="Mux Test 1080p" tvg-logo="https://img.icons8.com/fluency/96/video.png" group-title="Demo",Mux 1080p
-https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8
-#EXTINF:-1 tvg-id="sintel" tvg-name="Sintel FHD" tvg-logo="https://img.icons8.com/fluency/96/clapperboard.png" group-title="Movies",Sintel
-https://bitdash-a.akamaihd.net/content/sintel/hls/playlist.m3u8
-#EXTINF:-1 tvg-id="tos" tvg-name="Tears of Steel" tvg-logo="https://img.icons8.com/fluency/96/film-reel.png" group-title="Movies",Tears of Steel
-https://demo.unified-streaming.com/k8s/features/stable/video/tears-of-steel/tears-of-steel.ism/.m3u8
-#EXTINF:-1 tvg-id="nasa" tvg-name="NASA TV" tvg-logo="https://upload.wikimedia.org/wikipedia/commons/e/e5/NASA_logo.svg" group-title="Science",NASA UHD
-https://ntv1.akamaized.net/hls/live/2014075/NASA-NTV1-Public/master.m3u8
-#EXTINF:-1 tvg-id="src" tvg-name="Big Buck Bunny HD" tvg-logo="https://img.icons8.com/fluency/96/rabbit.png" group-title="Demo",Big Buck Bunny
-https://test-streams.mux.dev/x36xhzz/url_6/193039199_mp4_h264_aac_hq_7.m3u8
-#EXTINF:-1 tvg-id="bad" tvg-name="Broken Stream" tvg-logo="" group-title="Test",Broken (Expect Mati)
-https://example.com/broken/stream.m3u8
-`;
-  $('#pasteArea').value = sample;
-  channels = parseM3U(sample); renderAll(); toast('Sample loaded','success');
-};
-$('#clearBtn').onclick = ()=>{ channels=[]; renderAll(); };
+    channels = [];
+    const lines = content.split('\n');
+    let currentChannel = null;
 
-// Render
-function renderAll(){
-  updateGroups();
-  renderTable();
-  updateStats();
-  $('#emptyState').classList.toggle('hidden', channels.length>0);
-}
-function updateGroups(){
-  const groups = [...new Set(channels.map(c=>c.group))].sort();
-  $('#groupFilter').innerHTML = '<option value="">All Groups</option>' + groups.map(g=>`<option>${g}</option>`).join('');
-}
-function statusBadge(s){
-  const map = {
-    online: ['Lancar','bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 ring-emerald-500/20'],
-    buffering: ['Buffering','bg-amber-500/10 text-amber-600 dark:text-amber-400 ring-amber-500/20'],
-    offline: ['Mati','bg-red-500/10 text-red-600 dark:text-red-400 ring-red-500/20'],
-    cors: ['CORS','bg-violet-500/10 text-violet-600 dark:text-violet-400 ring-violet-500/20'],
-    untested: ['Untested','bg-slate-500/10 text-slate-600 dark:text-slate-400 ring-slate-500/20'],
-    testing: ['Testing...','bg-blue-500/10 text-blue-600 dark:text-blue-400 ring-blue-500/20 animate-pulse']
-  };
-  const [label, cls] = map[s] || map.untested;
-  return `<span class="inline-flex items-center px-2 py-1 rounded-lg text-[11px] font-medium ring-1 ring-inset ${cls}">${label}</span>`;
-}
-function renderTable(){
-  const q = $('#searchInput').value.toLowerCase();
-  const sf = $('#statusFilter').value;
-  const gf = $('#groupFilter').value;
-  const qf = $('#qualityFilter').value;
-  const showLogos = $('#logoToggle').checked;
-
-  const filtered = channels.filter(c=>{
-    if(q && !c.name.toLowerCase().includes(q) && !c.url.toLowerCase().includes(q)) return false;
-    if(sf && c.status !== sf) return false;
-    if(gf && c.group !== gf) return false;
-    if(qf && c.quality !== qf) return false;
-    return true;
-  });
-
-  $('#tableBody').innerHTML = filtered.map((c,i)=>{
-    const logo = c.tvgLogo ? `<img src="${c.tvgLogo}" class="w-8 h-8 rounded-lg object-cover bg-slate-100 dark:bg-slate-800 ring-1 ring-slate-200 dark:ring-slate-700" onerror="this.replaceWith(this.nextElementSibling)" /><div class="w-8 h-8 rounded-lg bg-slate-100 dark:bg-slate-800 hidden items-center justify-center ring-1 ring-slate-200 dark:ring-slate-700"><i data-lucide="tv" class="w-4 h-4 text-slate-400"></i></div>` : `<div class="w-8 h-8 rounded-lg bg-slate-100 dark:bg-slate-800 flex items-center justify-center ring-1 ring-slate-200 dark:ring-slate-700"><i data-lucide="tv" class="w-4 h-4 text-slate-400"></i></div>`;
-    
-    /* Tampilan kolom Quality: FHD/HD + resolusi + bitrate ungu biar jelas */
-    const qual = c.quality !== '-' 
-      ? `<div class="leading-tight">
-           <div class="font-semibold">${c.quality}</div>
-           <div class="text-[10px] text-slate-500 dark:text-slate-400">
-             ${c.resolution || ''} 
-             ${c.bitrate ? '• <span class="text-violet-600 dark:text-violet-400 font-medium">'+c.bitrate+'</span>' : ''}
-           </div>
-         </div>` 
-      : '<span class="text-slate-400">-</span>'; // Kalo belum di-test
-    
-    const proxyBadge = c.usedProxy ? `<span class="ml-1 text-[10px] px-1 py-0.5 rounded bg-violet-500/10 text-violet-600 dark:text-violet-400 ring-1 ring-violet-500/20">PROXY</span>` : '';
-    return `<tr class="hover:bg-slate-50/70 dark:hover:bg-slate-800/40 transition">
-      <td class="py-2.5 px-3 text-slate-500">${i+1}</td>
-      <td class="py-2.5 px-3"><div class="flex items-center gap-2.5">${showLogos?logo:''}<div class="min-w-0"><div class="font-medium truncate max-w-[180px] sm:max-w-[260px]" title="${c.name}">${c.name}</div><div class="text-[11px] text-slate-500 truncate max-w-[180px] sm:max-w-[260px]" title="${c.url}">${c.url}</div></div></div></td>
-      <td class="py-2.5 px-3 hidden sm:table-cell"><span class="text-xs px-2 py-1 rounded-lg bg-slate-100 dark:bg-slate-800">${c.group}</span></td>
-      <td class="py-2.5 px-3">${statusBadge(c.status)}${proxyBadge}</td>
-      <td class="py-2.5 px-3" title="${c.resolution}">${qual}</td>
-      <td class="py-2.5 px-3 hidden md:table-cell text-slate-600 dark:text-slate-400">${c.latency}</td>
-      <td class="py-2.5 px-3 text-right">
-        <div class="inline-flex gap-1">
-          <button onclick="previewChannel(${channels.indexOf(c)})" class="w-7 h-7 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 flex items-center justify-center" title="Preview"><i data-lucide="play" class="w-3.5 h-3.5"></i></button>
-          <button onclick="testChannel(${channels.indexOf(c)}, true)" class="w-7 h-7 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 flex items-center justify-center" title="Retest"><i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i></button>
-          <button onclick="copyUrl(${channels.indexOf(c)})" class="w-7 h-7 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 hidden sm:flex items-center justify-center" title="Copy URL"><i data-lucide="link" class="w-3.5 h-3.5"></i></button>
-        </div>
-      </td>
-    </tr>`;
-  }).join('');
-  lucide.createIcons();
-}
-
-function updateStats(){
-  $('#statTotal').textContent = channels.length;
-  $('#statOnline').textContent = channels.filter(c=>c.status==='online').length;
-  $('#statBuffer').textContent = channels.filter(c=>c.status==='buffering').length;
-  $('#statOffline').textContent = channels.filter(c=>c.status==='offline').length;
-  $('#statCors').textContent = channels.filter(c=>c.status==='cors').length;
-  $('#statHD').textContent = channels.filter(c=> (c.height||0) >= 720).length; // v2.4 fix
-}
-
-// Testing
-async function testStream(channel, useProxy=false){
-  return new Promise((resolve, reject)=>{
-    const start = performance.now();
-    const video = document.createElement('video');
-    video.muted = true; video.playsInline = true;
-    const hls = new Hls({enableWorker:true, maxBufferLength:4, manifestLoadingTimeOut:9000, levelLoadingTimeOut:9000, manifestLoadingMaxRetry:0, levelLoadingMaxRetry:0});
-    let url = channel.url;
-    if(useProxy){ url = 'https://corsproxy.io/?' + encodeURIComponent(channel.url); }
-    let timeout = setTimeout(()=>{ hls.destroy(); reject(new Error('timeout')); }, 12000);
-
-    hls.on(Hls.Events.MANIFEST_PARSED, (e,data)=>{
-      clearTimeout(timeout);
-      const levels = hls.levels || [];
-      if(levels.length){
-        // v2.4: full resolution detection
-        const bestLevel = levels.reduce((best,l)=> (l.height||0) > (best.height||0) ? l : best, levels[0]);
-        channel.width = bestLevel.width || 0;
-        channel.height = bestLevel.height || 0;
-        channel.resolution = `${bestLevel.width||'?'}x${bestLevel.height||'?'}`;
-        channel.bitrate = bestLevel.bitrate ? Math.round(bestLevel.bitrate/1000) + ' kbps' : '';
-        channel.quality = getQualityLabel(bestLevel.height);
-      } else {
-        channel.quality = 'SD';
-        channel.height = 0;
-        channel.resolution = '';
-      }
-      channel.latency = Math.round(performance.now()-start) + ' ms';
-      channel.status = channel.latency && parseInt(channel.latency) > 3000 ? 'buffering' : 'online';
-      hls.destroy();
-      resolve();
-    });
-
-    hls.on(Hls.Events.ERROR, (e,data)=>{
-      if(!data.fatal) return;
-      clearTimeout(timeout);
-      hls.destroy();
-      if(data.type === Hls.ErrorTypes.NETWORK_ERROR){
-        const details = data.details;
-        const xhr = data.networkDetails;
-        if((details === 'manifestLoadError' || details === 'levelLoadError') && (!xhr || xhr.status === 0)){
-          reject(new Error('cors'));
-        } else {
-          reject(new Error('network'));
+    for (let i = 0; i < lines.length; i++) {
+        const line = lines[i].trim();
+        
+        if (line.startsWith('#EXTINF:')) {
+            const info = line.substring(8);
+            const nameMatch = info.match(/,(.+)$/);
+            const logoMatch = info.match(/tvg-logo="([^"]+)"/);
+            const groupMatch = info.match(/group-title="([^"]+)"/);
+            
+            currentChannel = {
+                id: channels.length,
+                name: nameMatch ? nameMatch[1].trim() : 'Unknown Channel',
+                logo: logoMatch ? logoMatch[1] : null,
+                group: groupMatch ? groupMatch[1] : 'Uncategorized',
+                url: null,
+                status: 'pending',
+                resolution: null,
+                bitrate: null,
+                quality: null,
+                latency: null,
+                corsFixed: false
+            };
+        } else if (line && !line.startsWith('#') && currentChannel) {
+            currentChannel.url = line;
+            channels.push(currentChannel);
+            currentChannel = null;
         }
-      } else {
-        reject(new Error('media'));
-      }
+    }
+
+    if (channels.length === 0) {
+        alert('No valid channels found in playlist');
+        return;
+    }
+
+    stats.total = channels.length;
+    updateStats();
+    renderChannels();
+    document.getElementById('checkBtn').disabled = false;
+    emptyState.classList.add('hidden');
+    statsContainer.classList.remove('hidden');
+    filterContainer.classList.remove('hidden');
+}
+
+async function startChecking() {
+    if (isChecking || channels.length === 0) return;
+    
+    isChecking = true;
+    abortController = new AbortController();
+    stats = { total: channels.length, online: 0, offline: 0, cors: 0, checking: channels.length };
+    
+    document.getElementById('checkBtn').disabled = true;
+    document.getElementById('stopBtn').disabled = false;
+    document.getElementById('parseBtn').disabled = true;
+    progressContainer.classList.remove('hidden');
+    
+    updateStats();
+    
+    const queue = [...channels];
+    const results = [];
+    
+    const workers = Array(settings.concurrency).fill(null).map(async () => {
+        while (queue.length > 0 && !abortController.signal.aborted) {
+            const channel = queue.shift();
+            if (!channel) break;
+            
+            await checkChannel(channel);
+            results.push(channel);
+            updateProgress(results.length);
+        }
     });
-
-    try{ hls.loadSource(url); hls.attachMedia(video); video.play().catch(()=>{}); }
-    catch(err){ clearTimeout(timeout); reject(err); }
-  });
-}
-
-async function testChannel(idx, force=false){
-  const ch = channels[idx]; if(!ch) return;
-  if(ch.status==='testing' && !force) return;
-  const maxRetry = parseInt($('#maxRetry').value)||0;
-  const proxyEnabled = $('#proxyToggle').checked;
-
-  ch.status = 'testing'; ch.retries = 0; ch.usedProxy = false; renderTable(); updateStats();
-
-  for(let attempt=0; attempt<=maxRetry; attempt++){
-    if(stopFlag) break;
-    ch.retries = attempt;
-    const useProxy = attempt>0 && proxyEnabled;
-    try{
-      await testStream(ch, useProxy);
-      ch.usedProxy = useProxy;
-      if(ch.status==='online' || ch.status==='buffering') break;
-    }catch(err){
-      if(attempt === maxRetry){
-        if(err.message==='cors'){ ch.status = proxyEnabled ? 'offline' : 'cors'; }
-        else { ch.status = 'offline'; }
-        ch.quality = '-'; ch.resolution=''; ch.bitrate=''; ch.latency='-'; ch.height=0;
-      } else {
-        await new Promise(r=>setTimeout(r,400));
-      }
+    
+    await Promise.all(workers);
+    
+    if (!abortController.signal.aborted) {
+        isChecking = false;
+        document.getElementById('checkBtn').disabled = false;
+        document.getElementById('stopBtn').disabled = true;
+        document.getElementById('parseBtn').disabled = false;
+        document.getElementById('exportBtn').disabled = stats.online === 0;
     }
-    renderTable(); updateStats();
-  }
 }
 
-async function startBatchTest(){
-  if(testing) return;
-  testing = true; stopFlag = false;
-  $('#testAllBtn').disabled = true;
-  const concurrency = parseInt($('#concurrency').value)||3;
-  const queue = [...channels.keys()];
-  let i = 0;
-  async function worker(){
-    while(i<queue.length && !stopFlag){
-      const idx = queue[i++]; await testChannel(idx);
+function stopChecking() {
+    if (abortController) {
+        abortController.abort();
+        isChecking = false;
+        document.getElementById('checkBtn').disabled = false;
+        document.getElementById('stopBtn').disabled = true;
+        document.getElementById('parseBtn').disabled = false;
     }
-  }
-  await Promise.all(Array(concurrency).fill(0).map(worker));
-  testing = false; $('#testAllBtn').disabled = false;
-  toast('Batch test completed','success'); renderTable(); updateStats();
 }
 
-$('#testAllBtn').onclick = async ()=>{
-  if(!channels.length){ toast('Load a playlist first','warn'); return; }
-  channels.forEach(c=>{ c.status='untested'; c.quality='-'; c.latency='-'; c.height=0; c.resolution=''; });
-  renderAll(); await startBatchTest();
-};
-$('#stopBtn').onclick = ()=>{ stopFlag = true; toast('Stopping...','warn'); };
-$('#dupBtn').onclick = ()=>{
-  const seen = new Set(); const before = channels.length;
-  channels = channels.filter(c=>{ if(seen.has(c.url)) return false; seen.add(c.url); return true; });
-  renderAll(); toast(`Removed ${before - channels.length} duplicates`,'success');
-};
+async function checkChannel(channel) {
+    const startTime = Date.now();
+    channel.status = 'checking';
+    updateChannelCard(channel);
+    
+    // Smart CORS: Try direct first
+    let success = await testStream(channel.url, false);
+    
+    // If failed and Smart CORS enabled, try proxies
+    if (!success && settings.smartCors) {
+        for (let i = 0; i < CORS_PROXIES.length && !success; i++) {
+            const proxiedUrl = CORS_PROXIES[i] + encodeURIComponent(channel.url);
+            success = await testStream(proxiedUrl, true);
+            if (success) channel.corsFixed = true;
+        }
+    }
+    
+    channel.latency = Date.now() - startTime;
+    
+    if (success) {
+        channel.status = 'online';
+        stats.online++;
+        if (channel.corsFixed) stats.cors++;
+    } else {
+        channel.status = 'offline';
+        stats.offline++;
+    }
+    
+    stats.checking--;
+    updateChannelCard(channel);
+    updateStats();
+}
 
-// Filters
-['searchInput','statusFilter','groupFilter','qualityFilter','logoToggle'].forEach(id=>{
-  $('#'+id).addEventListener('input', renderTable);
-  $('#'+id).addEventListener('change', renderTable);
+function testStream(url, isProxied) {
+    return new Promise((resolve) => {
+        if (!Hls.isSupported()) {
+            // Fallback: try to fetch headers
+            fetch(url, { 
+                method: 'HEAD', 
+                signal: AbortSignal.timeout(settings.timeout * 1000),
+                mode: isProxied ? 'cors' : 'no-cors'
+            }).then(() => resolve(true)).catch(() => resolve(false));
+            return;
+        }
+        
+        const hls = new Hls({
+            debug: false,
+            enableWorker: false,
+            lowLatencyMode: false,
+            backBufferLength: 0
+        });
+        
+        const timeout = setTimeout(() => {
+            hls.destroy();
+            resolve(false);
+        }, settings.timeout * 1000);
+        
+        hls.loadSource(url);
+        hls.attachMedia(hiddenVideo);
+        
+        hls.on(Hls.Events.MANIFEST_PARSED, () => {
+            clearTimeout(timeout);
+            if (settings.fullResolution) {
+                detectResolution(hls, url).then((info) => {
+                    if (info) {
+                        channels.find(c => c.url === url || c.url.replace(CORS_PROXIES[0], '').replace(CORS_PROXIES[1], '').replace(CORS_PROXIES[2], '') === url).resolution = info.resolution;
+                        channels.find(c => c.url === url || c.url.replace(CORS_PROXIES[0], '').replace(CORS_PROXIES[1], '').replace(CORS_PROXIES[2], '') === url).bitrate = info.bitrate;
+                        channels.find(c => c.url === url || c.url.replace(CORS_PROXIES[0], '').replace(CORS_PROXIES[1], '').replace(CORS_PROXIES[2], '') === url).quality = info.quality;
+                    }
+                    hls.destroy();
+                    resolve(true);
+                });
+            } else {
+                hls.destroy();
+                resolve(true);
+            }
+        });
+        
+        hls.on(Hls.Events.ERROR, () => {
+            clearTimeout(timeout);
+            hls.destroy();
+            resolve(false);
+        });
+    });
+}
+
+async function detectResolution(hls, url) {
+    return new Promise((resolve) => {
+        const levels = hls.levels;
+        if (!levels || levels.length === 0) {
+            resolve(null);
+            return;
+        }
+        
+        // Get highest quality level
+        const bestLevel = levels.reduce((prev, current) => {
+            const prevRes = (prev.width || 0) * (prev.height || 0);
+            const currentRes = (current.width || 0) * (current.height || 0);
+            return currentRes > prevRes ? current : prev;
+        });
+        
+        if (bestLevel) {
+            const width = bestLevel.width || 0;
+            const height = bestLevel.height || 0;
+            const bitrate = bestLevel.bitrate || 0;
+            
+            let quality = 'SD';
+            if (height >= 2160 || width >= 3840) quality = '4K';
+            else if (height >= 1440 || width >= 2560) quality = '2K';
+            else if (height >= 1080 || width >= 1920) quality = 'FHD';
+            else if (height >= 720 || width >= 1280) quality = 'HD';
+            
+            resolve({
+                resolution: `${width}x${height}`,
+                bitrate: (bitrate / 1000000).toFixed(2) + ' Mbps',
+                quality: quality
+            });
+        } else {
+            resolve(null);
+        }
+    });
+}
+
+function renderChannels() {
+    resultsContainer.innerHTML = '';
+    channels.forEach(channel => {
+        const card = createChannelCard(channel);
+        resultsContainer.appendChild(card);
+    });
+}
+
+function createChannelCard(channel) {
+    const card = document.createElement('div');
+    card.className = 'channel-card glass rounded-xl p-4';
+    card.dataset.id = channel.id;
+    card.dataset.status = channel.status;
+    card.dataset.name = channel.name.toLowerCase();
+    updateChannelCardContent(card, channel);
+    return card;
+}
+
+function updateChannelCard(channel) {
+    const card = resultsContainer.querySelector(`[data-id="${channel.id}"]`);
+    if (card) {
+        card.dataset.status = channel.status;
+        updateChannelCardContent(card, channel);
+    }
+}
+
+function updateChannelCardContent(card, channel) {
+    let statusBadge = '';
+    if (channel.status === 'checking') {
+        statusBadge = '<span class="status-badge status-checking"><i class="fas fa-spinner fa-spin"></i>Checking</span>';
+    } else if (channel.status === 'online') {
+        statusBadge = '<span class="status-badge status-online"><i class="fas fa-check-circle"></i>Online</span>';
+    } else if (channel.status === 'offline') {
+        statusBadge = '<span class="status-badge status-offline"><i class="fas fa-times-circle"></i>Offline</span>';
+    }
+    
+    if (channel.corsFixed) {
+        statusBadge += '<span class="status-badge status-cors ml-2"><i class="fas fa-shield-alt"></i>CORS Fixed</span>';
+    }
+    
+    let qualityBadge = '';
+    if (channel.quality) {
+        const qualityClass = `quality-${channel.quality.toLowerCase()}`;
+        qualityBadge = `<span class="quality-badge ${qualityClass}">${channel.quality}</span>`;
+    }
+    
+    card.innerHTML = `
+        <div class="flex flex-col sm:flex-row items-start gap-4">
+            <div class="flex items-start gap-3 flex-1 min-w-0">
+                <div class="w-12 h-12 rounded-lg bg-slate-800 flex items-center justify-center flex-shrink-0 overflow-hidden">
+                    ${channel.logo ? `<img src="${channel.logo}" alt="${channel.name}" class="w-full h-full object-cover" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">` : ''}
+                    <i class="fas fa-tv text-slate-600" ${channel.logo ? 'style="display:none"' : ''}></i>
+                </div>
+                <div class="flex-1 min-w-0">
+                    <h3 class="font-semibold text-white truncate mb-1">${channel.name}</h3>
+                    <p class="text-xs text-slate-400 truncate">${channel.group}</p>
+                    <div class="flex flex-wrap gap-2 mt-2">
+                        ${statusBadge}
+                        ${qualityBadge}
+                    </div>
+                </div>
+            </div>
+            <div class="flex flex-wrap gap-3 text-xs w-full sm:w-auto">
+                ${channel.resolution ? `<div class="flex items-center gap-1 text-slate-400">
+                    <i class="fas fa-expand"></i>
+                    <span>${channel.resolution}</span>
+                </div>` : ''}
+                ${channel.bitrate ? `<div class="flex items-center gap-1 text-slate-400">
+                    <i class="fas fa-tachometer-alt"></i>
+                    <span>${channel.bitrate}</span>
+                </div>` : ''}
+                ${channel.latency ? `<div class="flex items-center gap-1 text-slate-400">
+                    <i class="fas fa-clock"></i>
+                    <span>${channel.latency}ms</span>
+                </div>` : ''}
+            </div>
+        </div>
+    `;
+}
+
+function updateStats() {
+    document.getElementById('statsOnline').textContent = stats.online;
+    document.getElementById('statsOffline').textContent = stats.offline;
+    document.getElementById('totalChannels').textContent = stats.total;
+    document.getElementById('onlineCount').textContent = stats.online;
+    document.getElementById('offlineCount').textContent = stats.offline;
+    document.getElementById('corsCount').textContent = stats.cors;
+    document.getElementById('checkingCount').textContent = stats.checking;
+}
+
+function updateProgress(checked) {
+    const percent = (checked / stats.total) * 100;
+    document.getElementById('progressFill').style.width = percent + '%';
+    document.getElementById('progressText').textContent = `${checked} / ${stats.total}`;
+}
+
+function clearAll() {
+    channels = [];
+    stats = { total: 0, online: 0, offline: 0, cors: 0, checking: 0 };
+    m3uInput.value = '';
+    resultsContainer.innerHTML = '';
+    emptyState.classList.remove('hidden');
+    statsContainer.classList.add('hidden');
+    filterContainer.classList.add('hidden');
+    progressContainer.classList.add('hidden');
+    document.getElementById('checkBtn').disabled = true;
+    document.getElementById('exportBtn').disabled = true;
+    updateStats();
+}
+
+function exportOnline() {
+    const onlineChannels = channels.filter(c => c.status === 'online');
+    if (onlineChannels.length === 0) {
+        alert('No online channels to export');
+        return;
+    }
+    
+    let m3u = '#EXTM3U\n';
+    onlineChannels.forEach(channel => {
+        m3u += `#EXTINF:-1 tvg-logo="${channel.logo || ''}" group-title="${channel.group}",${channel.name}\n`;
+        m3u += `${channel.url}\n`;
+    });
+    
+    const blob = new Blob([m3u], { type: 'audio/x-mpegurl' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `iptv_online_${Date.now()}.m3u`;
+    a.click();
+    URL.revokeObjectURL(url);
+}
+
+// Filter functionality
+document.querySelectorAll('.filter-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+        document.querySelectorAll('.filter-btn').forEach(b => {
+            b.classList.remove('active', 'bg-blue-600');
+            b.classList.add('bg-slate-700');
+        });
+        this.classList.remove('bg-slate-700');
+        this.classList.add('active', 'bg-blue-600');
+        
+        const filter = this.dataset.filter;
+        filterChannels(filter);
+    });
 });
 
-// Actions
-function copyUrl(idx){ navigator.clipboard.writeText(channels[idx].url); toast('URL copied','success'); }
-function previewChannel(idx){
-  const ch = channels[idx]; currentPreview = ch;
-  $('#previewModal').classList.remove('hidden');
-  $('#previewTitle').textContent = ch.name;
-  $('#previewInfo').textContent = `${ch.group} • ${ch.quality!=='-'? ch.quality+' ('+ch.resolution+')':'Unknown'} • ${ch.url}`;
-  const video = $('#previewVideo');
-  if(previewHls){ previewHls.destroy(); previewHls=null; }
-  if(Hls.isSupported()){
-    previewHls = new Hls({enableWorker:true}); 
-    const url = ch.usedProxy || $('#proxyToggle').checked ? 'https://corsproxy.io/?'+encodeURIComponent(ch.url) : ch.url;
-    previewHls.loadSource(url); previewHls.attachMedia(video); video.play().catch(()=>{});
-  } else { video.src = ch.url; video.play().catch(()=>{}); }
-}
-function closePreview(){
-  $('#previewModal').classList.add('hidden');
-  if(previewHls){ previewHls.destroy(); previewHls=null; }
-  $('#previewVideo').pause(); $('#previewVideo').src='';
-}
+document.getElementById('searchInput').addEventListener('input', function() {
+    const search = this.value.toLowerCase();
+    const activeFilter = document.querySelector('.filter-btn.active').dataset.filter;
+    filterChannels(activeFilter, search);
+});
 
-// Export
-$('#exportBtn').onclick = ()=> $('#exportModal').classList.remove('hidden');
-function closeExport(){ $('#exportModal').classList.add('hidden'); }
-function doExport(){
-  /* Ambil mode export: all / online / filtered */
-  const mode = document.querySelector('input[name="exp"]:checked').value;
-  // Cek apakah user centang "Include metadata"
-  const includeMeta = $('#includeMeta').checked;
-  let list = channels; // default ambil semua channel
-
-  /* Filter 1: Kalau pilih "Only Lancar", buang yang selain online */
-  if(mode==='online') list = channels.filter(c=>c.status==='online');
-
-  /* Filter 2: Kalau pilih "Current filtered view", samain sama filter di tabel */
-  if(mode==='filtered'){
-    const q = $('#searchInput').value.toLowerCase(); // keyword search
-    const sf = $('#statusFilter').value; // filter status: online/offline/cors
-    const gf = $('#groupFilter').value; // filter group
-    const qf = $('#qualityFilter').value; // filter quality: 4K/FHD/HD
-    list = channels.filter(c=>{
-      if(q &&!c.name.toLowerCase().includes(q)) return false;
-      if(sf && c.status!==sf) return false;
-      if(gf && c.group!==gf) return false;
-      if(qf && c.quality!==qf) return false;
-      return true;
+function filterChannels(status, search = '') {
+    const cards = resultsContainer.querySelectorAll('.channel-card');
+    cards.forEach(card => {
+        const cardStatus = card.dataset.status;
+        const cardName = card.dataset.name;
+        
+        const statusMatch = status === 'all' || cardStatus === status;
+        const searchMatch = !search || cardName.includes(search);
+        
+        if (statusMatch && searchMatch) {
+            card.style.display = '';
+        } else {
+            card.style.display = 'none';
+        }
     });
-  }
-
-  let m3u = '#EXTM3U\n'; // Header wajib file M3U
-  list.forEach(c=>{
-    // Logic ⚠️ : kasih tanda kalau channel error
-    let displayName = c.name;
-    if(c.status === 'offline' || c.status === 'cors'){
-      displayName = `⚠️ ${c.name}`; // Mati / CORS error
-    } else if(c.status === 'buffering'){
-      displayName = `⚠️ [Buffer] ${c.name}`; // Ngelag tapi hidup
-    }
-
-    /* Kalau user centang "Include metadata", simpen tvg-id, logo, group, resolusi */
-    if(includeMeta){
-      const attrs = [];
-      if(c.tvgId) attrs.push(`tvg-id="${c.tvgId}"`);
-      if(c.tvgName) attrs.push(`tvg-name="${c.tvgName}"`);
-      if(c.tvgLogo) attrs.push(`tvg-logo="${c.tvgLogo}"`);
-      if(c.group) attrs.push(`group-title="${c.group}"`);
-      if(c.resolution) attrs.push(`tvg-info="${c.quality} ${c.resolution} ${c.bitrate}"`); // simpen FHD 1920x1080 4500kbps
-      m3u += `#EXTINF:-1 ${attrs.join(' ')},${displayName}\n`;
-    } else {
-      /* Mode simple, cuma nama channel */
-      m3u += `#EXTINF:-1,${displayName}\n`;
-    }
-    m3u += `${c.url}\n`; // Baris URL stream-nya
-  });
-
-  /* Bikin file M3U terus auto download */
-  const blob = new Blob([m3u],{type:'application/x-mpegURL'});
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(blob);
-  a.download = 'iptv-checked-v24.m3u';
-  a.click();
-  URL.revokeObjectURL(a.href);
-
-  closeExport(); // Tutup modal
-  toast(`Exported ${list.length} channels (⚠️ = error)`,'success'); // Notif
 }
-
-// Init
-renderAll();
 </script>
 <script>(function(){document.addEventListener("click",function(e){var a=e.target.closest("[data-product-id]");if(!a)return;e.preventDefault();var pid=a.getAttribute("data-product-id");if(pid)parent.postMessage({type:"ecto-artifact-link-click",productId:pid},"*")})})();</script>
 <script>(function(){var loc=location.href.replace(/#.*$/,"");var ATTR_NAMES=["data-product-id","data-productid","data-product_id","product-id","productid","product_id","data-source-entity-id","source-entity-id","source_entity_id","data-product","data-metadata","data-meta"];var DATASET_KEYS=["productId","productid","product_id","sourceEntityId","sourceentityid","source_entity_id","product","metadata","meta"];function readProductId(value){if(typeof value!=="string"||value.length===0)return null;if(/^[0-9]{6,}$/.test(value))return value;var match=value.match(/(?:product(?:_|-)?id|source(?:_|-)?entity(?:_|-)?id)["'=:\s]+([0-9]{6,})/i);return match?match[1]:null}function extractProductId(start){for(var node=start;node&&node!==document.body;node=node.parentElement){for(var i=0;i<ATTR_NAMES.length;i++){var attrValue=node.getAttribute&&node.getAttribute(ATTR_NAMES[i]);var attrProductId=readProductId(attrValue);if(attrProductId)return attrProductId}var dataset=node.dataset||null;if(dataset){for(var j=0;j<DATASET_KEYS.length;j++){var dataValue=dataset[DATASET_KEYS[j]];var dataProductId=readProductId(dataValue);if(dataProductId)return dataProductId}}}return null}document.addEventListener("click",function(e){var target=e.target instanceof Element?e.target:null;if(!target)return;var a=target.closest?target.closest("a[href]"):null;if(!a||!a.href||!/^https?:\/\//.test(a.href))return;if(a.href.replace(/#.*$/,"")===loc)return;var productId=extractProductId(target)||extractProductId(a);if(!productId)return;e.preventDefault();parent.postMessage({type:"ecto-artifact-link-click",productId:productId},"*")},true)})();</script></body>
