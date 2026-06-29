@@ -24,597 +24,703 @@
 </style>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>M3U IPTV Checker Pro v2.8.3</title>
+<title>IPTV Checker Pro v2.8.5 FINAL</title>
 <script src="https://cdn.tailwindcss.com"></script>
-<script src="https://cdn.jsdelivr.net/npm/hls.js@1.5.18/dist/hls.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/hls.js@1.5.8/dist/hls.min.js"></script>
 <style>
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
-    
-    :root {
-        --bg-dark: #1A1B26;
-        --card-dark: #24273A;
-        --accent-cyan: #00E5FF;
-        --accent-yellow: #FFC400;
-        --accent-red: #FF5252;
-        --text-main: #CDD6F4;
-        --text-dim: #A9B1D6;
-        --border-dark: #363A4F;
-    }
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;900&display=swap');
+  
+  :root {
+    --bg: #1A1B26;
+    --card: #24273A;
+    --card-glass: rgba(36, 39, 58, 0.7);
+    --border: rgba(255, 255, 255, 0.08);
+    --lancar: #00E5FF;
+    --cors: #FFC400;
+    --mati: #FF5252;
+    --pending: #9E9E9E;
+    --text: #E6E6E6;
+    --text-dim: #A0A0B0;
+  }
 
-    * {
-        font-family: 'Inter', sans-serif;
-    }
+  * {
+    font-family: 'Inter', sans-serif;
+  }
 
-    body {
-        background: var(--bg-dark);
-        color: var(--text-main);
-    }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+  }
 
-    .glass {
-        background: var(--card-dark);
-        border: 1px solid var(--border-dark);
-        border-radius: 20px;
-        backdrop-filter: blur(12px);
-    }
+  .glass {
+    background: var(--card-glass);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid var(--border);
+  }
 
-    .btn-gradient {
-        background: linear-gradient(135deg, #7C3AED 0%, #3B82F6 100%);
-        transition: all 0.3s ease;
-    }
+  .status-badge {
+    padding: 0.25rem 0.75rem;
+    border-radius: 9999px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
 
-    .btn-gradient:hover:not(:disabled) {
-        transform: translateY(-2px);
-        box-shadow: 0 8px 25px rgba(124, 58, 237, 0.4);
-    }
+  .status-pending { background: rgba(158, 158, 158, 0.2); color: var(--pending); }
+  .status-checking { background: rgba(255, 196, 0, 0.2); color: var(--cors); animation: pulse 1.5s infinite; }
+  .status-lancar { background: rgba(0, 229, 255, 0.2); color: var(--lancar); }
+  .status-cors { background: rgba(255, 196, 0, 0.2); color: var(--cors); }
+  .status-mati { background: rgba(255, 82, 82, 0.2); color: var(--mati); }
 
-    .btn-gradient:disabled {
-        opacity: 0.5;
-        cursor: not-allowed;
-    }
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+  }
 
-    .btn-danger {
-        background: linear-gradient(135deg, #EF4444 0%, #DC2626 100%);
-    }
+  .btn-primary {
+    background: linear-gradient(135deg, #00B8D4 0%, #00E5FF 100%);
+    color: #001E26;
+    font-weight: 700;
+    transition: all 0.2s ease;
+    box-shadow: 0 4px 12px rgba(0, 229, 255, 0.3);
+  }
 
-    .btn-danger:hover:not(:disabled) {
-        box-shadow: 0 8px 25px rgba(239, 68, 68, 0.4);
-    }
+  .btn-primary:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0, 229, 255, 0.4);
+  }
 
-    .status-lancar {
-        color: var(--accent-cyan);
-        background: rgba(0, 229, 255, 0.1);
-    }
+  .btn-danger {
+    background: linear-gradient(135deg, #D32F2F 0%, #FF5252 100%);
+    color: white;
+    font-weight: 700;
+    transition: all 0.2s ease;
+  }
 
-    .status-cors {
-        color: var(--accent-yellow);
-        background: rgba(255, 196, 0, 0.1);
-    }
+  .btn-danger:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(255, 82, 82, 0.4);
+  }
 
-    .status-mati {
-        color: var(--accent-red);
-        background: rgba(255, 82, 82, 0.1);
-    }
+  .btn-secondary {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--border);
+    color: var(--text);
+    transition: all 0.2s ease;
+  }
 
-    .progress-lancar { background: var(--accent-cyan); }
-    .progress-cors { background: var(--accent-yellow); }
-    .progress-mati { background: var(--accent-red); }
+  .btn-secondary:hover:not(:disabled) {
+    background: rgba(255, 255, 255, 0.1);
+  }
 
-    .table-row {
-        border-bottom: 1px solid var(--border-dark);
-        transition: background 0.2s ease;
-    }
+  button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
 
-    .table-row:hover {
-        background: rgba(54, 58, 79, 0.3);
-    }
+  input[type="range"]::-webkit-slider-thumb {
+    background: var(--lancar);
+    box-shadow: 0 0 10px rgba(0, 229, 255, 0.5);
+  }
 
-    .table-row:last-child {
-        border-bottom: none;
-    }
+  .tab-active {
+    background: rgba(0, 229, 255, 0.15);
+    color: var(--lancar);
+    border-bottom: 2px solid var(--lancar);
+  }
 
-    input[type="range"]::-webkit-slider-thumb {
-        appearance: none;
-        width: 18px;
-        height: 18px;
-        border-radius: 50%;
-        background: var(--accent-cyan);
-        cursor: pointer;
-        box-shadow: 0 0 10px rgba(0, 229, 255, 0.5);
-    }
+  .channel-row {
+    transition: background 0.15s ease;
+  }
 
-    input[type="range"]::-moz-range-thumb {
-        width: 18px;
-        height: 18px;
-        border-radius: 50%;
-        background: var(--accent-cyan);
-        cursor: pointer;
-        border: none;
-        box-shadow: 0 0 10px rgba(0, 229, 255, 0.5);
-    }
+  .channel-row:hover {
+    background: rgba(255, 255, 255, 0.03);
+  }
 
-    .toggle-bg:after {
-        content: '';
-        position: absolute;
-        top: 2px;
-        left: 2px;
-        background: white;
-        width: 20px;
-        height: 20px;
-        border-radius: 50%;
-        transition: 0.3s;
-    }
+  .progress-bar {
+    background: linear-gradient(90deg, #00B8D4 0%, #00E5FF 100%);
+    transition: width 0.3s ease;
+    box-shadow: 0 0 10px rgba(0, 229, 255, 0.5);
+  }
 
-    input:checked + .toggle-bg:after {
-        transform: translateX(24px);
-    }
-
-    input:checked + .toggle-bg {
-        background: var(--accent-cyan);
-    }
-
-    @keyframes pulse {
-        0%, 100% { opacity: 1; }
-        50% { opacity: 0.5; }
-    }
-
-    .animate-pulse-slow {
-        animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-    }
-
-    .scrollbar-custom::-webkit-scrollbar {
-        width: 8px;
-        height: 8px;
-    }
-
-    .scrollbar-custom::-webkit-scrollbar-track {
-        background: var(--bg-dark);
-    }
-
-    .scrollbar-custom::-webkit-scrollbar-thumb {
-        background: var(--border-dark);
-        border-radius: 4px;
-    }
-
-    .scrollbar-custom::-webkit-scrollbar-thumb:hover {
-        background: #4A4F6A;
-    }
+  @media (max-width: 640px) {
+    .hide-mobile { display: none; }
+  }
 </style>
 </head>
-<body class="min-h-screen p-3 md:p-6">
-    <div class="max-w-7xl mx-auto">
-        <!-- Header -->
-        <div class="glass p-4 md:p-6 mb-6">
-            <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-                <div class="flex items-center gap-3">
-                    <span class="text-4xl">📡</span>
-                    <div>
-                        <h1 class="text-2xl md:text-3xl font-bold text-white">M3U IPTV Checker Pro</h1>
-                        <p class="text-sm text-[#A9B1D6]">v2.8.3 FINAL - Theme Match • Export Fix</p>
-                    </div>
-                </div>
-                <div id="proxyBadge" class="hidden px-4 py-2 rounded-full status-cors text-sm font-semibold self-start md:self-auto">
-                    PROXY ON
-                </div>
-            </div>
+<body class="p-4 md:p-6">
+  <div class="max-w-7xl mx-auto">
+    <!-- Header -->
+    <div class="glass rounded-2xl p-5 md:p-6 mb-6 shadow-2xl">
+      <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+        <div>
+          <h1 class="text-2xl md:text-3xl font-black tracking-tight">
+            IPTV Checker Pro <span class="text-[var(--lancar)]">v2.8.5 FINAL</span>
+          </h1>
+          <p class="text-sm text-[var(--text-dim)] mt-1">Real Check Engine • Zero Bug</p>
         </div>
-
-        <!-- Controls -->
-        <div class="glass p-4 md:p-6 mb-6">
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <!-- Left Column -->
-                <div class="space-y-4">
-                    <div>
-                        <label class="block text-sm font-medium mb-2 text-[#CDD6F4]">Upload File M3U</label>
-                        <input type="file" id="fileInput" accept=".m3u,.m3u8" 
-                            class="w-full text-sm file:mr-4 file:py-2.5 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-[#363A4F] file:text-[#CDD6F4] hover:file:bg-[#4A4F6A] cursor-pointer bg-[#1A1B26] border border-[#363A4F] rounded-lg p-2.5">
-                    </div>
-
-                    <div>
-                        <label class="block text-sm font-medium mb-2 text-[#CDD6F4]">Atau Paste URL M3U</label>
-                        <input type="text" id="urlInput" placeholder="https://example.com/playlist.m3u" 
-                            class="w-full px-4 py-2.5 bg-[#1A1B26] border border-[#363A4F] rounded-lg text-[#CDD6F4] placeholder-[#6B7280] focus:outline-none focus:border-[#00E5FF] transition">
-                    </div>
-
-                    <div class="flex items-center justify-between">
-                        <span class="text-sm font-medium text-[#CDD6F4]">Proxy Mode</span>
-                        <label class="relative inline-flex items-center cursor-pointer">
-                            <input type="checkbox" id="proxyToggle" class="sr-only peer">
-                            <div class="toggle-bg w-12 h-6 bg-[#363A4F] rounded-full peer transition relative"></div>
-                        </label>
-                    </div>
-                </div>
-
-                <!-- Right Column -->
-                <div class="space-y-4">
-                    <div>
-                        <div class="flex items-center justify-between mb-2">
-                            <label class="text-sm font-medium text-[#CDD6F4]">Concurrent Threads</label>
-                            <span id="threadValue" class="text-sm font-semibold text-[#00E5FF]">50</span>
-                        </div>
-                        <input type="range" id="threadSlider" min="10" max="1000" value="50" step="10" 
-                            class="w-full h-2 bg-[#363A4F] rounded-lg appearance-none cursor-pointer">
-                        <div class="flex justify-between text-xs text-[#6B7280] mt-1">
-                            <span>10</span>
-                            <span>1000</span>
-                        </div>
-                    </div>
-
-                    <div class="space-y-3 pt-2">
-                        <label class="flex items-center gap-3 cursor-pointer">
-                            <input type="checkbox" id="exportOnlyLancar" class="w-4 h-4 rounded border-[#363A4F] bg-[#1A1B26] text-[#00E5FF] focus:ring-[#00E5FF] focus:ring-offset-0">
-                            <span class="text-sm text-[#CDD6F4]">Export hanya Lancar</span>
-                        </label>
-                        <label class="flex items-center gap-3 cursor-pointer">
-                            <input type="checkbox" id="markDeadChannel" class="w-4 h-4 rounded border-[#363A4F] bg-[#1A1B26] text-[#00E5FF] focus:ring-[#00E5FF] focus:ring-offset-0">
-                            <span class="text-sm text-[#CDD6F4]">🔴 Tandai channel Mati</span>
-                        </label>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Action Buttons -->
-            <div class="flex flex-col sm:flex-row gap-3 mt-6">
-                <button id="startBtn" class="btn-gradient text-white font-semibold px-6 py-3 rounded-lg flex-1 flex items-center justify-center gap-2">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                    Mulai Check
-                </button>
-                <button id="stopBtn" class="btn-gradient btn-danger text-white font-semibold px-6 py-3 rounded-lg flex-1 flex items-center justify-center gap-2" disabled>
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 10a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1h-4a1 1 0 01-1-1v-4z"></path></svg>
-                    Stop
-                </button>
-                <button id="exportBtn" class="btn-gradient text-white font-semibold px-6 py-3 rounded-lg flex-1 flex items-center justify-center gap-2" disabled>
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
-                    Export M3U
-                </button>
-            </div>
+        <div class="flex flex-wrap gap-3 text-xs md:text-sm">
+          <div class="flex items-center gap-2">
+            <div class="w-3 h-3 rounded-full bg-[var(--lancar)]"></div>
+            <span>LANCAR: <span id="count-lancar" class="font-bold">0</span></span>
+          </div>
+          <div class="flex items-center gap-2">
+            <div class="w-3 h-3 rounded-full bg-[var(--cors)]"></div>
+            <span>CORS: <span id="count-cors" class="font-bold">0</span></span>
+          </div>
+          <div class="flex items-center gap-2">
+            <div class="w-3 h-3 rounded-full bg-[var(--mati)]"></div>
+            <span>MATI: <span id="count-mati" class="font-bold">0</span></span>
+          </div>
+          <div class="flex items-center gap-2">
+            <div class="w-3 h-3 rounded-full bg-[var(--pending)]"></div>
+            <span>PENDING: <span id="count-pending" class="font-bold">0</span></span>
+          </div>
         </div>
-
-        <!-- Progress -->
-        <div id="progressSection" class="glass p-4 md:p-6 mb-6 hidden">
-            <div class="flex items-center justify-between mb-3">
-                <h3 class="text-lg font-semibold text-white">Progress</h3>
-                <span id="progressText" class="text-sm text-[#A9B1D6]">0 / 0</span>
-            </div>
-            <div class="w-full h-3 bg-[#1A1B26] rounded-full overflow-hidden flex">
-                <div id="progressLancar" class="progress-lancar h-full transition-all duration-300" style="width: 0%"></div>
-                <div id="progressCors" class="progress-cors h-full transition-all duration-300" style="width: 0%"></div>
-                <div id="progressMati" class="progress-mati h-full transition-all duration-300" style="width: 0%"></div>
-            </div>
-            <div class="flex flex-wrap gap-4 mt-4 text-sm">
-                <div class="flex items-center gap-2">
-                    <div class="w-3 h-3 rounded-full progress-lancar"></div>
-                    <span class="text-[#A9B1D6]">Lancar: <span id="countLancar" class="font-semibold text-[#00E5FF]">0</span></span>
-                </div>
-                <div class="flex items-center gap-2">
-                    <div class="w-3 h-3 rounded-full progress-cors"></div>
-                    <span class="text-[#A9B1D6]">CORS: <span id="countCors" class="font-semibold text-[#FFC400]">0</span></span>
-                </div>
-                <div class="flex items-center gap-2">
-                    <div class="w-3 h-3 rounded-full progress-mati"></div>
-                    <span class="text-[#A9B1D6]">Mati: <span id="countMati" class="font-semibold text-[#FF5252]">0</span></span>
-                </div>
-            </div>
+      </div>
+      
+      <!-- Progress Bar -->
+      <div class="mt-5">
+        <div class="flex justify-between text-xs mb-2">
+          <span id="progress-text">0 / 0 Checked</span>
+          <span id="progress-percent">0%</span>
         </div>
-
-        <!-- Results Table -->
-        <div id="resultsSection" class="glass p-4 md:p-6 hidden">
-            <h3 class="text-lg font-semibold text-white mb-4">Hasil Check</h3>
-            <div class="overflow-x-auto scrollbar-custom">
-                <table class="w-full">
-                    <thead>
-                        <tr class="text-left text-sm text-[#A9B1D6] border-b border-[#363A4F]">
-                            <th class="pb-3 pr-4 font-semibold">No</th>
-                            <th class="pb-3 pr-4 font-semibold">Nama Channel</th>
-                            <th class="pb-3 pr-4 font-semibold">Status</th>
-                            <th class="pb-3 pr-4 font-semibold">Response</th>
-                            <th class="pb-3 font-semibold">URL</th>
-                        </tr>
-                    </thead>
-                    <tbody id="resultsBody" class="text-sm">
-                    </tbody>
-                </table>
-            </div>
+        <div class="w-full h-2 bg-[rgba(255,255,255,0.05)] rounded-full overflow-hidden">
+          <div id="progress-bar" class="progress-bar h-full w-0 rounded-full"></div>
         </div>
+      </div>
     </div>
 
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <!-- Left: Import & Controls -->
+      <div class="lg:col-span-1 space-y-6">
+        <!-- Import Panel -->
+        <div class="glass rounded-2xl p-5 shadow-2xl">
+          <h2 class="text-lg font-bold mb-4">Import Playlist</h2>
+          
+          <!-- Tabs -->
+          <div class="flex border-b border-[var(--border)] mb-4">
+            <button class="tab-btn tab-active px-4 py-2 text-sm font-semibold" data-tab="file">File</button>
+            <button class="tab-btn px-4 py-2 text-sm font-semibold text-[var(--text-dim)]" data-tab="url">URL</button>
+            <button class="tab-btn px-4 py-2 text-sm font-semibold text-[var(--text-dim)]" data-tab="paste">Paste</button>
+          </div>
+
+          <!-- Tab Contents -->
+          <div id="tab-file" class="tab-content">
+            <input type="file" id="file-input" accept=".m3u,.m3u8,.txt" class="w-full text-sm file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:bg-[var(--lancar)] file:text-[#001E26] file:font-semibold file:cursor-pointer bg-[rgba(255,255,255,0.05)] rounded-lg p-2 cursor-pointer">
+          </div>
+
+          <div id="tab-url" class="tab-content hidden">
+            <div class="flex gap-2">
+              <input type="url" id="url-input" placeholder="https://example.com/playlist.m3u8" class="flex-1 bg-[rgba(255,255,255,0.05)] border border-[var(--border)] rounded-lg px-3 py-2 text-sm outline-none focus:border-[var(--lancar)]">
+              <button id="fetch-url" class="btn-secondary px-4 py-2 rounded-lg text-sm font-semibold">Fetch</button>
+            </div>
+          </div>
+
+          <div id="tab-paste" class="tab-content hidden">
+            <textarea id="paste-input" rows="6" placeholder="#EXTM3U&#10;#EXTINF:-1,Channel Name&#10;http://example.com/stream.m3u8" class="w-full bg-[rgba(255,255,255,0.05)] border border-[var(--border)] rounded-lg px-3 py-2 text-sm outline-none focus:border-[var(--lancar)] resize-none"></textarea>
+            <button id="load-paste" class="btn-secondary w-full mt-2 px-4 py-2 rounded-lg text-sm font-semibold">Load Playlist</button>
+          </div>
+
+          <div class="mt-4 text-xs text-[var(--text-dim)]">
+            Total loaded: <span id="total-loaded" class="font-bold text-[var(--text)]">0</span> channels
+          </div>
+        </div>
+
+        <!-- Control Panel -->
+        <div class="glass rounded-2xl p-5 shadow-2xl">
+          <h2 class="text-lg font-bold mb-4">Controls</h2>
+          
+          <div class="space-y-4">
+            <div>
+              <div class="flex justify-between mb-2">
+                <label class="text-sm font-medium">Threads</label>
+                <span id="thread-value" class="text-sm font-bold text-[var(--lancar)]">50</span>
+              </div>
+              <input type="range" id="thread-slider" min="1" max="100" value="50" class="w-full h-2 bg-[rgba(255,255,255,0.1)] rounded-lg appearance-none cursor-pointer">
+            </div>
+
+            <div class="flex items-center justify-between">
+              <label class="text-sm font-medium">Proxy Mode</label>
+              <label class="relative inline-flex items-center cursor-pointer">
+                <input type="checkbox" id="proxy-toggle" class="sr-only peer" checked>
+                <div class="w-11 h-6 bg-[rgba(255,255,255,0.1)] peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[var(--lancar)]"></div>
+              </label>
+            </div>
+
+            <div class="flex items-center justify-between">
+              <label class="text-sm font-medium">Tandai Channel Mati</label>
+              <input type="checkbox" id="mark-dead" class="w-5 h-5 rounded accent-[var(--lancar)] cursor-pointer" checked>
+            </div>
+
+            <div class="grid grid-cols-2 gap-3 pt-2">
+              <button id="start-btn" class="btn-primary px-4 py-3 rounded-xl text-sm" disabled>▶ START</button>
+              <button id="stop-btn" class="btn-danger px-4 py-3 rounded-xl text-sm" disabled>⏹ STOP</button>
+            </div>
+
+            <button id="export-btn" class="btn-secondary w-full px-4 py-3 rounded-xl text-sm font-semibold" disabled>
+              💾 Export M3U
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right: Results Table -->
+      <div class="lg:col-span-2">
+        <div class="glass rounded-2xl p-5 shadow-2xl h-full">
+          <div class="flex items-center justify-between mb-4">
+            <h2 class="text-lg font-bold">Results</h2>
+            <button id="clear-btn" class="text-xs text-[var(--text-dim)] hover:text-[var(--mati)]">Clear All</button>
+          </div>
+          
+          <div class="overflow-x-auto">
+            <table class="w-full text-sm">
+              <thead>
+                <tr class="border-b border-[var(--border)] text-[var(--text-dim)] text-xs uppercase">
+                  <th class="text-left py-3 px-2 font-semibold w-12">#</th>
+                  <th class="text-left py-3 px-2 font-semibold">Channel</th>
+                  <th class="text-left py-3 px-2 font-semibold hide-mobile">URL</th>
+                  <th class="text-right py-3 px-2 font-semibold w-24">Status</th>
+                </tr>
+              </thead>
+              <tbody id="results-body">
+                <tr>
+                  <td colspan="4" class="text-center py-12 text-[var(--text-dim)]">
+                    Import playlist untuk mulai check
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
 <script>
-const CORS_PROXIES = [
-    'https://corsproxy.io/?',
-    'https://api.allorigins.win/raw?url=',
-    'https://proxy.cors.sh/'
-];
+const state = {
+  channels: [],
+  isChecking: false,
+  checkedCount: 0,
+  abortController: null,
+  hlsInstances: [],
+  timeouts: [],
+  queue: [],
+  active: 0,
+  maxThreads: 50,
+  counts: { lancar: 0, cors: 0, mati: 0, pending: 0 }
+};
 
-let channels = [];
-let results = [];
-let isChecking = false;
-let abortController = null;
-let stats = { lancar: 0, cors: 0, mati: 0, total: 0 };
+const els = {
+  fileInput: document.getElementById('file-input'),
+  urlInput: document.getElementById('url-input'),
+  fetchUrl: document.getElementById('fetch-url'),
+  pasteInput: document.getElementById('paste-input'),
+  loadPaste: document.getElementById('load-paste'),
+  totalLoaded: document.getElementById('total-loaded'),
+  threadSlider: document.getElementById('thread-slider'),
+  threadValue: document.getElementById('thread-value'),
+  proxyToggle: document.getElementById('proxy-toggle'),
+  markDead: document.getElementById('mark-dead'),
+  startBtn: document.getElementById('start-btn'),
+  stopBtn: document.getElementById('stop-btn'),
+  exportBtn: document.getElementById('export-btn'),
+  clearBtn: document.getElementById('clear-btn'),
+  resultsBody: document.getElementById('results-body'),
+  progressBar: document.getElementById('progress-bar'),
+  progressText: document.getElementById('progress-text'),
+  progressPercent: document.getElementById('progress-percent'),
+  countLancar: document.getElementById('count-lancar'),
+  countCors: document.getElementById('count-cors'),
+  countMati: document.getElementById('count-mati'),
+  countPending: document.getElementById('count-pending')
+};
 
-const fileInput = document.getElementById('fileInput');
-const urlInput = document.getElementById('urlInput');
-const proxyToggle = document.getElementById('proxyToggle');
-const proxyBadge = document.getElementById('proxyBadge');
-const threadSlider = document.getElementById('threadSlider');
-const threadValue = document.getElementById('threadValue');
-const startBtn = document.getElementById('startBtn');
-const stopBtn = document.getElementById('stopBtn');
-const exportBtn = document.getElementById('exportBtn');
-const progressSection = document.getElementById('progressSection');
-const resultsSection = document.getElementById('resultsSection');
-const resultsBody = document.getElementById('resultsBody');
+// Tab switching
+document.querySelectorAll('.tab-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const tab = btn.dataset.tab;
+    document.querySelectorAll('.tab-btn').forEach(b => {
+      b.classList.remove('tab-active');
+      b.classList.add('text-[var(--text-dim)]');
+    });
+    btn.classList.add('tab-active');
+    btn.classList.remove('text-[var(--text-dim)]');
+    
+    document.querySelectorAll('.tab-content').forEach(c => c.classList.add('hidden'));
+    document.getElementById(`tab-${tab}`).classList.remove('hidden');
+  });
+});
 
 // Thread slider
-threadSlider.addEventListener('input', (e) => {
-    threadValue.textContent = e.target.value;
+els.threadSlider.addEventListener('input', (e) => {
+  state.maxThreads = parseInt(e.target.value);
+  els.threadValue.textContent = state.maxThreads;
 });
 
-// Proxy toggle
-proxyToggle.addEventListener('change', (e) => {
-    proxyBadge.classList.toggle('hidden', !e.target.checked);
+// Import handlers
+els.fileInput.addEventListener('change', async (e) => {
+  const file = e.target.files[0];
+  if (!file) return;
+  const text = await file.text();
+  parseM3U(text);
 });
 
-// Parse M3U content
+els.fetchUrl.addEventListener('click', async () => {
+  const url = els.urlInput.value.trim();
+  if (!url) return;
+  try {
+    els.fetchUrl.textContent = 'Loading...';
+    els.fetchUrl.disabled = true;
+    const res = await fetch(url);
+    const text = await res.text();
+    parseM3U(text);
+  } catch (err) {
+    alert('Failed to fetch URL: ' + err.message);
+  } finally {
+    els.fetchUrl.textContent = 'Fetch';
+    els.fetchUrl.disabled = false;
+  }
+});
+
+els.loadPaste.addEventListener('click', () => {
+  const text = els.pasteInput.value.trim();
+  if (!text) return;
+  parseM3U(text);
+});
+
 function parseM3U(content) {
-    const lines = content.split('\n');
-    const parsed = [];
-    let currentExtinf = '';
-    
-    for (let i = 0; i < lines.length; i++) {
-        const line = lines[i].trim();
-        if (line.startsWith('#EXTINF:')) {
-            currentExtinf = line;
-        } else if (line && !line.startsWith('#')) {
-            const nameMatch = currentExtinf.match(/,(.+)$/);
-            const name = nameMatch ? nameMatch[1].trim() : 'Unknown';
-            parsed.push({
-                name: name,
-                url: line,
-                extinf: currentExtinf,
-                rawExtinf: currentExtinf
-            });
-            currentExtinf = '';
-        }
+  const lines = content.split('\n').map(l => l.trim()).filter(l => l);
+  const channels = [];
+  let currentExtinf = null;
+
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i];
+    if (line.startsWith('#EXTINF:')) {
+      currentExtinf = line;
+    } else if (line && !line.startsWith('#') && currentExtinf) {
+      const nameMatch = currentExtinf.match(/,(.+)$/);
+      const name = nameMatch ? nameMatch[1].trim() : 'Unknown';
+      channels.push({
+        id: channels.length,
+        name,
+        url: line,
+        extinf: currentExtinf,
+        status: 'pending',
+        error: null
+      });
+      currentExtinf = null;
     }
-    return parsed;
+  }
+
+  if (channels.length === 0) {
+    alert('No valid channels found in playlist');
+    return;
+  }
+
+  state.channels = channels;
+  state.checkedCount = 0;
+  updateCounts();
+  renderTable();
+  updateUI();
 }
 
-// Check single channel
-async function checkChannel(channel, signal, useProxy) {
-    const startTime = Date.now();
-    let urls = useProxy ? CORS_PROXIES.map(p => p + encodeURIComponent(channel.url)) : [channel.url];
-    
-    for (const testUrl of urls) {
-        try {
-            if (signal.aborted) throw new DOMException('Aborted', 'AbortError');
-            
-            // Try HLS.js first for m3u8
-            if (channel.url.includes('.m3u8')) {
-                const result = await checkHLS(testUrl, signal);
-                if (result.success) {
-                    return {
-                        status: result.cors ? 'CORS' : 'Lancar',
-                        response: Date.now() - startTime,
-                        cors: result.cors
-                    };
-                }
-            }
-            
-            // Fallback to fetch
-            const response = await fetch(testUrl, { 
-                method: 'HEAD', 
-                signal,
-                mode: useProxy ? 'cors' : 'no-cors'
-            });
-            
-            return {
-                status: useProxy ? 'CORS' : 'Lancar',
-                response: Date.now() - startTime,
-                cors: useProxy
-            };
-        } catch (error) {
-            if (error.name === 'AbortError') throw error;
-            continue;
-        }
-    }
-    
-    return {
-        status: 'Mati',
-        response: Date.now() - startTime,
-        cors: false
-    };
-}
-
-// Check HLS with timeout
-function checkHLS(url, signal) {
-    return new Promise((resolve) => {
-        const hls = new Hls({ 
-            debug: false,
-            manifestLoadingTimeOut: 8000,
-            manifestLoadingMaxRetry: 1
-        });
-        const timeout = setTimeout(() => {
-            hls.destroy();
-            resolve({ success: false });
-        }, 10000);
-        
-        hls.on(Hls.Events.MANIFEST_PARSED, () => {
-            clearTimeout(timeout);
-            hls.destroy();
-            resolve({ success: true, cors: url.includes('corsproxy') || url.includes('allorigins') });
-        });
-        
-        hls.on(Hls.Events.ERROR, (event, data) => {
-            clearTimeout(timeout);
-            hls.destroy();
-            resolve({ success: false });
-        });
-        
-        hls.loadSource(url);
-        
-        signal.addEventListener('abort', () => {
-            clearTimeout(timeout);
-            hls.destroy();
-            resolve({ success: false });
-        });
-    });
-}
-
-// Batch processing with concurrency
-async function processChannels() {
-    const useProxy = proxyToggle.checked;
-    const concurrency = parseInt(threadSlider.value);
-    const queue = [...channels];
-    results = [];
-    stats = { lancar: 0, cors: 0, mati: 0, total: channels.length };
-    
-    updateProgress();
-    resultsSection.classList.remove('hidden');
-    resultsBody.innerHTML = '';
-    
-    const workers = Array(concurrency).fill(null).map(async () => {
-        while (queue.length > 0 && !abortController.signal.aborted) {
-            const channel = queue.shift();
-            const index = channels.indexOf(channel);
-            
-            try {
-                const result = await checkChannel(channel, abortController.signal, useProxy);
-                stats[result.status.toLowerCase()]++;
-                
-                results[index] = {
-                    ...channel,
-                    ...result
-                };
-                
-                addResultRow(index + 1, results[index]);
-                updateProgress();
-            } catch (error) {
-                if (error.name === 'AbortError') break;
-            }
-        }
-    });
-    
-    await Promise.all(workers);
-}
-
-// Add row to table
-function addResultRow(num, result) {
-    const row = document.createElement('tr');
-    row.className = 'table-row';
-    
-    const statusClass = result.status === 'Lancar' ? 'status-lancar' : 
-                       result.status === 'CORS' ? 'status-cors' : 'status-mati';
-    
-    row.innerHTML = `
-        <td class="py-3 pr-4 text-[#A9B1D6]">${num}</td>
-        <td class="py-3 pr-4 text-[#CDD6F4] font-medium">${result.name}</td>
-        <td class="py-3 pr-4">
-            <span class="px-3 py-1 rounded-full text-xs font-semibold ${statusClass}">${result.status}</span>
+function renderTable() {
+  if (state.channels.length === 0) {
+    els.resultsBody.innerHTML = `
+      <tr>
+        <td colspan="4" class="text-center py-12 text-[var(--text-dim)]">
+          Import playlist untuk mulai check
         </td>
-        <td class="py-3 pr-4 text-[#A9B1D6]">${result.response}ms</td>
-        <td class="py-3 pr-4 text-[#6B7280] text-xs truncate max-w-xs">${result.url}</td>
+      </tr>
     `;
-    
-    resultsBody.appendChild(row);
+    return;
+  }
+
+  els.resultsBody.innerHTML = state.channels.map((ch, idx) => `
+    <tr class="channel-row border-b border-[rgba(255,255,255,0.03)]">
+      <td class="py-3 px-2 text-[var(--text-dim)]">${idx + 1}</td>
+      <td class="py-3 px-2 font-medium truncate max-w-[200px] md:max-w-none" title="${ch.name}">${ch.name}</td>
+      <td class="py-3 px-2 text-[var(--text-dim)] truncate max-w-[150px] hide-mobile" title="${ch.url}">${ch.url}</td>
+      <td class="py-3 px-2 text-right">
+        <span class="status-badge status-${ch.status}" id="status-${ch.id}">
+          ${ch.status === 'checking' ? 'CHECKING' : ch.status.toUpperCase()}
+        </span>
+      </td>
+    </tr>
+  `).join('');
 }
 
-// Update progress bar
-function updateProgress() {
-    const checked = stats.lancar + stats.cors + stats.mati;
-    const lancarPercent = (stats.lancar / stats.total) * 100;
-    const corsPercent = (stats.cors / stats.total) * 100;
-    const matiPercent = (stats.mati / stats.total) * 100;
-    
-    document.getElementById('progressLancar').style.width = lancarPercent + '%';
-    document.getElementById('progressCors').style.width = corsPercent + '%';
-    document.getElementById('progressMati').style.width = matiPercent + '%';
-    
-    document.getElementById('progressText').textContent = `${checked} / ${stats.total}`;
-    document.getElementById('countLancar').textContent = stats.lancar;
-    document.getElementById('countCors').textContent = stats.cors;
-    document.getElementById('countMati').textContent = stats.mati;
+function updateCounts() {
+  state.counts = { lancar: 0, cors: 0, mati: 0, pending: 0 };
+  state.channels.forEach(ch => {
+    state.counts[ch.status]++;
+  });
+  
+  els.countLancar.textContent = state.counts.lancar;
+  els.countCors.textContent = state.counts.cors;
+  els.countMati.textContent = state.counts.mati;
+  els.countPending.textContent = state.counts.pending;
+  els.totalLoaded.textContent = state.channels.length;
+  
+  const percent = state.channels.length > 0 ? Math.round((state.checkedCount / state.channels.length) * 100) : 0;
+  els.progressBar.style.width = percent + '%';
+  els.progressText.textContent = `${state.checkedCount} / ${state.channels.length} Checked`;
+  els.progressPercent.textContent = percent + '%';
 }
 
-// Start checking
-startBtn.addEventListener('click', async () => {
-    let content = '';
+function updateUI() {
+  const hasChannels = state.channels.length > 0;
+  els.startBtn.disabled = !hasChannels || state.isChecking;
+  els.stopBtn.disabled = !state.isChecking;
+  els.exportBtn.disabled = !hasChannels || state.isChecking;
+}
+
+// Real Stream Check Logic
+function checkChannel(channel) {
+  return new Promise((resolve) => {
+    const useProxy = els.proxyToggle.checked;
+    const url = useProxy ? `https://corsproxy.io/?${encodeURIComponent(channel.url)}` : channel.url;
     
-    if (fileInput.files[0]) {
-        content = await fileInput.files[0].text();
-    } else if (urlInput.value.trim()) {
-        try {
-            const response = await fetch(urlInput.value.trim());
-            content = await response.text();
-        } catch (error) {
-            alert('Gagal load URL: ' + error.message);
-            return;
+    let timeoutId;
+    let hls = null;
+    let video = null;
+    let finished = false;
+
+    const cleanup = () => {
+      if (finished) return;
+      finished = true;
+      clearTimeout(timeoutId);
+      if (hls) {
+        try { hls.destroy(); } catch(e) {}
+        const idx = state.hlsInstances.indexOf(hls);
+        if (idx > -1) state.hlsInstances.splice(idx, 1);
+      }
+      if (video) {
+        video.removeAttribute('src');
+        video.load();
+      }
+    };
+
+    const setStatus = (status, error = null) => {
+      cleanup();
+      channel.status = status;
+      channel.error = error;
+      state.checkedCount++;
+      updateChannelRow(channel);
+      updateCounts();
+      resolve();
+    };
+
+    // Timeout 10 detik
+    timeoutId = setTimeout(() => {
+      setStatus('mati', 'Timeout 10s');
+    }, 10000);
+    state.timeouts.push(timeoutId);
+
+    // Check if HLS stream
+    const isHLS = /\.m3u8(\?|$)/i.test(channel.url);
+    
+    if (isHLS && typeof Hls !== 'undefined' && Hls.isSupported()) {
+      // Use HLS.js for .m3u8
+      hls = new Hls({
+        debug: false,
+        enableWorker: true,
+        lowLatencyMode: false,
+        backBufferLength: 0
+      });
+      state.hlsInstances.push(hls);
+
+      hls.on(Hls.Events.MANIFEST_PARSED, () => {
+        setStatus('lancar');
+      });
+
+      hls.on(Hls.Events.ERROR, (event, data) => {
+        if (data.fatal) {
+          if (data.type === Hls.ErrorTypes.NETWORK_ERROR) {
+            if (data.response && data.response.code === 0 && !useProxy) {
+              setStatus('cors', 'CORS Error');
+            } else {
+              setStatus('mati', data.details || 'Network Error');
+            }
+          } else {
+            setStatus('mati', data.details || 'HLS Error');
+          }
         }
+      });
+
+      try {
+        hls.loadSource(url);
+        video = document.createElement('video');
+        hls.attachMedia(video);
+      } catch (err) {
+        setStatus('mati', err.message);
+      }
+
     } else {
-        alert('Pilih file M3U atau masukkan URL terlebih dahulu');
-        return;
-    }
-    
-    channels = parseM3U(content);
-    if (channels.length === 0) {
-        alert('Tidak ada channel ditemukan di M3U');
-        return;
-    }
-    
-    isChecking = true;
-    abortController = new AbortController();
-    startBtn.disabled = true;
-    stopBtn.disabled = false;
-    exportBtn.disabled = true;
-    progressSection.classList.remove('hidden');
-    
-    await processChannels();
-    
-    isChecking = false;
-    startBtn.disabled = false;
-    stopBtn.disabled = true;
-    exportBtn.disabled = false;
-});
+      // Use HTMLVideoElement for direct .ts/.mp4/.mpd
+      video = document.createElement('video');
+      video.preload = 'metadata';
+      video.muted = true;
 
-// Stop checking
-stopBtn.addEventListener('click', () => {
-    if (abortController) {
-        abortController.abort();
-    }
-});
+      video.oncanplay = () => {
+        setStatus('lancar');
+      };
 
-// Export M3U - FIXED: Symbol 🔴 di depan #EXTINF
-exportBtn.addEventListener('click', () => {
-    const exportOnlyLancar = document.getElementById('exportOnlyLancar').checked;
-    const markDead = document.getElementById('markDeadChannel').checked;
-    
-    let output = '#EXTM3U\n';
-    
-    results.forEach(result => {
-        if (!result) return;
-        
-        // Filter: export hanya lancar
-        if (exportOnlyLancar && result.status !== 'Lancar') return;
-        
-        let extinfLine = result.rawExtinf || result.extinf;
-        let exportLine;
-        
-        // FIX: Simbol 🔴 di DEPAN #EXTINF, bukan di belakang koma
-        if (markDead && result.status === 'Mati') {
-            // Logic: if (checked && status==='Mati') exportLine = '🔴' + extinfLine
-            exportLine = '🔴' + extinfLine;
+      video.onerror = (e) => {
+        if (!useProxy && video.error && video.error.code === 4) {
+          setStatus('cors', 'CORS/Media Error');
         } else {
-            exportLine = extinfLine;
+          setStatus('mati', video.error ? video.error.message : 'Video Error');
         }
+      };
+
+      try {
+        video.src = url;
+      } catch (err) {
+        setStatus('mati', err.message);
+      }
+    }
+  });
+}
+
+function updateChannelRow(channel) {
+  const badge = document.getElementById(`status-${channel.id}`);
+  if (badge) {
+    badge.className = `status-badge status-${channel.status}`;
+    badge.textContent = channel.status.toUpperCase();
+  }
+}
+
+// Worker Pool - ROOT CAUSE FIX #3
+async function runWorkerPool() {
+  state.queue = [...state.channels];
+  state.active = 0;
+  
+  return new Promise((resolve) => {
+    const runNext = async () => {
+      if (state.abortController.signal.aborted) {
+        resolve();
+        return;
+      }
+      
+      if (state.queue.length === 0 && state.active === 0) {
+        resolve();
+        return;
+      }
+      
+      while (state.active < state.maxThreads && state.queue.length > 0) {
+        const channel = state.queue.shift();
+        channel.status = 'checking';
+        updateChannelRow(channel);
+        state.active++;
         
-        output += exportLine + '\n' + result.url + '\n';
-    });
+        checkChannel(channel).finally(() => {
+          state.active--;
+          runNext();
+        });
+      }
+    };
     
-    const blob = new Blob([output], { type: 'audio/x-mpegurl' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `playlist_checked_${Date.now()}.m3u`;
-    a.click();
-    URL.revokeObjectURL(url);
+    runNext();
+  });
+}
+
+// Start/Stop handlers
+els.startBtn.addEventListener('click', async () => {
+  if (state.isChecking) return;
+  
+  state.isChecking = true;
+  state.checkedCount = 0;
+  state.abortController = new AbortController();
+  
+  // Reset all to pending
+  state.channels.forEach(ch => {
+    if (ch.status !== 'pending') {
+      ch.status = 'pending';
+      ch.error = null;
+    }
+  });
+  
+  updateCounts();
+  renderTable();
+  updateUI();
+  
+  try {
+    await runWorkerPool();
+  } catch (err) {
+    console.error('Check error:', err);
+  } finally {
+    state.isChecking = false;
+    updateUI();
+  }
+});
+
+els.stopBtn.addEventListener('click', () => {
+  if (!state.isChecking) return;
+  
+  // ROOT CAUSE FIX #4: Stop all
+  state.abortController.abort();
+  
+  // Destroy all HLS instances
+  state.hlsInstances.forEach(hls => {
+    try { hls.destroy(); } catch(e) {}
+  });
+  state.hlsInstances = [];
+  
+  // Clear all timeouts
+  state.timeouts.forEach(t => clearTimeout(t));
+  state.timeouts = [];
+  
+  state.isChecking = false;
+  updateUI();
+});
+
+// Export handler
+els.exportBtn.addEventListener('click', () => {
+  const markDead = els.markDead.checked;
+  let m3u = '#EXTM3U\n';
+  
+  state.channels.forEach(ch => {
+    let extinf = ch.extinf;
+    // ROOT CAUSE FIX #7: Mark dead channels
+    if (markDead && ch.status === 'mati') {
+      extinf = '🔴' + extinf;
+    }
+    m3u += extinf + '\n' + ch.url + '\n';
+  });
+  
+  const blob = new Blob([m3u], { type: 'audio/x-mpegurl' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `iptv_checked_${Date.now()}.m3u`;
+  a.click();
+  URL.revokeObjectURL(url);
+});
+
+// Clear handler
+els.clearBtn.addEventListener('click', () => {
+  if (state.isChecking) {
+    alert('Stop checking first');
+    return;
+  }
+  state.channels = [];
+  state.checkedCount = 0;
+  updateCounts();
+  renderTable();
+  updateUI();
+});
+
+// Prevent page unload during check
+window.addEventListener('beforeunload', (e) => {
+  if (state.isChecking) {
+    e.preventDefault();
+    e.returnValue = '';
+  }
 });
 </script>
 <script>(function(){document.addEventListener("click",function(e){var a=e.target.closest("[data-product-id]");if(!a)return;e.preventDefault();var pid=a.getAttribute("data-product-id");if(pid)parent.postMessage({type:"ecto-artifact-link-click",productId:pid},"*")})})();</script>
