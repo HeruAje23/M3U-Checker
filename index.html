@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="id">
 <head><style>
 @font-face {
   font-family: "Optimistic";
@@ -24,919 +24,1088 @@
 </style>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>M3U IPTV Checker Pro v2.5 - Smart CORS + 3D Realistic UI</title>
-<script src="https://cdn.tailwindcss.com"></script>
-<script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<title>M3U IPTV Checker Pro v2.6 FINAL - Smart Fetch + CORS Detector</title>
+<script src="https://cdn.jsdelivr.net/npm/hls.js@1.5.8/dist/hls.min.js"></script>
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
-        
+:root {
+  --bg: #0b0d1a;
+  --bg-card: #12162a;
+  --bg-card-hover: #1a1f38;
+  --primary: #7c3aed;
+  --primary-dark: #6d28d9;
+  --secondary: #2563eb;
+  --success: #10b981;
+  --warning: #f59e0b;
+  --danger: #ef4444;
+  --text: #e5e7eb;
+  --text-muted: #9ca3af;
+  --border: #1f2947;
+  --shadow: 0 10px 30px rgba(0,0,0,0.4);
+  --radius: 12px;
+  --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
 * {
-    font-family: 'Inter', sans-serif;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
 }
 
 body {
-    background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0f172a 100%);
-    min-height: 100vh;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background: linear-gradient(135deg, #0b0d1a 0%, #1e1b4b 100%);
+  color: var(--text);
+  min-height: 100vh;
+  line-height: 1.6;
+  padding: 16px;
 }
 
-.glass {
-    background: rgba(30, 41, 59, 0.6);
-    backdrop-filter: blur(20px);
-    border: 1px solid rgba(255, 255, 255, 0.08);
+.container {
+  max-width: 1400px;
+  margin: 0 auto;
 }
 
-/* 3D Realistic Button Base */
-.btn-3d {
-    position: relative;
-    transform-style: preserve-3d;
-    transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
-    box-shadow: 
-        0 4px 0 0 rgba(0, 0, 0, 0.3),
-        0 6px 15px -3px rgba(0, 0, 0, 0.4),
-        inset 0 1px 0 0 rgba(255, 255, 255, 0.15),
-        inset 0 -2px 0 0 rgba(0, 0, 0, 0.2);
-    border: 1px solid rgba(0, 0, 0, 0.2);
-    overflow: hidden;
+.header {
+  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  padding: 24px;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  margin-bottom: 24px;
+  position: relative;
+  overflow: hidden;
 }
 
-.btn-3d::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 50%;
-    background: linear-gradient(180deg, rgba(255, 255, 255, 0.15) 0%, transparent 100%);
-    border-radius: inherit;
-    pointer-events: none;
+.header::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  right: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+  animation: pulse 4s ease-in-out infinite;
 }
 
-.btn-3d:hover {
-    transform: translateY(-2px);
-    box-shadow: 
-        0 6px 0 0 rgba(0, 0, 0, 0.3),
-        0 10px 20px -3px rgba(0, 0, 0, 0.5),
-        inset 0 1px 0 0 rgba(255, 255, 255, 0.2),
-        inset 0 -2px 0 0 rgba(0, 0, 0, 0.2);
+@keyframes pulse {
+  0%, 100% { transform: scale(1); opacity: 0.5; }
+  50% { transform: scale(1.1); opacity: 0.8; }
 }
 
-.btn-3d:active {
-    transform: translateY(2px);
-    box-shadow: 
-        0 1px 0 0 rgba(0, 0, 0, 0.3),
-        0 2px 5px -1px rgba(0, 0, 0, 0.4),
-        inset 0 3px 5px 0 rgba(0, 0, 0, 0.3),
-        inset 0 1px 0 0 rgba(0, 0, 0, 0.2);
+.header h1 {
+  font-size: clamp(1.5rem, 4vw, 2.25rem);
+  font-weight: 800;
+  margin-bottom: 8px;
+  position: relative;
+  z-index: 1;
 }
 
-.btn-3d:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-    transform: translateY(0) !important;
-    box-shadow: 
-        0 2px 0 0 rgba(0, 0, 0, 0.2),
-        0 3px 8px -3px rgba(0, 0, 0, 0.3),
-        inset 0 1px 0 0 rgba(255, 255, 255, 0.1);
+.header .version {
+  display: inline-block;
+  background: rgba(255,255,255,0.2);
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  margin-left: 8px;
 }
 
-/* Ripple Effect */
-.ripple {
-    position: absolute;
-    border-radius: 50%;
-    background: rgba(255, 255, 255, 0.6);
-    transform: scale(0);
-    animation: ripple-animation 0.6s ease-out;
-    pointer-events: none;
+.header p {
+  opacity: 0.9;
+  font-size: 0.95rem;
+  position: relative;
+  z-index: 1;
 }
 
-@keyframes ripple-animation {
-    to {
-        transform: scale(4);
-        opacity: 0;
-    }
+.controls {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 16px;
+  margin-bottom: 24px;
 }
 
-/* Toggle Switch Fix with !important */
-.toggle-switch {
-    position: relative;
-    width: 52px !important;
-    height: 28px !important;
-    background: #334155 !important;
-    border-radius: 14px !important;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
-    cursor: pointer;
-    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.3) !important;
-    border: 1px solid rgba(0, 0, 0, 0.2) !important;
+.card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px;
+  box-shadow: var(--shadow);
+  transition: var(--transition);
 }
 
-.toggle-switch.active {
-    background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%) !important;
-    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.2), 0 0 15px rgba(59, 130, 246, 0.4) !important;
+.card:hover {
+  background: var(--bg-card-hover);
+  transform: translateY(-2px);
 }
 
-.toggle-knob {
-    position: absolute !important;
-    top: 2px !important;
-    left: 2px !important;
-    width: 24px !important;
-    height: 24px !important;
-    background: linear-gradient(180deg, #ffffff 0%, #e2e8f0 100%) !important;
-    border-radius: 50% !important;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3), inset 0 -1px 2px rgba(0, 0, 0, 0.1) !important;
+.card-title {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  margin-bottom: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
-.toggle-switch.active .toggle-knob {
-    transform: translateX(24px) !important;
+.btn {
+  position: relative;
+  width: 100%;
+  padding: 14px 24px;
+  border: none;
+  border-radius: 10px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition);
+  overflow: hidden;
+  background: linear-gradient(145deg, var(--primary), var(--primary-dark));
+  color: white;
+  box-shadow: 0 4px 15px rgba(124, 58, 237, 0.4), inset 0 1px 0 rgba(255,255,255,0.2);
+  transform: perspective(500px) translateZ(0);
+}
+
+.btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+  transition: left 0.5s;
+}
+
+.btn:hover::before {
+  left: 100%;
+}
+
+.btn:hover {
+  transform: perspective(500px) translateZ(10px);
+  box-shadow: 0 6px 20px rgba(124, 58, 237, 0.6), inset 0 1px 0 rgba(255,255,255,0.3);
+}
+
+.btn:active {
+  transform: perspective(500px) translateZ(-5px) scale(0.96);
+  box-shadow: 0 2px 8px rgba(124, 58, 237, 0.3), inset 0 2px 4px rgba(0,0,0,0.3);
+}
+
+.btn-secondary {
+  background: linear-gradient(145deg, #374151, #1f2937);
+  box-shadow: 0 4px 15px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.1);
+}
+
+.btn-secondary:hover {
+  box-shadow: 0 6px 20px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.15);
+}
+
+.btn-success {
+  background: linear-gradient(145deg, var(--success), #059669);
+  box-shadow: 0 4px 15px rgba(16, 185, 129, 0.4);
+}
+
+.btn-danger {
+  background: linear-gradient(145deg, var(--danger), #dc2626);
+  box-shadow: 0 4px 15px rgba(239, 68, 68, 0.4);
+}
+
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none !important;
+}
+
+.btn .ripple {
+  position: absolute;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.6);
+  transform: scale(0);
+  animation: ripple 0.6s ease-out;
+  pointer-events: none;
+}
+
+@keyframes ripple {
+  to {
+    transform: scale(4);
+    opacity: 0;
+  }
+}
+
+.spinner {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(255,255,255,0.3);
+  border-top-color: white;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  margin-right: 8px;
+  vertical-align: middle;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.input-group {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.input, select {
+  flex: 1;
+  padding: 12px 16px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--text);
+  font-size: 0.9rem;
+  transition: var(--transition);
+}
+
+.input:focus, select:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.2);
+}
+
+textarea.input {
+  min-height: 120px;
+  resize: vertical;
+  font-family: 'Courier New', monospace;
+  font-size: 0.85rem;
+}
+
+.toggle-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.toggle-label {
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+.toggle {
+  position: relative;
+  width: 52px;
+  height: 28px;
+  background: #374151;
+  border-radius: 14px;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.toggle-slider {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 24px;
+  height: 24px;
+  background: white;
+  border-radius: 50%;
+  transition: var(--transition);
+  box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+}
+
+.toggle.active {
+  background: var(--primary) !important;
+}
+
+.toggle.active .toggle-slider {
+  transform: translateX(24px) !important;
+}
+
+.stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 12px;
+}
+
+.stat-item {
+  text-align: center;
+  padding: 16px;
+  background: var(--bg);
+  border-radius: 8px;
+  border: 1px solid var(--border);
+}
+
+.stat-value {
+  font-size: 1.75rem;
+  font-weight: 700;
+  line-height: 1;
+  margin-bottom: 4px;
+}
+
+.stat-label {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+}
+
+.table-wrapper {
+  background: var(--bg-card);
+  border-radius: var(--radius);
+  overflow: hidden;
+  box-shadow: var(--shadow);
+  border: 1px solid var(--border);
+}
+
+.table-scroll {
+  overflow-x: auto;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 800px;
+}
+
+thead {
+  background: linear-gradient(135deg, var(--primary), var(--secondary));
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+th {
+  padding: 16px 12px;
+  text-align: left;
+  font-weight: 600;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+td {
+  padding: 14px 12px;
+  border-bottom: 1px solid var(--border);
+  font-size: 0.9rem;
+}
+
+tbody tr {
+  transition: var(--transition);
+}
+
+tbody tr:hover {
+  background: var(--bg-card-hover);
 }
 
 .status-badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.375rem;
-    padding: 0.375rem 0.75rem;
-    border-radius: 0.5rem;
-    font-size: 0.75rem;
-    font-weight: 600;
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  white-space: nowrap;
 }
 
-.status-checking { background: rgba(251, 191, 36, 0.15); color: #fbbf24; border: 1px solid rgba(251, 191, 36, 0.3); }
-.status-online { background: rgba(34, 197, 94, 0.15); color: #4ade80; border: 1px solid rgba(34, 197, 94, 0.3); }
-.status-offline { background: rgba(239, 68, 68, 0.15); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.3); }
-.status-cors { background: rgba(168, 85, 247, 0.15); color: #c084fc; border: 1px solid rgba(168, 85, 247, 0.3); }
-
-.channel-card {
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    border: 1px solid rgba(255, 255, 255, 0.05);
+.status-lancar {
+  background: rgba(16, 185, 129, 0.2);
+  color: var(--success);
+  border: 1px solid rgba(16, 185, 129, 0.3);
 }
 
-.channel-card:hover {
-    background: rgba(51, 65, 85, 0.5);
-    border-color: rgba(59, 130, 246, 0.3);
-    transform: translateY(-2px);
-    box-shadow: 0 8px 16px -4px rgba(0, 0, 0, 0.4);
+.status-cors {
+  background: rgba(245, 158, 11, 0.2);
+  color: var(--warning);
+  border: 1px solid rgba(245, 158, 11, 0.3);
+}
+
+.status-mati {
+  background: rgba(239, 68, 68, 0.2);
+  color: var(--danger);
+  border: 1px solid rgba(239, 68, 68, 0.3);
 }
 
 .quality-badge {
-    display: inline-flex;
-    align-items: center;
-    padding: 0.25rem 0.625rem;
-    border-radius: 0.375rem;
-    font-size: 0.7rem;
-    font-weight: 700;
-    letter-spacing: 0.025em;
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  background: linear-gradient(135deg, var(--primary), var(--secondary));
 }
 
-.quality-sd { background: linear-gradient(135deg, #64748b 0%, #475569 100%); color: white; }
-.quality-hd { background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%); color: white; }
-.quality-fhd { background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%); color: white; }
-.quality-2k { background: linear-gradient(135deg, #ec4899 0%, #db2777 100%); color: white; }
-.quality-4k { background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); color: white; }
+.channel-name {
+  font-weight: 600;
+  max-width: 200px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.url-text {
+  font-family: 'Courier New', monospace;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  max-width: 300px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
 
 .progress-bar {
-    height: 6px;
-    background: rgba(51, 65, 85, 0.8);
-    border-radius: 3px;
-    overflow: hidden;
-    box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.3);
+  width: 100%;
+  height: 4px;
+  background: var(--bg);
+  border-radius: 2px;
+  overflow: hidden;
+  margin-top: 12px;
 }
 
 .progress-fill {
-    height: 100%;
-    background: linear-gradient(90deg, #3b82f6 0%, #8b5cf6 100%);
-    transition: width 0.3s ease;
-    box-shadow: 0 0 10px rgba(59, 130, 246, 0.6);
+  height: 100%;
+  background: linear-gradient(90deg, var(--primary), var(--secondary));
+  transition: width 0.3s ease;
+  border-radius: 2px;
 }
 
-/* Scrollbar styling */
-::-webkit-scrollbar {
-    width: 8px;
-    height: 8px;
+.video-modal {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.95);
+  z-index: 1000;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
 }
 
-::-webkit-scrollbar-track {
-    background: rgba(15, 23, 42, 0.5);
+.video-modal.active {
+  display: flex;
 }
 
-::-webkit-scrollbar-thumb {
-    background: rgba(59, 130, 246, 0.5);
-    border-radius: 4px;
+.video-container {
+  max-width: 1200px;
+  width: 100%;
+  position: relative;
 }
 
-::-webkit-scrollbar-thumb:hover {
-    background: rgba(59, 130, 246, 0.7);
+.video-container video {
+  width: 100%;
+  border-radius: var(--radius);
+  background: #000;
 }
 
-@keyframes pulse-glow {
-    0%, 100% { box-shadow: 0 0 10px rgba(59, 130, 246, 0.3); }
-    50% { box-shadow: 0 0 20px rgba(59, 130, 246, 0.6); }
+.close-modal {
+  position: absolute;
+  top: -40px;
+  right: 0;
+  background: var(--danger);
+  border: none;
+  color: white;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 1.2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-.pulse-glow {
-    animation: pulse-glow 2s ease-in-out infinite;
+@media (max-width: 768px) {
+  body {
+    padding: 8px;
+  }
+  
+  .controls {
+    grid-template-columns: 1fr;
+  }
+  
+  .input-group {
+    flex-direction: column;
+  }
+  
+  .stats {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  th, td {
+    padding: 10px 8px;
+    font-size: 0.8rem;
+  }
+  
+  .channel-name, .url-text {
+    max-width: 120px;
+  }
 }
 
-@media (max-width: 640px) {
-    .btn-3d {
-        font-size: 0.875rem;
-        padding: 0.625rem 1rem;
-    }
+.toast {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  padding: 16px 20px;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  transform: translateX(400px);
+  transition: var(--transition);
+  z-index: 2000;
+}
+
+.toast.show {
+  transform: translateX(0);
 }
 </style>
 </head>
-<body class="text-slate-100">
-<div class="container mx-auto px-4 py-6 max-w-7xl">
-    <!-- Header -->
-    <header class="glass rounded-2xl p-6 mb-6 shadow-2xl">
-        <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
-            <div class="flex items-center gap-4">
-                <div class="w-14 h-14 rounded-xl bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center shadow-lg">
-                    <i class="fas fa-tv text-2xl text-white"></i>
-                </div>
-                <div>
-                    <h1 class="text-2xl md:text-3xl font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
-                        M3U IPTV Checker Pro
-                    </h1>
-                    <p class="text-sm text-slate-400 mt-1">v2.5 - Smart CORS + 3D Realistic UI</p>
-                </div>
-            </div>
-            <div class="flex items-center gap-4 w-full md:w-auto">
-                <div class="flex items-center gap-2 text-sm">
-                    <i class="fas fa-check-circle text-green-400"></i>
-                    <span id="statsOnline" class="font-bold text-green-400">0</span>
-                    <span class="text-slate-400">Online</span>
-                </div>
-                <div class="flex items-center gap-2 text-sm">
-                    <i class="fas fa-times-circle text-red-400"></i>
-                    <span id="statsOffline" class="font-bold text-red-400">0</span>
-                    <span class="text-slate-400">Offline</span>
-                </div>
-            </div>
-        </div>
-    </header>
+<body>
+<div class="container">
+  <div class="header">
+    <h1>M3U IPTV Checker Pro <span class="version">v2.6 - Smart Fetch + CORS Detector</span></h1>
+    <p>Anti CORS Bullshit • 3D Button • HLS Manifest Quality Detection</p>
+  </div>
 
-    <!-- Control Panel -->
-    <div class="glass rounded-2xl p-6 mb-6 shadow-2xl">
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-            <!-- M3U Input -->
-            <div>
-                <label class="block text-sm font-semibold mb-2 text-slate-300">
-                    <i class="fas fa-file-code mr-2 text-blue-400"></i>M3U Playlist
-                </label>
-                <textarea id="m3uInput" rows="6" placeholder="#EXTM3U&#10;#EXTINF:-1,Channel Name&#10;http://example.com/stream.m3u8" 
-                    class="w-full px-4 py-3 bg-slate-800/50 border border-slate-700 rounded-xl text-sm focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all"></textarea>
-                <div class="flex gap-2 mt-3">
-                    <button id="loadFileBtn" class="btn-3d flex-1 bg-slate-700 hover:bg-slate-600 text-white px-4 py-2.5 rounded-xl font-medium text-sm">
-                        <i class="fas fa-upload mr-2"></i>Load File
-                    </button>
-                    <input type="file" id="fileInput" accept=".m3u,.m3u8" class="hidden">
-                    <button id="loadUrlBtn" class="btn-3d flex-1 bg-slate-700 hover:bg-slate-600 text-white px-4 py-2.5 rounded-xl font-medium text-sm">
-                        <i class="fas fa-link mr-2"></i>Load URL
-                    </button>
-                </div>
-            </div>
-
-            <!-- Settings -->
-            <div class="space-y-4">
-                <div>
-                    <label class="flex items-center justify-between mb-3">
-                        <span class="text-sm font-semibold text-slate-300">
-                            <i class="fas fa-sliders-h mr-2 text-purple-400"></i>Concurrent Checks
-                        </span>
-                        <span id="concurrencyValue" class="text-sm font-bold text-blue-400">3</span>
-                    </label>
-                    <input type="range" id="concurrencySlider" min="1" max="10" value="3" 
-                        class="w-full h-2 bg-slate-700 rounded-lg appearance-none cursor-pointer accent-blue-500">
-                </div>
-
-                <div>
-                    <label class="flex items-center justify-between mb-3">
-                        <span class="text-sm font-semibold text-slate-300">
-                            <i class="fas fa-clock mr-2 text-orange-400"></i>Timeout (seconds)
-                        </span>
-                        <span id="timeoutValue" class="text-sm font-bold text-blue-400">15s</span>
-                    </label>
-                    <input type="range" id="timeoutSlider" min="5" max="60" value="15" 
-                        class="w-full h-2 bg-slate-700 rounded-lg appearance-none cursor-pointer accent-blue-500">
-                </div>
-
-                <div class="space-y-3 pt-2">
-                    <div class="flex items-center justify-between">
-                        <label class="text-sm font-semibold text-slate-300">
-                            <i class="fas fa-shield-alt mr-2 text-green-400"></i>Smart CORS Fallback
-                        </label>
-                        <div class="toggle-switch active" id="smartCorsToggle">
-                            <div class="toggle-knob"></div>
-                        </div>
-                    </div>
-                    <div class="flex items-center justify-between">
-                        <label class="text-sm font-semibold text-slate-300">
-                            <i class="fas fa-video mr-2 text-pink-400"></i>Full Resolution Detection
-                        </label>
-                        <div class="toggle-switch active" id="resolutionToggle">
-                            <div class="toggle-knob"></div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Action Buttons -->
-        <div class="flex flex-wrap gap-3">
-            <button id="parseBtn" class="btn-3d bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-500 hover:to-blue-400 text-white px-6 py-3 rounded-xl font-semibold text-sm">
-                <i class="fas fa-code mr-2"></i>Parse Playlist
-            </button>
-            <button id="checkBtn" class="btn-3d bg-gradient-to-r from-green-600 to-emerald-500 hover:from-green-500 hover:to-emerald-400 text-white px-6 py-3 rounded-xl font-semibold text-sm" disabled>
-                <i class="fas fa-play mr-2"></i>Check All
-            </button>
-            <button id="stopBtn" class="btn-3d bg-gradient-to-r from-red-600 to-red-500 hover:from-red-500 hover:to-red-400 text-white px-6 py-3 rounded-xl font-semibold text-sm" disabled>
-                <i class="fas fa-stop mr-2"></i>Stop
-            </button>
-            <button id="exportBtn" class="btn-3d bg-gradient-to-r from-purple-600 to-purple-500 hover:from-purple-500 hover:to-purple-400 text-white px-6 py-3 rounded-xl font-semibold text-sm" disabled>
-                <i class="fas fa-download mr-2"></i>Export Online
-            </button>
-            <button id="clearBtn" class="btn-3d bg-slate-700 hover:bg-slate-600 text-white px-6 py-3 rounded-xl font-semibold text-sm">
-                <i class="fas fa-trash mr-2"></i>Clear
-            </button>
-        </div>
+  <div class="controls">
+    <div class="card">
+      <div class="card-title">Import M3U</div>
+      <textarea class="input" id="m3uInput" placeholder="Paste M3U playlist atau URL disini...
+#EXTM3U
+#EXTINF:-1,Channel Name
+http://example.com/stream.m3u8"></textarea>
+      <div class="input-group">
+        <button class="btn" onclick="parseM3U()">Parse M3U</button>
+        <input type="file" id="fileInput" accept=".m3u,.m3u8" style="display:none" onchange="handleFile(event)">
+        <button class="btn btn-secondary" onclick="document.getElementById('fileInput').click()">Upload File</button>
+      </div>
+      <div class="input-group">
+        <input type="text" class="input" id="urlInput" placeholder="https://example.com/playlist.m3u">
+        <button class="btn btn-secondary" onclick="loadFromURL()">Load URL</button>
+      </div>
     </div>
 
-    <!-- Progress Bar -->
-    <div id="progressContainer" class="glass rounded-2xl p-4 mb-6 shadow-2xl hidden">
-        <div class="flex items-center justify-between mb-2">
-            <span class="text-sm font-semibold text-slate-300">
-                <i class="fas fa-spinner fa-spin mr-2"></i>Checking channels...
-            </span>
-            <span id="progressText" class="text-sm font-bold text-blue-400">0 / 0</span>
+    <div class="card">
+      <div class="card-title">Test Controls</div>
+      <button class="btn btn-success" id="testAllBtn" onclick="testAll()">
+        <span id="testBtnText">Test All Channels</span>
+      </button>
+      <button class="btn btn-danger" onclick="stopTest()">Stop Testing</button>
+      <div class="progress-bar">
+        <div class="progress-fill" id="progressBar" style="width: 0%"></div>
+      </div>
+      <div class="toggle-wrapper" style="margin-top: 16px;">
+        <span class="toggle-label">Auto Quality Check</span>
+        <div class="toggle active" id="qualityToggle" onclick="toggleQuality(this)">
+          <div class="toggle-slider"></div>
         </div>
-        <div class="progress-bar">
-            <div id="progressFill" class="progress-fill" style="width: 0%"></div>
+      <div class="toggle-wrapper">
+        <span class="toggle-label">CORS Bypass Mode</span>
+        <div class="toggle active" id="corsToggle" onclick="toggleCORS(this)">
+          <div class="toggle-slider"></div>
         </div>
+      </div>
     </div>
 
-    <!-- Stats Cards -->
-    <div id="statsContainer" class="grid grid-cols-2 md:grid-cols-5 gap-4 mb-6 hidden">
-        <div class="glass rounded-xl p-4 text-center">
-            <div class="text-2xl font-bold text-white" id="totalChannels">0</div>
-            <div class="text-xs text-slate-400 mt-1">Total</div>
-        </div>
-        <div class="glass rounded-xl p-4 text-center">
-            <div class="text-2xl font-bold text-green-400" id="onlineCount">0</div>
-            <div class="text-xs text-slate-400 mt-1">Online</div>
-        </div>
-        <div class="glass rounded-xl p-4 text-center">
-            <div class="text-2xl font-bold text-red-400" id="offlineCount">0</div>
-            <div class="text-xs text-slate-400 mt-1">Offline</div>
-        </div>
-        <div class="glass rounded-xl p-4 text-center">
-            <div class="text-2xl font-bold text-purple-400" id="corsCount">0</div>
-            <div class="text-xs text-slate-400 mt-1">CORS Fixed</div>
-        </div>
-        <div class="glass rounded-xl p-4 text-center">
-            <div class="text-2xl font-bold text-yellow-400" id="checkingCount">0</div>
-            <div class="text-xs text-slate-400 mt-1">Checking</div>
-        </div>
+    <div class="card">
+      <div class="card-title">Filter & Export</div>
+      <div class="input-group">
+        <input type="text" class="input" id="searchInput" placeholder="Cari channel..." oninput="filterChannels()">
+      </div>
+      <select class="input" id="statusFilter" onchange="filterChannels()">
+        <option value="all">Semua Status</option>
+        <option value="lancar">Lancar Only</option>
+        <option value="cors">CORS Only</option>
+        <option value="mati">Mati Only</option>
+      </select>
+      <button class="btn" style="margin-top: 12px;" onclick="exportM3U()">Export Working M3U</button>
+      <button class="btn btn-secondary" onclick="exportCSV()">Export CSV Report</button>
     </div>
 
-    <!-- Filters -->
-    <div id="filterContainer" class="glass rounded-2xl p-4 mb-6 shadow-2xl hidden">
-        <div class="flex flex-wrap items-center gap-3">
-            <div class="flex items-center gap-2">
-                <i class="fas fa-filter text-slate-400"></i>
-                <span class="text-sm font-semibold text-slate-300">Filter:</span>
-            </div>
-            <button class="btn-3d filter-btn active bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium" data-filter="all">
-                All
-            </button>
-            <button class="btn-3d filter-btn bg-slate-700 text-white px-4 py-2 rounded-lg text-sm font-medium" data-filter="online">
-                <i class="fas fa-check-circle text-green-400 mr-1"></i>Online
-            </button>
-            <button class="btn-3d filter-btn bg-slate-700 text-white px-4 py-2 rounded-lg text-sm font-medium" data-filter="offline">
-                <i class="fas fa-times-circle text-red-400 mr-1"></i>Offline
-            </button>
-            <div class="flex-1"></div>
-            <div class="relative w-full sm:w-auto">
-                <input type="text" id="searchInput" placeholder="Search channels..." 
-                    class="w-full sm:w-64 px-4 py-2 bg-slate-800/50 border border-slate-700 rounded-lg text-sm focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 pl-10">
-                <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-sm"></i>
-            </div>
+    <div class="card">
+      <div class="card-title">Statistics</div>
+      <div class="stats">
+        <div class="stat-item">
+          <div class="stat-value" id="totalCount">0</div>
+          <div class="stat-label">Total</div>
         </div>
+        <div class="stat-item">
+          <div class="stat-value" style="color: var(--success)" id="lancarCount">0</div>
+          <div class="stat-label">Lancar</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-value" style="color: var(--warning)" id="corsCount">0</div>
+          <div class="stat-label">CORS</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-value" style="color: var(--danger)" id="matiCount">0</div>
+          <div class="stat-label">Mati</div>
+        </div>
+      </div>
     </div>
+  </div>
 
-    <!-- Results Container -->
-    <div id="resultsContainer" class="space-y-3"></div>
-
-    <!-- Empty State -->
-    <div id="emptyState" class="glass rounded-2xl p-12 text-center shadow-2xl">
-        <i class="fas fa-satellite-dish text-6xl text-slate-600 mb-4"></i>
-        <h3 class="text-xl font-bold text-slate-300 mb-2">No Channels Loaded</h3>
-        <p class="text-slate-400 text-sm">Parse an M3U playlist to start checking channels</p>
+  <div class="table-wrapper">
+    <div class="table-scroll">
+      <table id="channelTable">
+        <thead>
+          <tr>
+            <th style="width: 50px">#</th>
+            <th>Channel Name</th>
+            <th>URL</th>
+            <th style="width: 100px">Status</th>
+            <th style="width: 100px">Quality</th>
+            <th style="width: 100px">Resolution</th>
+            <th style="width: 100px">Bitrate</th>
+            <th style="width: 100px">Action</th>
+          </tr>
+        </thead>
+        <tbody id="channelBody">
+          <tr>
+            <td colspan="8" style="text-align:center; padding:40px; color:var(--text-muted)">
+              Import playlist M3U untuk mulai testing
+            </td>
+          </tr>
+        </tbody>
+      </table>
     </div>
+  </div>
 </div>
 
-<!-- Hidden video element for resolution detection -->
-<video id="hiddenVideo" playsinline muted style="position: absolute; left: -9999px; width: 1px; height: 1px;"></video>
+<div class="video-modal" id="videoModal" onclick="closeModal(event)">
+  <div class="video-container" onclick="event.stopPropagation()">
+    <button class="close-modal" onclick="closeModal()">×</button>
+    <video id="videoPlayer" controls></video>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
 
 <script>
-const CORS_PROXIES = [
-    'https://corsproxy.io/?',
-    'https://api.allorigins.win/raw?url=',
-    'https://proxy.cors.sh/'
-];
-
 let channels = [];
-let isChecking = false;
-let abortController = null;
-let stats = { total: 0, online: 0, offline: 0, cors: 0, checking: 0 };
-let settings = {
-    concurrency: 3,
-    timeout: 15,
-    smartCors: true,
-    fullResolution: true
-};
+let isTestRunning = false;
+let currentTestIndex = 0;
+let hls = null;
+let qualityCheckEnabled = true;
+let corsBypassEnabled = true;
 
-const m3uInput = document.getElementById('m3uInput');
-const fileInput = document.getElementById('fileInput');
-const resultsContainer = document.getElementById('resultsContainer');
-const emptyState = document.getElementById('emptyState');
-const progressContainer = document.getElementById('progressContainer');
-const statsContainer = document.getElementById('statsContainer');
-const filterContainer = document.getElementById('filterContainer');
-const hiddenVideo = document.getElementById('hiddenVideo');
-
-// Ripple effect for all 3D buttons
+// Ripple Effect untuk semua tombol 3D
 document.addEventListener('click', function(e) {
-    if (e.target.closest('.btn-3d')) {
-        const btn = e.target.closest('.btn-3d');
-        const ripple = document.createElement('span');
-        const rect = btn.getBoundingClientRect();
-        const size = Math.max(rect.width, rect.height);
-        const x = e.clientX - rect.left - size / 2;
-        const y = e.clientY - rect.top - size / 2;
-        
-        ripple.style.width = ripple.style.height = size + 'px';
-        ripple.style.left = x + 'px';
-        ripple.style.top = y + 'px';
-        ripple.classList.add('ripple');
-        
-        btn.appendChild(ripple);
-        setTimeout(() => ripple.remove(), 600);
-    }
+  if (e.target.closest('.btn')) {
+    const btn = e.target.closest('.btn');
+    const ripple = document.createElement('span');
+    const rect = btn.getBoundingClientRect();
+    const size = Math.max(rect.width, rect.height);
+    const x = e.clientX - rect.left - size / 2;
+    const y = e.clientY - rect.top - size / 2;
+    
+    ripple.className = 'ripple';
+    ripple.style.width = ripple.style.height = size + 'px';
+    ripple.style.left = x + 'px';
+    ripple.style.top = y + 'px';
+    
+    btn.appendChild(ripple);
+    setTimeout(() => ripple.remove(), 600);
+  }
 });
 
-// Toggle switches
-document.getElementById('smartCorsToggle').addEventListener('click', function() {
-    this.classList.toggle('active');
-    settings.smartCors = this.classList.contains('active');
-});
+function showToast(msg) {
+  const toast = document.getElementById('toast');
+  toast.textContent = msg;
+  toast.classList.add('show');
+  setTimeout(() => toast.classList.remove('show'), 3000);
+}
 
-document.getElementById('resolutionToggle').addEventListener('click', function() {
-    this.classList.toggle('active');
-    settings.fullResolution = this.classList.contains('active');
-});
+function toggleQuality(el) {
+  el.classList.toggle('active');
+  qualityCheckEnabled = el.classList.contains('active');
+}
 
-// Sliders
-document.getElementById('concurrencySlider').addEventListener('input', function() {
-    settings.concurrency = parseInt(this.value);
-    document.getElementById('concurrencyValue').textContent = this.value;
-});
-
-document.getElementById('timeoutSlider').addEventListener('input', function() {
-    settings.timeout = parseInt(this.value);
-    document.getElementById('timeoutValue').textContent = this.value + 's';
-});
-
-// File input
-document.getElementById('loadFileBtn').addEventListener('click', () => fileInput.click());
-fileInput.addEventListener('change', function(e) {
-    const file = e.target.files[0];
-    if (file) {
-        const reader = new FileReader();
-        reader.onload = (e) => {
-            m3uInput.value = e.target.result;
-        };
-        reader.readAsText(file);
-    }
-});
-
-// Load URL
-document.getElementById('loadUrlBtn').addEventListener('click', async function() {
-    const url = prompt('Enter M3U playlist URL:');
-    if (url) {
-        try {
-            const response = await fetch(url);
-            const text = await response.text();
-            m3uInput.value = text;
-        } catch (err) {
-            alert('Failed to load URL: ' + err.message);
-        }
-    }
-});
-
-// Parse M3U
-document.getElementById('parseBtn').addEventListener('click', parseM3U);
-document.getElementById('checkBtn').addEventListener('click', startChecking);
-document.getElementById('stopBtn').addEventListener('click', stopChecking);
-document.getElementById('clearBtn').addEventListener('click', clearAll);
-document.getElementById('exportBtn').addEventListener('click', exportOnline);
+function toggleCORS(el) {
+  el.classList.toggle('active');
+  corsBypassEnabled = el.classList.contains('active');
+}
 
 function parseM3U() {
-    const content = m3uInput.value.trim();
-    if (!content) {
-        alert('Please enter M3U playlist content');
+  const content = document.getElementById('m3uInput').value.trim();
+  if (!content) {
+    showToast('Paste M3U content dulu bro!');
+    return;
+  }
+  
+  const lines = content.split('\n');
+  channels = [];
+  let currentName = '';
+  
+  for (let line of lines) {
+    line = line.trim();
+    if (line.startsWith('#EXTINF')) {
+      const match = line.match(/,(.*)$/);
+      currentName = match ? match[1].trim() : 'Unknown';
+    } else if (line && !line.startsWith('#')) {
+      channels.push({
+        name: currentName || 'Unknown Channel',
+        url: line,
+        status: 'pending',
+        quality: '-',
+        resolution: '-',
+        bitrate: '-'
+      });
+      currentName = '';
+    }
+  }
+  
+  renderTable();
+  updateStats();
+  showToast(`${channels.length} channel berhasil di-import`);
+}
+
+function handleFile(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    document.getElementById('m3uInput').value = e.target.result;
+    parseM3U();
+  };
+  reader.readAsText(file);
+}
+
+async function loadFromURL() {
+  const url = document.getElementById('urlInput').value.trim();
+  if (!url) {
+    showToast('Masukin URL M3U dulu!');
+    return;
+  }
+  
+  try {
+    showToast('Loading playlist...');
+    const response = await fetch(url);
+    const text = await response.text();
+    document.getElementById('m3uInput').value = text;
+    parseM3U();
+  } catch (err) {
+    showToast('Gagal load URL: ' + err.message);
+  }
+}
+
+function renderTable() {
+  const tbody = document.getElementById('channelBody');
+  const filter = document.getElementById('statusFilter').value;
+  const search = document.getElementById('searchInput').value.toLowerCase();
+  
+  const filtered = channels.filter(ch => {
+    const matchStatus = filter === 'all' || ch.status === filter;
+    const matchSearch = ch.name.toLowerCase().includes(search) || ch.url.toLowerCase().includes(search);
+    return matchStatus && matchSearch;
+  });
+  
+  if (filtered.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="8" style="text-align:center; padding:40px; color:var(--text-muted)">Tidak ada channel</td></tr>';
+    return;
+  }
+  
+  tbody.innerHTML = filtered.map((ch, i) => `
+    <tr>
+      <td>${i + 1}</td>
+      <td class="channel-name" title="${ch.name}">${ch.name}</td>
+      <td class="url-text" title="${ch.url}">${ch.url}</td>
+      <td>${getStatusBadge(ch.status)}</td>
+      <td>${ch.quality !== '-' ? `<span class="quality-badge">${ch.quality}</span>` : '-'}</td>
+      <td>${ch.resolution}</td>
+      <td>${ch.bitrate}</td>
+      <td>
+        <button class="btn btn-secondary" style="padding:6px 12px; font-size:0.8rem" onclick="playChannel(${channels.indexOf(ch)})">▶ Play</button>
+      </td>
+    </tr>
+  `).join('');
+}
+
+function getStatusBadge(status) {
+  const badges = {
+    pending: '<span class="status-badge" style="background:rgba(156,163,175,0.2);color:var(--text-muted)">⏳ Pending</span>',
+    lancar: '<span class="status-badge status-lancar">🟢 Lancar</span>',
+    cors: '<span class="status-badge status-cors">🟡 CORS</span>',
+    mati: '<span class="status-badge status-mati">🔴 Mati</span>'
+  };
+  return badges[status] || badges.pending;
+}
+
+async function testAll() {
+  if (isTestRunning) return;
+  if (channels.length === 0) {
+    showToast('Import channel dulu bro!');
+    return;
+  }
+  
+  isTestRunning = true;
+  currentTestIndex = 0;
+  const btn = document.getElementById('testAllBtn');
+  const btnText = document.getElementById('testBtnText');
+  btn.disabled = true;
+  btnText.innerHTML = '<span class="spinner"></span>Testing...';
+  
+  for (let i = 0; i < channels.length; i++) {
+    if (!isTestRunning) break;
+    currentTestIndex = i;
+    await testChannel(i);
+    updateProgress((i + 1) / channels.length * 100);
+    renderTable();
+    updateStats();
+    await sleep(100);
+  }
+  
+  isTestRunning = false;
+  btn.disabled = false;
+  btnText.textContent = 'Test All Channels';
+  updateProgress(0);
+  showToast('Testing selesai!');
+}
+
+function stopTest() {
+  isTestRunning = false;
+  showToast('Testing dihentikan');
+}
+
+async function testChannel(index) {
+  const ch = channels[index];
+  ch.status = 'pending';
+  
+  try {
+    // Step 1: Anti CORS Bullshit - Test pake no-cors mode
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 8000);
+    
+    let serverAlive = false;
+    
+    if (corsBypassEnabled) {
+      try {
+        await fetch(ch.url, {
+          mode: 'no-cors',
+          signal: controller.signal,
+          cache: 'no-store'
+        });
+        serverAlive = true; // no-cors always opaque response, tapi kalo fetch berhasil = server nyala
+      } catch (err) {
+        if (err.name === 'AbortError') {
+          ch.status = 'mati';
+          ch.quality = '-';
+          ch.resolution = 'Timeout';
+          ch.bitrate = '-';
+          clearTimeout(timeout);
+          return;
+        }
+        // Network error = server mati
+        ch.status = 'mati';
+        ch.quality = '-';
+        ch.resolution = 'Dead';
+        ch.bitrate = '-';
+        clearTimeout(timeout);
         return;
+      }
     }
-
-    channels = [];
-    const lines = content.split('\n');
-    let currentChannel = null;
-
-    for (let i = 0; i < lines.length; i++) {
-        const line = lines[i].trim();
-        
-        if (line.startsWith('#EXTINF:')) {
-            const info = line.substring(8);
-            const nameMatch = info.match(/,(.+)$/);
-            const logoMatch = info.match(/tvg-logo="([^"]+)"/);
-            const groupMatch = info.match(/group-title="([^"]+)"/);
-            
-            currentChannel = {
-                id: channels.length,
-                name: nameMatch ? nameMatch[1].trim() : 'Unknown Channel',
-                logo: logoMatch ? logoMatch[1] : null,
-                group: groupMatch ? groupMatch[1] : 'Uncategorized',
-                url: null,
-                status: 'pending',
-                resolution: null,
-                bitrate: null,
-                quality: null,
-                latency: null,
-                corsFixed: false
-            };
-        } else if (line && !line.startsWith('#') && currentChannel) {
-            currentChannel.url = line;
-            channels.push(currentChannel);
-            currentChannel = null;
-        }
-    }
-
-    if (channels.length === 0) {
-        alert('No valid channels found in playlist');
+    
+    clearTimeout(timeout);
+    
+    // Step 2: Cek CORS dengan fetch normal
+    try {
+      const resp = await fetch(ch.url, { method: 'HEAD', cache: 'no-store' });
+      if (resp.ok) {
+        ch.status = 'lancar';
+      } else {
+        ch.status = 'cors';
+      }
+    } catch (err) {
+      // CORS error tapi server nyala
+      if (serverAlive) {
+        ch.status = 'cors';
+      } else {
+        ch.status = 'mati';
         return;
+      }
     }
-
-    stats.total = channels.length;
-    updateStats();
-    renderChannels();
-    document.getElementById('checkBtn').disabled = false;
-    emptyState.classList.add('hidden');
-    statsContainer.classList.remove('hidden');
-    filterContainer.classList.remove('hidden');
+    
+    // Step 3: Quality Full Detection via HLS manifest
+    if (qualityCheckEnabled && ch.status !== 'mati') {
+      await detectQuality(ch);
+    }
+    
+  } catch (err) {
+    ch.status = 'mati';
+    ch.quality = '-';
+    ch.resolution = 'Error';
+    ch.bitrate = '-';
+  }
 }
 
-async function startChecking() {
-    if (isChecking || channels.length === 0) return;
+async function detectQuality(ch) {
+  return new Promise((resolve) => {
+    if (!Hls.isSupported()) {
+      resolve();
+      return;
+    }
     
-    isChecking = true;
-    abortController = new AbortController();
-    stats = { total: channels.length, online: 0, offline: 0, cors: 0, checking: channels.length };
-    
-    document.getElementById('checkBtn').disabled = true;
-    document.getElementById('stopBtn').disabled = false;
-    document.getElementById('parseBtn').disabled = true;
-    progressContainer.classList.remove('hidden');
-    
-    updateStats();
-    
-    const queue = [...channels];
-    const results = [];
-    
-    const workers = Array(settings.concurrency).fill(null).map(async () => {
-        while (queue.length > 0 && !abortController.signal.aborted) {
-            const channel = queue.shift();
-            if (!channel) break;
-            
-            await checkChannel(channel);
-            results.push(channel);
-            updateProgress(results.length);
-        }
+    const tempHls = new Hls({ 
+      enableWorker: false,
+      lowLatencyMode: false,
+      debug: false
     });
     
-    await Promise.all(workers);
+    const timeout = setTimeout(() => {
+      tempHls.destroy();
+      resolve();
+    }, 5000);
     
-    if (!abortController.signal.aborted) {
-        isChecking = false;
-        document.getElementById('checkBtn').disabled = false;
-        document.getElementById('stopBtn').disabled = true;
-        document.getElementById('parseBtn').disabled = false;
-        document.getElementById('exportBtn').disabled = stats.online === 0;
-    }
-}
-
-function stopChecking() {
-    if (abortController) {
-        abortController.abort();
-        isChecking = false;
-        document.getElementById('checkBtn').disabled = false;
-        document.getElementById('stopBtn').disabled = true;
-        document.getElementById('parseBtn').disabled = false;
-    }
-}
-
-async function checkChannel(channel) {
-    const startTime = Date.now();
-    channel.status = 'checking';
-    updateChannelCard(channel);
-    
-    // Smart CORS: Try direct first
-    let success = await testStream(channel.url, false);
-    
-    // If failed and Smart CORS enabled, try proxies
-    if (!success && settings.smartCors) {
-        for (let i = 0; i < CORS_PROXIES.length && !success; i++) {
-            const proxiedUrl = CORS_PROXIES[i] + encodeURIComponent(channel.url);
-            success = await testStream(proxiedUrl, true);
-            if (success) channel.corsFixed = true;
+    tempHls.on(Hls.Events.LEVEL_LOADED, (event, data) => {
+      clearTimeout(timeout);
+      
+      if (data.details && data.levels && data.levels.length > 0) {
+        const level = data.levels[data.currentLevel] || data.levels[0];
+        const height = level.height || 0;
+        const bitrate = level.bitrate || 0;
+        
+        ch.resolution = `${level.width || '?'}x${height}`;
+        ch.bitrate = formatBitrate(bitrate);
+        ch.quality = getQualityLabel(height);
+        
+        if (data.levels.length > 1) {
+          ch.quality += ` (${data.levels.length}Q)`;
         }
-    }
-    
-    channel.latency = Date.now() - startTime;
-    
-    if (success) {
-        channel.status = 'online';
-        stats.online++;
-        if (channel.corsFixed) stats.cors++;
-    } else {
-        channel.status = 'offline';
-        stats.offline++;
-    }
-    
-    stats.checking--;
-    updateChannelCard(channel);
-    updateStats();
-}
-
-function testStream(url, isProxied) {
-    return new Promise((resolve) => {
-        if (!Hls.isSupported()) {
-            // Fallback: try to fetch headers
-            fetch(url, { 
-                method: 'HEAD', 
-                signal: AbortSignal.timeout(settings.timeout * 1000),
-                mode: isProxied ? 'cors' : 'no-cors'
-            }).then(() => resolve(true)).catch(() => resolve(false));
-            return;
-        }
-        
-        const hls = new Hls({
-            debug: false,
-            enableWorker: false,
-            lowLatencyMode: false,
-            backBufferLength: 0
-        });
-        
-        const timeout = setTimeout(() => {
-            hls.destroy();
-            resolve(false);
-        }, settings.timeout * 1000);
-        
-        hls.loadSource(url);
-        hls.attachMedia(hiddenVideo);
-        
-        hls.on(Hls.Events.MANIFEST_PARSED, () => {
-            clearTimeout(timeout);
-            if (settings.fullResolution) {
-                detectResolution(hls, url).then((info) => {
-                    if (info) {
-                        channels.find(c => c.url === url || c.url.replace(CORS_PROXIES[0], '').replace(CORS_PROXIES[1], '').replace(CORS_PROXIES[2], '') === url).resolution = info.resolution;
-                        channels.find(c => c.url === url || c.url.replace(CORS_PROXIES[0], '').replace(CORS_PROXIES[1], '').replace(CORS_PROXIES[2], '') === url).bitrate = info.bitrate;
-                        channels.find(c => c.url === url || c.url.replace(CORS_PROXIES[0], '').replace(CORS_PROXIES[1], '').replace(CORS_PROXIES[2], '') === url).quality = info.quality;
-                    }
-                    hls.destroy();
-                    resolve(true);
-                });
-            } else {
-                hls.destroy();
-                resolve(true);
-            }
-        });
-        
-        hls.on(Hls.Events.ERROR, () => {
-            clearTimeout(timeout);
-            hls.destroy();
-            resolve(false);
-        });
+      }
+      
+      tempHls.destroy();
+      resolve();
     });
-}
-
-async function detectResolution(hls, url) {
-    return new Promise((resolve) => {
-        const levels = hls.levels;
-        if (!levels || levels.length === 0) {
-            resolve(null);
-            return;
-        }
-        
-        // Get highest quality level
-        const bestLevel = levels.reduce((prev, current) => {
-            const prevRes = (prev.width || 0) * (prev.height || 0);
-            const currentRes = (current.width || 0) * (current.height || 0);
-            return currentRes > prevRes ? current : prev;
-        });
-        
-        if (bestLevel) {
-            const width = bestLevel.width || 0;
-            const height = bestLevel.height || 0;
-            const bitrate = bestLevel.bitrate || 0;
-            
-            let quality = 'SD';
-            if (height >= 2160 || width >= 3840) quality = '4K';
-            else if (height >= 1440 || width >= 2560) quality = '2K';
-            else if (height >= 1080 || width >= 1920) quality = 'FHD';
-            else if (height >= 720 || width >= 1280) quality = 'HD';
-            
-            resolve({
-                resolution: `${width}x${height}`,
-                bitrate: (bitrate / 1000000).toFixed(2) + ' Mbps',
-                quality: quality
-            });
-        } else {
-            resolve(null);
-        }
+    
+    tempHls.on(Hls.Events.ERROR, () => {
+      clearTimeout(timeout);
+      tempHls.destroy();
+      resolve();
     });
-}
-
-function renderChannels() {
-    resultsContainer.innerHTML = '';
-    channels.forEach(channel => {
-        const card = createChannelCard(channel);
-        resultsContainer.appendChild(card);
-    });
-}
-
-function createChannelCard(channel) {
-    const card = document.createElement('div');
-    card.className = 'channel-card glass rounded-xl p-4';
-    card.dataset.id = channel.id;
-    card.dataset.status = channel.status;
-    card.dataset.name = channel.name.toLowerCase();
-    updateChannelCardContent(card, channel);
-    return card;
-}
-
-function updateChannelCard(channel) {
-    const card = resultsContainer.querySelector(`[data-id="${channel.id}"]`);
-    if (card) {
-        card.dataset.status = channel.status;
-        updateChannelCardContent(card, channel);
-    }
-}
-
-function updateChannelCardContent(card, channel) {
-    let statusBadge = '';
-    if (channel.status === 'checking') {
-        statusBadge = '<span class="status-badge status-checking"><i class="fas fa-spinner fa-spin"></i>Checking</span>';
-    } else if (channel.status === 'online') {
-        statusBadge = '<span class="status-badge status-online"><i class="fas fa-check-circle"></i>Online</span>';
-    } else if (channel.status === 'offline') {
-        statusBadge = '<span class="status-badge status-offline"><i class="fas fa-times-circle"></i>Offline</span>';
-    }
     
-    if (channel.corsFixed) {
-        statusBadge += '<span class="status-badge status-cors ml-2"><i class="fas fa-shield-alt"></i>CORS Fixed</span>';
+    try {
+      tempHls.loadSource(ch.url);
+    } catch {
+      tempHls.destroy();
+      resolve();
     }
-    
-    let qualityBadge = '';
-    if (channel.quality) {
-        const qualityClass = `quality-${channel.quality.toLowerCase()}`;
-        qualityBadge = `<span class="quality-badge ${qualityClass}">${channel.quality}</span>`;
-    }
-    
-    card.innerHTML = `
-        <div class="flex flex-col sm:flex-row items-start gap-4">
-            <div class="flex items-start gap-3 flex-1 min-w-0">
-                <div class="w-12 h-12 rounded-lg bg-slate-800 flex items-center justify-center flex-shrink-0 overflow-hidden">
-                    ${channel.logo ? `<img src="${channel.logo}" alt="${channel.name}" class="w-full h-full object-cover" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">` : ''}
-                    <i class="fas fa-tv text-slate-600" ${channel.logo ? 'style="display:none"' : ''}></i>
-                </div>
-                <div class="flex-1 min-w-0">
-                    <h3 class="font-semibold text-white truncate mb-1">${channel.name}</h3>
-                    <p class="text-xs text-slate-400 truncate">${channel.group}</p>
-                    <div class="flex flex-wrap gap-2 mt-2">
-                        ${statusBadge}
-                        ${qualityBadge}
-                    </div>
-                </div>
-            </div>
-            <div class="flex flex-wrap gap-3 text-xs w-full sm:w-auto">
-                ${channel.resolution ? `<div class="flex items-center gap-1 text-slate-400">
-                    <i class="fas fa-expand"></i>
-                    <span>${channel.resolution}</span>
-                </div>` : ''}
-                ${channel.bitrate ? `<div class="flex items-center gap-1 text-slate-400">
-                    <i class="fas fa-tachometer-alt"></i>
-                    <span>${channel.bitrate}</span>
-                </div>` : ''}
-                ${channel.latency ? `<div class="flex items-center gap-1 text-slate-400">
-                    <i class="fas fa-clock"></i>
-                    <span>${channel.latency}ms</span>
-                </div>` : ''}
-            </div>
-        </div>
-    `;
+  });
+}
+
+function getQualityLabel(height) {
+  if (height >= 2160) return '4K';
+  if (height >= 1440) return '2K';
+  if (height >= 1080) return 'FHD';
+  if (height >= 720) return 'HD';
+  if (height >= 480) return 'SD';
+  return 'LD';
+}
+
+function formatBitrate(bps) {
+  if (!bps || bps === 0) return '-';
+  if (bps >= 1000000) return (bps / 1000000).toFixed(2) + ' Mbps';
+  if (bps >= 1000) return (bps / 1000).toFixed(0) + ' Kbps';
+  return bps + ' bps';
+}
+
+function updateProgress(percent) {
+  document.getElementById('progressBar').style.width = percent + '%';
 }
 
 function updateStats() {
-    document.getElementById('statsOnline').textContent = stats.online;
-    document.getElementById('statsOffline').textContent = stats.offline;
-    document.getElementById('totalChannels').textContent = stats.total;
-    document.getElementById('onlineCount').textContent = stats.online;
-    document.getElementById('offlineCount').textContent = stats.offline;
-    document.getElementById('corsCount').textContent = stats.cors;
-    document.getElementById('checkingCount').textContent = stats.checking;
+  document.getElementById('totalCount').textContent = channels.length;
+  document.getElementById('lancarCount').textContent = channels.filter(c => c.status === 'lancar').length;
+  document.getElementById('corsCount').textContent = channels.filter(c => c.status === 'cors').length;
+  document.getElementById('matiCount').textContent = channels.filter(c => c.status === 'mati').length;
 }
 
-function updateProgress(checked) {
-    const percent = (checked / stats.total) * 100;
-    document.getElementById('progressFill').style.width = percent + '%';
-    document.getElementById('progressText').textContent = `${checked} / ${stats.total}`;
+function filterChannels() {
+  renderTable();
 }
 
-function clearAll() {
-    channels = [];
-    stats = { total: 0, online: 0, offline: 0, cors: 0, checking: 0 };
-    m3uInput.value = '';
-    resultsContainer.innerHTML = '';
-    emptyState.classList.remove('hidden');
-    statsContainer.classList.add('hidden');
-    filterContainer.classList.add('hidden');
-    progressContainer.classList.add('hidden');
-    document.getElementById('checkBtn').disabled = true;
-    document.getElementById('exportBtn').disabled = true;
-    updateStats();
-}
-
-function exportOnline() {
-    const onlineChannels = channels.filter(c => c.status === 'online');
-    if (onlineChannels.length === 0) {
-        alert('No online channels to export');
-        return;
-    }
-    
-    let m3u = '#EXTM3U\n';
-    onlineChannels.forEach(channel => {
-        m3u += `#EXTINF:-1 tvg-logo="${channel.logo || ''}" group-title="${channel.group}",${channel.name}\n`;
-        m3u += `${channel.url}\n`;
+function playChannel(index) {
+  const ch = channels[index];
+  const modal = document.getElementById('videoModal');
+  const video = document.getElementById('videoPlayer');
+  
+  modal.classList.add('active');
+  
+  if (hls) {
+    hls.destroy();
+  }
+  
+  if (Hls.isSupported()) {
+    hls = new Hls();
+    hls.loadSource(ch.url);
+    hls.attachMedia(video);
+    hls.on(Hls.Events.ERROR, (event, data) => {
+      if (data.fatal) {
+        showToast('Error: ' + data.type);
+      }
     });
-    
-    const blob = new Blob([m3u], { type: 'audio/x-mpegurl' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `iptv_online_${Date.now()}.m3u`;
-    a.click();
-    URL.revokeObjectURL(url);
+  } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
+    video.src = ch.url;
+  }
+  
+  video.play().catch(() => {});
 }
 
-// Filter functionality
-document.querySelectorAll('.filter-btn').forEach(btn => {
-    btn.addEventListener('click', function() {
-        document.querySelectorAll('.filter-btn').forEach(b => {
-            b.classList.remove('active', 'bg-blue-600');
-            b.classList.add('bg-slate-700');
-        });
-        this.classList.remove('bg-slate-700');
-        this.classList.add('active', 'bg-blue-600');
-        
-        const filter = this.dataset.filter;
-        filterChannels(filter);
-    });
-});
+function closeModal(event) {
+  if (event && event.target.id !== 'videoModal' && !event.target.classList.contains('close-modal')) return;
+  
+  const modal = document.getElementById('videoModal');
+  const video = document.getElementById('videoPlayer');
+  
+  modal.classList.remove('active');
+  video.pause();
+  video.src = '';
+  
+  if (hls) {
+    hls.destroy();
+    hls = null;
+  }
+}
 
-document.getElementById('searchInput').addEventListener('input', function() {
-    const search = this.value.toLowerCase();
-    const activeFilter = document.querySelector('.filter-btn.active').dataset.filter;
-    filterChannels(activeFilter, search);
-});
+function exportM3U() {
+  const working = channels.filter(c => c.status === 'lancar' || c.status === 'cors');
+  if (working.length === 0) {
+    showToast('Tidak ada channel yang work!');
+    return;
+  }
+  
+  let m3u = '#EXTM3U\n';
+  working.forEach(ch => {
+    m3u += `#EXTINF:-1,${ch.name} [${ch.quality}]\n${ch.url}\n`;
+  });
+  
+  downloadFile(m3u, 'working_playlist.m3u', 'audio/x-mpegurl');
+  showToast(`Export ${working.length} channel berhasil!`);
+}
 
-function filterChannels(status, search = '') {
-    const cards = resultsContainer.querySelectorAll('.channel-card');
-    cards.forEach(card => {
-        const cardStatus = card.dataset.status;
-        const cardName = card.dataset.name;
-        
-        const statusMatch = status === 'all' || cardStatus === status;
-        const searchMatch = !search || cardName.includes(search);
-        
-        if (statusMatch && searchMatch) {
-            card.style.display = '';
-        } else {
-            card.style.display = 'none';
-        }
-    });
+function exportCSV() {
+  if (channels.length === 0) {
+    showToast('Tidak ada data!');
+    return;
+  }
+  
+  let csv = 'No,Name,URL,Status,Quality,Resolution,Bitrate\n';
+  channels.forEach((ch, i) => {
+    csv += `${i + 1},"${ch.name}","${ch.url}","${ch.status}","${ch.quality}","${ch.resolution}","${ch.bitrate}"\n`;
+  });
+  
+  downloadFile(csv, 'iptv_report.csv', 'text/csv');
+  showToast('CSV report berhasil di-export!');
+}
+
+function downloadFile(content, filename, type) {
+  const blob = new Blob([content], { type });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = filename;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+function sleep(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
 }
 </script>
 <script>(function(){document.addEventListener("click",function(e){var a=e.target.closest("[data-product-id]");if(!a)return;e.preventDefault();var pid=a.getAttribute("data-product-id");if(pid)parent.postMessage({type:"ecto-artifact-link-click",productId:pid},"*")})})();</script>
