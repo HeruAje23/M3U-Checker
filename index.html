@@ -98,12 +98,14 @@
         <label class="flex items-center justify-between">
           <span class="text-sm flex items-center gap-2"><i data-lucide="shield" class="w-3.5 h-3.5"></i> CORS Proxy Auto</span>
           <input id="proxyToggle" type="checkbox" checked class="peer sr-only">
-          <div class="w-10 h-6 rounded-full bg-slate-200 dark:bg-slate-700 peer-checked:bg-violet-600 relative transition"><div class="absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full transition peer-checked:translate-x-4"></div></div>
+          <!-- Toggle CORS Proxy: kasih animasi geser + ganti warna -->
+          <div class="w-10 h-6 rounded-full bg-slate-200 dark:bg-slate-700 peer-checked:bg-violet-600 relative transition-colors duration-200"><div class="absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full transition-transform duration-200 peer-checked:translate-x-4"></div></div>
         </label>
         <label class="flex items-center justify-between">
           <span class="text-sm flex items-center gap-2"><i data-lucide="image" class="w-3.5 h-3.5"></i> Show Logos</span>
           <input id="logoToggle" type="checkbox" checked class="peer sr-only">
-          <div class="w-10 h-6 rounded-full bg-slate-200 dark:bg-slate-700 peer-checked:bg-violet-600 relative transition"><div class="absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full transition peer-checked:translate-x-4"></div></div>
+          <!-- Toggle Show Logos: kasih animasi geser + ganti warna -->
+          <div class="w-10 h-6 rounded-full bg-slate-200 dark:bg-slate-700 peer-checked:bg-violet-600 relative transition-colors duration-200"><div class="absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full transition-transform duration-200 peer-checked:translate-x-4"></div></div>
         </label>
         <div class="flex items-center justify-between">
           <span class="text-sm flex items-center gap-2"><i data-lucide="repeat-2" class="w-3.5 h-3.5"></i> Max Retry</span>
@@ -364,16 +366,16 @@ function renderTable(){
   $('#tableBody').innerHTML = filtered.map((c,i)=>{
     const logo = c.tvgLogo ? `<img src="${c.tvgLogo}" class="w-8 h-8 rounded-lg object-cover bg-slate-100 dark:bg-slate-800 ring-1 ring-slate-200 dark:ring-slate-700" onerror="this.replaceWith(this.nextElementSibling)" /><div class="w-8 h-8 rounded-lg bg-slate-100 dark:bg-slate-800 hidden items-center justify-center ring-1 ring-slate-200 dark:ring-slate-700"><i data-lucide="tv" class="w-4 h-4 text-slate-400"></i></div>` : `<div class="w-8 h-8 rounded-lg bg-slate-100 dark:bg-slate-800 flex items-center justify-center ring-1 ring-slate-200 dark:ring-slate-700"><i data-lucide="tv" class="w-4 h-4 text-slate-400"></i></div>`;
     
-    /* GANTI INI: const qual - sekarang bitrate warna ungu + ada komentar */
+    /* Tampilan kolom Quality: FHD/HD + resolusi + bitrate ungu biar jelas */
     const qual = c.quality !== '-' 
       ? `<div class="leading-tight">
            <div class="font-semibold">${c.quality}</div>
-           <div class="text- text-slate-500 dark:text-slate-400">
+           <div class="text-[10px] text-slate-500 dark:text-slate-400">
              ${c.resolution || ''} 
              ${c.bitrate ? '• <span class="text-violet-600 dark:text-violet-400 font-medium">'+c.bitrate+'</span>' : ''}
            </div>
          </div>` 
-      : '<span class="text-slate-400">-</span>'; /* belum di-test */
+      : '<span class="text-slate-400">-</span>'; // Kalo belum di-test
     
     const proxyBadge = c.usedProxy ? `<span class="ml-1 text-[10px] px-1 py-0.5 rounded bg-violet-500/10 text-violet-600 dark:text-violet-400 ring-1 ring-violet-500/20">PROXY</span>` : '';
     return `<tr class="hover:bg-slate-50/70 dark:hover:bg-slate-800/40 transition">
