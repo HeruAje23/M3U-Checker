@@ -1,0 +1,1125 @@
+<!DOCTYPE html>
+<html lang="id">
+<head><style>
+@font-face {
+  font-family: "Optimistic";
+  font-style: normal;
+  font-weight: 400 600;
+  font-display: swap;
+  src: url("/fonts/OptimisticAI_VF_Optimized.woff2") format("woff2");
+}
+@font-face {
+  font-family: "Optimistic Mono";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("/fonts/OptimisticMono_W_TextRegular.woff2") format("woff2");
+}
+:where(html) {
+  font-family: "Optimistic", system-ui, sans-serif;
+}
+:where(code, pre, kbd, samp) {
+  font-family: "Optimistic Mono", ui-monospace, monospace;
+}
+</style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Opsi 2 - IPTV M3U Checker HLS.js</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdn.jsdelivr.net/npm/hls.js@1.5.15/dist/hls.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/lucide@0.441.0/dist/umd/lucide.min.js"></script>
+<style>
+    :root {
+        --bg-primary: #0f172a;
+        --bg-secondary: #1e293b;
+        --bg-card: #334155;
+        --text-primary: #f1f5f9;
+        --text-secondary: #cbd5e1;
+        --border-color: #475569;
+        --accent: #3b82f6;
+        --success: #10b981;
+        --warning: #f59e0b;
+        --danger: #ef4444;
+    }
+    
+    [data-theme="light"] {
+        --bg-primary: #f8fafc;
+        --bg-secondary: #ffffff;
+        --bg-card: #f1f5f9;
+        --text-primary: #0f172a;
+        --text-secondary: #475569;
+        --border-color: #cbd5e1;
+        --accent: #2563eb;
+        --success: #059669;
+        --warning: #d97706;
+        --danger: #dc2626;
+    }
+
+    * { scrollbar-width: thin; scrollbar-color: var(--border-color) var(--bg-secondary); }
+    *::-webkit-scrollbar { width: 8px; height: 8px; }
+    *::-webkit-scrollbar-track { background: var(--bg-secondary); }
+    *::-webkit-scrollbar-thumb { background-color: var(--border-color); border-radius: 4px; }
+    
+    body {
+        background: var(--bg-primary);
+        color: var(--text-primary);
+        font-family: 'Inter', system-ui, -apple-system, sans-serif;
+        transition: background 0.3s ease, color 0.3s ease;
+    }
+    
+    .card {
+        background: var(--bg-secondary);
+        border: 1px solid var(--border-color);
+        transition: all 0.3s ease;
+    }
+    
+    .status-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.375rem;
+        padding: 0.25rem 0.75rem;
+        border-radius: 9999px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        white-space: nowrap;
+    }
+    
+    .pulse {
+        animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+    }
+    
+    @keyframes pulse {
+        0%, 100% { opacity: 1; }
+        50% { opacity: .5; }
+    }
+    
+    .fade-in {
+        animation: fadeIn 0.3s ease-in;
+    }
+    
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    
+    .progress-bar {
+        transition: width 0.3s ease;
+    }
+    
+    input[type="checkbox"]:checked {
+        background-color: var(--accent);
+        border-color: var(--accent);
+    }
+</style>
+</head>
+<body data-theme="dark">
+<div id="app" class="min-h-screen pb-20">
+    <!-- Header -->
+    <header class="sticky top-0 z-50 card border-b backdrop-blur-lg bg-opacity-90">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+            <div class="flex items-center justify-between flex-wrap gap-4">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-lg flex items-center justify-center" style="background: var(--accent)">
+                        <i data-lucide="tv" class="w-6 h-6 text-white"></i>
+                    </div>
+                    <div>
+                        <h1 class="text-xl sm:text-2xl font-bold">M3U IPTV Checker Pro</h1>
+                        <p class="text-xs" style="color: var(--text-secondary)">HLS.js Stream Tester v2.0</p>
+                    </div>
+                </div>
+                <button id="themeToggle" class="p-2 rounded-lg card hover:opacity-80 transition">
+                    <i data-lucide="sun" class="w-5 h-5 hidden" id="sunIcon"></i>
+                    <i data-lucide="moon" class="w-5 h-5" id="moonIcon"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- CORS Warning -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-6">
+        <div class="card rounded-xl p-4 border-l-4" style="border-left-color: var(--warning); background: var(--bg-card)">
+            <div class="flex gap-3">
+                <i data-lucide="alert-triangle" class="w-5 h-5 flex-shrink-0 mt-0.5" style="color: var(--warning)"></i>
+                <div class="flex-1">
+                    <h3 class="font-semibold mb-1">Penting: Batasan CORS Browser</h3>
+                    <p class="text-sm" style="color: var(--text-secondary)">
+                        Beberapa stream yang sebenarnya aktif mungkin ditampilkan sebagai "Mati" karena kebijakan CORS browser. 
+                        Ini adalah alat pengecekan client-side 100% yang berjalan di browser Anda. Untuk hasil 100% akurat, 
+                        gunakan tools server-side atau aplikasi IPTV player langsung.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Upload Section -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-6">
+        <div class="card rounded-xl p-6">
+            <h2 class="text-lg font-semibold mb-4 flex items-center gap-2">
+                <i data-lucide="upload" class="w-5 h-5"></i>
+                Input Playlist M3U/M3U8
+            </h2>
+            
+            <div class="grid md:grid-cols-2 gap-4 mb-4">
+                <div>
+                    <label class="block text-sm font-medium mb-2">Upload File</label>
+                    <input type="file" id="fileInput" accept=".m3u,.m3u8,.txt" 
+                        class="w-full text-sm rounded-lg card p-3 border cursor-pointer file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-blue-500 file:text-white hover:file:bg-blue-600">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium mb-2">Atau Paste URL Playlist</label>
+                    <div class="flex gap-2">
+                        <input type="url" id="urlInput" placeholder="https://example.com/playlist.m3u8" 
+                            class="flex-1 rounded-lg card p-3 border text-sm">
+                        <button id="loadUrlBtn" class="px-4 py-2 rounded-lg text-white font-medium transition hover:opacity-90" style="background: var(--accent)">
+                            Muat
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium mb-2">Atau Paste Langsung Text M3U</label>
+                <textarea id="playlistInput" rows="6" placeholder="#EXTM3U&#10;#EXTINF:-1 tvg-id=&quot;&quot; tvg-name=&quot;Channel Name&quot; tvg-logo=&quot;&quot; group-title=&quot;Group&quot;,Channel Name&#10;http://example.com/stream.m3u8" 
+                    class="w-full rounded-lg card p-3 border text-sm font-mono"></textarea>
+            </div>
+
+            <div class="flex flex-wrap gap-3 mt-4">
+                <button id="parseBtn" class="px-6 py-2.5 rounded-lg text-white font-medium transition hover:opacity-90 flex items-center gap-2" style="background: var(--accent)">
+                    <i data-lucide="file-search" class="w-4 h-4"></i>
+                    Parse Playlist
+                </button>
+                <button id="clearBtn" class="px-6 py-2.5 rounded-lg card font-medium transition hover:opacity-80 flex items-center gap-2">
+                    <i data-lucide="trash-2" class="w-4 h-4"></i>
+                    Bersihkan
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Settings Section -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-6">
+        <div class="card rounded-xl p-6">
+            <h2 class="text-lg font-semibold mb-4 flex items-center gap-2">
+                <i data-lucide="settings" class="w-5 h-5"></i>
+                Pengaturan Testing
+            </h2>
+            <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div>
+                    <label class="block text-sm font-medium mb-2">Timeout (detik)</label>
+                    <input type="number" id="timeoutInput" value="10" min="3" max="60" class="w-full rounded-lg card p-2.5 border text-sm">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium mb-2">Batch Size</label>
+                    <input type="number" id="batchSizeInput" value="5" min="1" max="20" class="w-full rounded-lg card p-2.5 border text-sm">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium mb-2">Delay Antar Stream (ms)</label>
+                    <input type="number" id="delayInput" value="500" min="0" max="5000" step="100" class="w-full rounded-lg card p-2.5 border text-sm">
+                </div>
+                <div class="flex items-end">
+                    <label class="flex items-center gap-2 cursor-pointer">
+                        <input type="checkbox" id="testVideoEl" checked class="w-4 h-4 rounded">
+                        <span class="text-sm">Test Video Playback</span>
+                    </label>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Stats Dashboard -->
+    <div id="statsSection" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-6 hidden">
+        <div class="grid grid-cols-2 lg:grid-cols-5 gap-4">
+            <div class="card rounded-xl p-4">
+                <div class="flex items-center justify-between mb-2">
+                    <span class="text-sm" style="color: var(--text-secondary)">Total</span>
+                    <i data-lucide="list" class="w-4 h-4" style="color: var(--accent)"></i>
+                </div>
+                <p class="text-2xl font-bold" id="statTotal">0</p>
+            </div>
+            <div class="card rounded-xl p-4">
+                <div class="flex items-center justify-between mb-2">
+                    <span class="text-sm" style="color: var(--text-secondary)">Lancar</span>
+                    <i data-lucide="check-circle" class="w-4 h-4" style="color: var(--success)"></i>
+                </div>
+                <p class="text-2xl font-bold" style="color: var(--success)" id="statWorking">0</p>
+            </div>
+            <div class="card rounded-xl p-4">
+                <div class="flex items-center justify-between mb-2">
+                    <span class="text-sm" style="color: var(--text-secondary)">Buffering</span>
+                    <i data-lucide="loader" class="w-4 h-4" style="color: var(--warning)"></i>
+                </div>
+                <p class="text-2xl font-bold" style="color: var(--warning)" id="statBuffering">0</p>
+            </div>
+            <div class="card rounded-xl p-4">
+                <div class="flex items-center justify-between mb-2">
+                    <span class="text-sm" style="color: var(--text-secondary)">Mati</span>
+                    <i data-lucide="x-circle" class="w-4 h-4" style="color: var(--danger)"></i>
+                </div>
+                <p class="text-2xl font-bold" style="color: var(--danger)" id="statDead">0</p>
+            </div>
+            <div class="card rounded-xl p-4 col-span-2 lg:col-span-1">
+                <div class="flex items-center justify-between mb-2">
+                    <span class="text-sm" style="color: var(--text-secondary)">HD+</span>
+                    <i data-lucide="hd" class="w-4 h-4" style="color: var(--accent)"></i>
+                </div>
+                <p class="text-2xl font-bold" style="color: var(--accent)" id="statHD">0</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Controls -->
+    <div id="controlsSection" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-6 hidden">
+        <div class="card rounded-xl p-6">
+            <div class="flex flex-wrap items-center gap-3 mb-4">
+                <button id="startTestBtn" class="px-6 py-2.5 rounded-lg text-white font-medium transition hover:opacity-90 flex items-center gap-2" style="background: var(--success)">
+                    <i data-lucide="play" class="w-4 h-4"></i>
+                    Mulai Test
+                </button>
+                <button id="stopTestBtn" class="px-6 py-2.5 rounded-lg text-white font-medium transition hover:opacity-90 flex items-center gap-2 hidden" style="background: var(--danger)">
+                    <i data-lucide="square" class="w-4 h-4"></i>
+                    Stop
+                </button>
+                <button id="exportBtn" class="px-6 py-2.5 rounded-lg card font-medium transition hover:opacity-80 flex items-center gap-2">
+                    <i data-lucide="download" class="w-4 h-4"></i>
+                    Export M3U
+                </button>
+            </div>
+
+            <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
+                <div>
+                    <label class="block text-sm font-medium mb-2">Filter Status</label>
+                    <select id="statusFilter" class="w-full rounded-lg card p-2.5 border text-sm">
+                        <option value="all">Semua Channel</option>
+                        <option value="working">Hanya Lancar</option>
+                        <option value="buffering">Hanya Buffering</option>
+                        <option value="dead">Hanya Mati</option>
+                        <option value="hd">Hanya HD (≥720p)</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium mb-2">Filter Group</label>
+                    <select id="groupFilter" class="w-full rounded-lg card p-2.5 border text-sm">
+                        <option value="all">Semua Group</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium mb-2">Search</label>
+                    <input type="text" id="searchInput" placeholder="Cari channel..." class="w-full rounded-lg card p-2.5 border text-sm">
+                </div>
+                <div class="flex items-end">
+                    <label class="flex items-center gap-2 cursor-pointer">
+                        <input type="checkbox" id="removeDupes" class="w-4 h-4 rounded">
+                        <span class="text-sm">Hapus Duplikat</span>
+                    </label>
+                </div>
+            </div>
+
+            <!-- Progress Bar -->
+            <div id="progressSection" class="hidden">
+                <div class="flex items-center justify-between mb-2">
+                    <span class="text-sm font-medium">Progress Testing</span>
+                    <span class="text-sm" id="progressText">0 / 0</span>
+                </div>
+                <div class="w-full rounded-full h-2.5" style="background: var(--bg-card)">
+                    <div id="progressBar" class="progress-bar h-2.5 rounded-full" style="width: 0%; background: var(--accent)"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Results -->
+    <div id="resultsSection" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-6 hidden">
+        <div id="channelsList" class="space-y-4"></div>
+    </div>
+
+    <!-- Empty State -->
+    <div id="emptyState" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-12">
+        <div class="card rounded-xl p-12 text-center">
+            <i data-lucide="inbox" class="w-16 h-16 mx-auto mb-4 opacity-50"></i>
+            <h3 class="text-xl font-semibold mb-2">Belum Ada Playlist</h3>
+            <p style="color: var(--text-secondary)">Upload file M3U atau paste playlist untuk mulai testing</p>
+        </div>
+    </div>
+</div>
+
+<!-- Video element for testing - hidden -->
+<video id="testVideo" style="display:none;" muted></video>
+
+<!-- Export Modal -->
+<div id="exportModal" class="fixed inset-0 z-50 hidden items-center justify-center p-4" style="background: rgba(0,0,0,0.7)">
+    <div class="card rounded-xl p-6 max-w-md w-full">
+        <h3 class="text-lg font-semibold mb-4">Export Playlist</h3>
+        <div class="space-y-3 mb-6">
+            <label class="flex items-center gap-2 cursor-pointer">
+                <input type="checkbox" id="exportWorking" checked class="w-4 h-4 rounded">
+                <span class="text-sm">Hanya channel Lancar</span>
+            </label>
+            <label class="flex items-center gap-2 cursor-pointer">
+                <input type="checkbox" id="exportKeepGroups" checked class="w-4 h-4 rounded">
+                <span class="text-sm">Pertahankan struktur Group</span>
+            </label>
+            <label class="flex items-center gap-2 cursor-pointer">
+                <input type="checkbox" id="exportSortName" class="w-4 h-4 rounded">
+                <span class="text-sm">Urutkan berdasarkan Nama</span>
+            </label>
+            <label class="flex items-center gap-2 cursor-pointer">
+                <input type="checkbox" id="exportRemoveDupes" checked class="w-4 h-4 rounded">
+                <span class="text-sm">Hapus duplikat URL</span>
+            </label>
+        </div>
+        <div class="flex gap-3">
+            <button id="confirmExport" class="flex-1 px-4 py-2.5 rounded-lg text-white font-medium" style="background: var(--accent)">
+                Download M3U
+            </button>
+            <button id="cancelExport" class="flex-1 px-4 py-2.5 rounded-lg card font-medium">
+                Batal
+            </button>
+        </div>
+    </div>
+</div>
+
+<script>
+/**
+ * M3U IPTV Checker Pro - HLS.js Stream Tester
+ * Advanced client-side M3U playlist validator using HLS.js
+ * @version 2.0.0
+ * @license MIT
+ */
+
+class M3UChecker {
+    constructor() {
+        this.channels = [];
+        this.filteredChannels = [];
+        this.groups = new Set();
+        this.isTesting = false;
+        this.shouldStop = false;
+        this.testedCount = 0;
+        this.hlsInstances = new Map();
+        
+        this.stats = {
+            total: 0,
+            working: 0,
+            buffering: 0,
+            dead: 0,
+            hd: 0
+        };
+        
+        this.initEventListeners();
+        this.initTheme();
+        lucide.createIcons();
+    }
+
+    /**
+     * Initialize all event listeners
+     */
+    initEventListeners() {
+        document.getElementById('fileInput').addEventListener('change', (e) => this.handleFileUpload(e));
+        document.getElementById('loadUrlBtn').addEventListener('click', () => this.handleUrlLoad());
+        document.getElementById('parseBtn').addEventListener('click', () => this.parsePlaylist());
+        document.getElementById('clearBtn').addEventListener('click', () => this.clearAll());
+        document.getElementById('startTestBtn').addEventListener('click', () => this.startTesting());
+        document.getElementById('stopTestBtn').addEventListener('click', () => this.stopTesting());
+        document.getElementById('exportBtn').addEventListener('click', () => this.showExportModal());
+        document.getElementById('confirmExport').addEventListener('click', () => this.exportPlaylist());
+        document.getElementById('cancelExport').addEventListener('click', () => this.hideExportModal());
+        document.getElementById('themeToggle').addEventListener('click', () => this.toggleTheme());
+        
+        document.getElementById('statusFilter').addEventListener('change', () => this.applyFilters());
+        document.getElementById('groupFilter').addEventListener('change', () => this.applyFilters());
+        document.getElementById('searchInput').addEventListener('input', () => this.applyFilters());
+        document.getElementById('removeDupes').addEventListener('change', () => this.applyFilters());
+    }
+
+    /**
+     * Theme management
+     */
+    initTheme() {
+        const saved = localStorage.getItem('theme') || 'dark';
+        this.setTheme(saved);
+    }
+
+    setTheme(theme) {
+        document.body.setAttribute('data-theme', theme);
+        localStorage.setItem('theme', theme);
+        document.getElementById('sunIcon').classList.toggle('hidden', theme === 'dark');
+        document.getElementById('moonIcon').classList.toggle('hidden', theme === 'light');
+    }
+
+    toggleTheme() {
+        const current = document.body.getAttribute('data-theme');
+        this.setTheme(current === 'dark' ? 'light' : 'dark');
+    }
+
+    /**
+     * Handle file upload
+     */
+    async handleFileUpload(e) {
+        const file = e.target.files[0];
+        if (!file) return;
+        
+        try {
+            const text = await file.text();
+            document.getElementById('playlistInput').value = text;
+            this.parsePlaylist();
+        } catch (err) {
+            this.showToast('Error membaca file: ' + err.message, 'error');
+        }
+    }
+
+    /**
+     * Handle URL load
+     */
+    async handleUrlLoad() {
+        const url = document.getElementById('urlInput').value.trim();
+        if (!url) {
+            this.showToast('Masukkan URL playlist terlebih dahulu', 'warning');
+            return;
+        }
+
+        try {
+            this.showToast('Memuat playlist dari URL...', 'info');
+            const response = await fetch(url);
+            if (!response.ok) throw new Error(`HTTP ${response.status}`);
+            const text = await response.text();
+            document.getElementById('playlistInput').value = text;
+            this.parsePlaylist();
+        } catch (err) {
+            this.showToast('Gagal memuat URL: ' + err.message + ' (mungkin diblokir CORS)', 'error');
+        }
+    }
+
+    /**
+     * Parse M3U playlist content
+     * Supports EXTINF with attributes: tvg-id, tvg-name, tvg-logo, group-title
+     */
+    parsePlaylist() {
+        const content = document.getElementById('playlistInput').value.trim();
+        if (!content) {
+            this.showToast('Playlist kosong', 'warning');
+            return;
+        }
+
+        if (!content.includes('#EXTM3U') && !content.includes('#EXTINF')) {
+            this.showToast('Format M3U tidak valid', 'error');
+            return;
+        }
+
+        this.channels = [];
+        this.groups.clear();
+        const lines = content.split('\n').map(l => l.trim()).filter(l => l);
+
+        let currentInfo = null;
+        
+        for (let i = 0; i < lines.length; i++) {
+            const line = lines[i];
+            
+            if (line.startsWith('#EXTINF:')) {
+                currentInfo = this.parseExtinf(line);
+            } else if (line && !line.startsWith('#') && currentInfo) {
+                this.channels.push({
+                    id: this.channels.length,
+                    ...currentInfo,
+                    url: line,
+                    status: 'pending',
+                    responseTime: null,
+                    resolution: null,
+                    bitrate: null,
+                    error: null,
+                    tested: false
+                });
+                
+                if (currentInfo.group) this.groups.add(currentInfo.group);
+                currentInfo = null;
+            }
+        }
+
+        this.updateStats();
+        this.updateGroupFilter();
+        this.showSections();
+        this.applyFilters();
+        this.showToast(`Berhasil parse ${this.channels.length} channel`, 'success');
+    }
+
+    /**
+     * Parse EXTINF line to extract metadata
+     * Format: #EXTINF:-1 tvg-id="id" tvg-name="name" tvg-logo="logo" group-title="group",Channel Name
+     */
+    parseExtinf(line) {
+        const info = {
+            name: '',
+            tvgId: '',
+            tvgName: '',
+            logo: '',
+            group: 'Undefined'
+        };
+
+        // Extract attributes
+        const idMatch = line.match(/tvg-id="([^"]*)"/i);
+        const nameMatch = line.match(/tvg-name="([^"]*)"/i);
+        const logoMatch = line.match(/tvg-logo="([^"]*)"/i);
+        const groupMatch = line.match(/group-title="([^"]*)"/i);
+
+        if (idMatch) info.tvgId = idMatch[1];
+        if (nameMatch) info.tvgName = nameMatch[1];
+        if (logoMatch) info.logo = logoMatch[1];
+        if (groupMatch) info.group = groupMatch[1];
+
+        // Extract channel name after last comma
+        const namePart = line.split(',').pop();
+        info.name = namePart ? namePart.trim() : info.tvgName || 'Unknown';
+
+        return info;
+    }
+
+    /**
+     * Start testing all channels
+     */
+    async startTesting() {
+        if (this.isTesting) return;
+        if (this.channels.length === 0) {
+            this.showToast('Tidak ada channel untuk ditest', 'warning');
+            return;
+        }
+
+        if (!Hls.isSupported()) {
+            this.showToast('Browser Anda tidak support HLS.js', 'error');
+            return;
+        }
+
+        this.isTesting = true;
+        this.shouldStop = false;
+        this.testedCount = 0;
+        
+        document.getElementById('startTestBtn').classList.add('hidden');
+        document.getElementById('stopTestBtn').classList.remove('hidden');
+        document.getElementById('progressSection').classList.remove('hidden');
+
+        const timeout = parseInt(document.getElementById('timeoutInput').value) * 1000;
+        const batchSize = parseInt(document.getElementById('batchSizeInput').value);
+        const delay = parseInt(document.getElementById('delayInput').value);
+        const testVideo = document.getElementById('testVideoEl').checked;
+
+        // Reset all to pending
+        this.channels.forEach(ch => {
+            if (ch.status !== 'pending') {
+                ch.status = 'pending';
+                ch.tested = false;
+            }
+        });
+        this.applyFilters();
+
+        // Process in batches to avoid overwhelming browser
+        for (let i = 0; i < this.channels.length; i += batchSize) {
+            if (this.shouldStop) break;
+
+            const batch = this.channels.slice(i, i + batchSize);
+            await Promise.all(batch.map(ch => this.testStream(ch, timeout, testVideo)));
+            
+            if (delay > 0 && i + batchSize < this.channels.length) {
+                await this.sleep(delay);
+            }
+        }
+
+        this.isTesting = false;
+        document.getElementById('startTestBtn').classList.remove('hidden');
+        document.getElementById('stopTestBtn').classList.add('hidden');
+        this.showToast('Testing selesai!', 'success');
+    }
+
+    /**
+     * Test single stream using HLS.js
+     * Status logic:
+     * - Lancar: Manifest loaded + video can play
+     * - Buffering: Manifest loaded but video stalls/slow
+     * - Mati: Failed to load manifest / network error / CORS
+     */
+    async testStream(channel, timeout, testVideo) {
+        if (this.shouldStop) return;
+        
+        const startTime = Date.now();
+        channel.status = 'testing';
+        this.updateChannelCard(channel.id);
+
+        return new Promise((resolve) => {
+            const hls = new Hls({
+                debug: false,
+                enableWorker: true,
+                lowLatencyMode: false,
+                backBufferLength: 90,
+                manifestLoadingTimeOut: timeout,
+                manifestLoadingMaxRetry: 2,
+                levelLoadingTimeOut: timeout,
+                fragLoadingTimeOut: timeout
+            });
+
+            const timeoutId = setTimeout(() => {
+                hls.destroy();
+                channel.status = 'dead';
+                channel.error = 'Timeout';
+                channel.responseTime = timeout;
+                this.finishTest(channel, resolve);
+            }, timeout);
+
+            let manifestLoaded = false;
+            let levelLoaded = false;
+            let videoPlaying = false;
+
+            hls.on(Hls.Events.MANIFEST_PARSED, (event, data) => {
+                manifestLoaded = true;
+                channel.responseTime = Date.now() - startTime;
+                
+                // Get quality info
+                if (data.levels && data.levels.length > 0) {
+                    const bestLevel = data.levels.reduce((max, cur) => 
+                        cur.height > max.height ? cur : max, data.levels[0]);
+                    channel.resolution = `${bestLevel.width}x${bestLevel.height}`;
+                    channel.bitrate = Math.round(bestLevel.bitrate / 1000) + ' kbps';
+                }
+
+                if (!testVideo) {
+                    // If not testing video playback, consider working after manifest load
+                    channel.status = 'working';
+                    clearTimeout(timeoutId);
+                    hls.destroy();
+                    this.finishTest(channel, resolve);
+                } else {
+                    // Try to play video
+                    const video = document.getElementById('testVideo');
+                    video.src = '';
+                    hls.attachMedia(video);
+                    video.play().catch(() => {});
+                }
+            });
+
+            hls.on(Hls.Events.LEVEL_LOADED, () => {
+                levelLoaded = true;
+            });
+
+            // Check video playback
+            const video = document.getElementById('testVideo');
+            const onPlaying = () => {
+                videoPlaying = true;
+                channel.status = 'working';
+                clearTimeout(timeoutId);
+                hls.destroy();
+                video.removeEventListener('playing', onPlaying);
+                video.removeEventListener('waiting', onWaiting);
+                this.finishTest(channel, resolve);
+            };
+
+            const onWaiting = () => {
+                if (manifestLoaded && !videoPlaying) {
+                    channel.status = 'buffering';
+                }
+            };
+
+            if (testVideo) {
+                video.addEventListener('playing', onPlaying);
+                video.addEventListener('waiting', onWaiting);
+            }
+
+            hls.on(Hls.Events.ERROR, (event, data) => {
+                if (data.fatal) {
+                    clearTimeout(timeoutId);
+                    hls.destroy();
+                    
+                    if (manifestLoaded) {
+                        channel.status = 'buffering';
+                        channel.error = data.type;
+                    } else {
+                        channel.status = 'dead';
+                        channel.error = data.details || 'Network Error';
+                    }
+                    
+                    channel.responseTime = Date.now() - startTime;
+                    video.removeEventListener('playing', onPlaying);
+                    video.removeEventListener('waiting', onWaiting);
+                    this.finishTest(channel, resolve);
+                }
+            });
+
+            try {
+                hls.loadSource(channel.url);
+                this.hlsInstances.set(channel.id, hls);
+            } catch (err) {
+                clearTimeout(timeoutId);
+                channel.status = 'dead';
+                channel.error = err.message;
+                channel.responseTime = Date.now() - startTime;
+                this.finishTest(channel, resolve);
+            }
+        });
+    }
+
+    finishTest(channel, resolve) {
+        channel.tested = true;
+        this.testedCount++;
+        this.updateStats();
+        this.updateProgress();
+        this.updateChannelCard(channel.id);
+        
+        // Cleanup HLS instance
+        const hls = this.hlsInstances.get(channel.id);
+        if (hls) {
+            hls.destroy();
+            this.hlsInstances.delete(channel.id);
+        }
+        
+        resolve();
+    }
+
+    stopTesting() {
+        this.shouldStop = true;
+        this.isTesting = false;
+        this.showToast('Testing dihentikan', 'warning');
+        
+        // Destroy all active HLS instances
+        this.hlsInstances.forEach(hls => hls.destroy());
+        this.hlsInstances.clear();
+    }
+
+    /**
+     * UI Updates
+     */
+    updateStats() {
+        this.stats.total = this.channels.length;
+        this.stats.working = this.channels.filter(c => c.status === 'working').length;
+        this.stats.buffering = this.channels.filter(c => c.status === 'buffering').length;
+        this.stats.dead = this.channels.filter(c => c.status === 'dead').length;
+        this.stats.hd = this.channels.filter(c => {
+            if (!c.resolution) return false;
+            const height = parseInt(c.resolution.split('x')[1]);
+            return height >= 720;
+        }).length;
+
+        document.getElementById('statTotal').textContent = this.stats.total;
+        document.getElementById('statWorking').textContent = this.stats.working;
+        document.getElementById('statBuffering').textContent = this.stats.buffering;
+        document.getElementById('statDead').textContent = this.stats.dead;
+        document.getElementById('statHD').textContent = this.stats.hd;
+    }
+
+    updateProgress() {
+        const percent = (this.testedCount / this.channels.length) * 100;
+        document.getElementById('progressBar').style.width = percent + '%';
+        document.getElementById('progressText').textContent = `${this.testedCount} / ${this.channels.length}`;
+    }
+
+    updateGroupFilter() {
+        const select = document.getElementById('groupFilter');
+        select.innerHTML = '<option value="all">Semua Group</option>';
+        Array.from(this.groups).sort().forEach(group => {
+            select.innerHTML += `<option value="${group}">${group}</option>`;
+        });
+    }
+
+    applyFilters() {
+        const statusFilter = document.getElementById('statusFilter').value;
+        const groupFilter = document.getElementById('groupFilter').value;
+        const searchQuery = document.getElementById('searchInput').value.toLowerCase();
+        const removeDupes = document.getElementById('removeDupes').checked;
+
+        let filtered = [...this.channels];
+
+        // Status filter
+        if (statusFilter !== 'all') {
+            if (statusFilter === 'hd') {
+                filtered = filtered.filter(c => {
+                    if (!c.resolution) return false;
+                    const height = parseInt(c.resolution.split('x')[1]);
+                    return height >= 720;
+                });
+            } else {
+                filtered = filtered.filter(c => c.status === statusFilter);
+            }
+        }
+
+        // Group filter
+        if (groupFilter !== 'all') {
+            filtered = filtered.filter(c => c.group === groupFilter);
+        }
+
+        // Search
+        if (searchQuery) {
+            filtered = filtered.filter(c => 
+                c.name.toLowerCase().includes(searchQuery) ||
+                c.group.toLowerCase().includes(searchQuery) ||
+                c.url.toLowerCase().includes(searchQuery)
+            );
+        }
+
+        // Remove duplicates
+        if (removeDupes) {
+            const seen = new Set();
+            filtered = filtered.filter(c => {
+                if (seen.has(c.url)) return false;
+                seen.add(c.url);
+                return true;
+            });
+        }
+
+        this.filteredChannels = filtered;
+        this.renderChannels();
+    }
+
+    renderChannels() {
+        const container = document.getElementById('channelsList');
+        
+        if (this.filteredChannels.length === 0) {
+            container.innerHTML = `
+                <div class="card rounded-xl p-8 text-center">
+                    <i data-lucide="search-x" class="w-12 h-12 mx-auto mb-3 opacity-50"></i>
+                    <p style="color: var(--text-secondary)">Tidak ada channel yang cocok dengan filter</p>
+                </div>
+            `;
+            lucide.createIcons();
+            return;
+        }
+
+        // Group by category
+        const grouped = {};
+        this.filteredChannels.forEach(ch => {
+            if (!grouped[ch.group]) grouped[ch.group] = [];
+            grouped[ch.group].push(ch);
+        });
+
+        container.innerHTML = Object.entries(grouped).map(([group, channels]) => `
+            <div class="card rounded-xl overflow-hidden fade-in">
+                <div class="px-6 py-3 border-b flex items-center justify-between" style="background: var(--bg-card); border-color: var(--border-color)">
+                    <div class="flex items-center gap-2">
+                        <i data-lucide="folder" class="w-4 h-4"></i>
+                        <h3 class="font-semibold">${group}</h3>
+                    </div>
+                    <span class="text-sm" style="color: var(--text-secondary)">${channels.length} channel</span>
+                </div>
+                <div class="divide-y" style="border-color: var(--border-color)">
+                    ${channels.map(ch => this.renderChannelCard(ch)).join('')}
+                </div>
+            </div>
+        `).join('');
+
+        lucide.createIcons();
+    }
+
+    renderChannelCard(channel) {
+        const statusConfig = {
+            pending: { color: 'var(--text-secondary)', icon: 'clock', label: 'Belum Ditest', bg: 'var(--bg-card)' },
+            testing: { color: 'var(--accent)', icon: 'loader', label: 'Testing...', bg: 'var(--bg-card)', pulse: true },
+            working: { color: 'var(--success)', icon: 'check-circle', label: 'Lancar', bg: 'var(--success)' },
+            buffering: { color: 'var(--warning)', icon: 'alert-circle', label: 'Buffering', bg: 'var(--warning)' },
+            dead: { color: 'var(--danger)', icon: 'x-circle', label: 'Mati', bg: 'var(--danger)' }
+        };
+
+        const status = statusConfig[channel.status];
+        const isHD = channel.resolution && parseInt(channel.resolution.split('x')[1]) >= 720;
+
+        return `
+            <div id="channel-${channel.id}" class="p-4 hover:bg-opacity-50 transition" style="background: var(--bg-secondary)">
+                <div class="flex items-start gap-3">
+                    ${channel.logo ? `
+                        <img src="${channel.logo}" alt="${channel.name}" class="w-12 h-12 rounded object-cover flex-shrink-0" onerror="this.style.display='none'">
+                    ` : `
+                        <div class="w-12 h-12 rounded flex items-center justify-center flex-shrink-0" style="background: var(--bg-card)">
+                            <i data-lucide="tv" class="w-6 h-6 opacity-50"></i>
+                        </div>
+                    `}
+                    <div class="flex-1 min-w-0">
+                        <div class="flex items-start justify-between gap-2 mb-2">
+                            <div class="flex-1 min-w-0">
+                                <h4 class="font-semibold truncate">${channel.name}</h4>
+                                <p class="text-xs truncate" style="color: var(--text-secondary)">${channel.url}</p>
+                            </div>
+                            <div class="status-badge ${status.pulse ? 'pulse' : ''}" style="background: ${status.bg}20; color: ${status.color}; border: 1px solid ${status.color}40">
+                                <i data-lucide="${status.icon}" class="w-3 h-3"></i>
+                                ${status.label}
+                            </div>
+                        </div>
+                        <div class="flex flex-wrap gap-2 text-xs">
+                            ${channel.responseTime ? `
+                                <span class="px-2 py-1 rounded" style="background: var(--bg-card)">
+                                    <i data-lucide="zap" class="w-3 h-3 inline"></i> ${channel.responseTime}ms
+                                </span>
+                            ` : ''}
+                            ${channel.resolution ? `
+                                <span class="px-2 py-1 rounded" style="background: var(--bg-card)">
+                                    <i data-lucide="monitor" class="w-3 h-3 inline"></i> ${channel.resolution}
+                                </span>
+                            ` : ''}
+                            ${channel.bitrate ? `
+                                <span class="px-2 py-1 rounded" style="background: var(--bg-card)">
+                                    <i data-lucide="activity" class="w-3 h-3 inline"></i> ${channel.bitrate}
+                                </span>
+                            ` : ''}
+                            ${isHD ? `
+                                <span class="px-2 py-1 rounded font-semibold" style="background: var(--accent)20; color: var(--accent)">
+                                    HD
+                                </span>
+                            ` : ''}
+                            ${channel.error ? `
+                                <span class="px-2 py-1 rounded" style="background: var(--danger)20; color: var(--danger)">
+                                    ${channel.error}
+                                </span>
+                            ` : ''}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+    }
+
+    updateChannelCard(channelId) {
+        const channel = this.channels.find(c => c.id === channelId);
+        if (!channel) return;
+        
+        const element = document.getElementById(`channel-${channelId}`);
+        if (element) {
+            const newHTML = this.renderChannelCard(channel);
+            const temp = document.createElement('div');
+            temp.innerHTML = newHTML;
+            element.replaceWith(temp.firstElementChild);
+            lucide.createIcons();
+        }
+    }
+
+    showSections() {
+        document.getElementById('emptyState').classList.add('hidden');
+        document.getElementById('statsSection').classList.remove('hidden');
+        document.getElementById('controlsSection').classList.remove('hidden');
+        document.getElementById('resultsSection').classList.remove('hidden');
+    }
+
+    clearAll() {
+        this.channels = [];
+        this.filteredChannels = [];
+        this.groups.clear();
+        this.stopTesting();
+        document.getElementById('playlistInput').value = '';
+        document.getElementById('fileInput').value = '';
+        document.getElementById('urlInput').value = '';
+        document.getElementById('emptyState').classList.remove('hidden');
+        document.getElementById('statsSection').classList.add('hidden');
+        document.getElementById('controlsSection').classList.add('hidden');
+        document.getElementById('resultsSection').classList.add('hidden');
+        this.showToast('Data dibersihkan', 'info');
+    }
+
+    /**
+     * Export functionality
+     */
+    showExportModal() {
+        if (this.channels.length === 0) {
+            this.showToast('Tidak ada data untuk diexport', 'warning');
+            return;
+        }
+        document.getElementById('exportModal').classList.remove('hidden');
+        document.getElementById('exportModal').classList.add('flex');
+    }
+
+    hideExportModal() {
+        document.getElementById('exportModal').classList.add('hidden');
+        document.getElementById('exportModal').classList.remove('flex');
+    }
+
+    exportPlaylist() {
+        let channels = [...this.channels];
+        
+        const onlyWorking = document.getElementById('exportWorking').checked;
+        const keepGroups = document.getElementById('exportKeepGroups').checked;
+        const sortName = document.getElementById('exportSortName').checked;
+        const removeDupes = document.getElementById('exportRemoveDupes').checked;
+
+        if (onlyWorking) {
+            channels = channels.filter(c => c.status === 'working');
+        }
+
+        if (removeDupes) {
+            const seen = new Set();
+            channels = channels.filter(c => {
+                if (seen.has(c.url)) return false;
+                seen.add(c.url);
+                return true;
+            });
+        }
+
+        if (sortName) {
+            channels.sort((a, b) => a.name.localeCompare(b.name));
+        }
+
+        // Generate M3U content
+        let m3u = '#EXTM3U\n';
+        
+        if (keepGroups) {
+            const grouped = {};
+            channels.forEach(ch => {
+                if (!grouped[ch.group]) grouped[ch.group] = [];
+                grouped[ch.group].push(ch);
+            });
+
+            Object.entries(grouped).forEach(([group, chs]) => {
+                chs.forEach(ch => {
+                    m3u += `#EXTINF:-1 tvg-id="${ch.tvgId}" tvg-name="${ch.tvgName}" tvg-logo="${ch.logo}" group-title="${group}",${ch.name}\n`;
+                    m3u += `${ch.url}\n`;
+                });
+            });
+        } else {
+            channels.forEach(ch => {
+                m3u += `#EXTINF:-1 tvg-id="${ch.tvgId}" tvg-name="${ch.tvgName}" tvg-logo="${ch.logo}" group-title="${ch.group}",${ch.name}\n`;
+                m3u += `${ch.url}\n`;
+            });
+        }
+
+        // Download
+        const blob = new Blob([m3u], { type: 'application/x-mpegurl' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `playlist_checked_${Date.now()}.m3u`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+
+        this.hideExportModal();
+        this.showToast(`Export berhasil: ${channels.length} channel`, 'success');
+    }
+
+    /**
+     * Utility functions
+     */
+    sleep(ms) {
+        return new Promise(resolve => setTimeout(resolve, ms));
+    }
+
+    showToast(message, type = 'info') {
+        const colors = {
+            success: 'var(--success)',
+            error: 'var(--danger)',
+            warning: 'var(--warning)',
+            info: 'var(--accent)'
+        };
+
+        const toast = document.createElement('div');
+        toast.className = 'fixed top-20 right-4 z-50 card rounded-lg px-4 py-3 shadow-lg fade-in flex items-center gap-3 max-w-sm';
+        toast.style.borderLeft = `4px solid ${colors[type]}`;
+        toast.innerHTML = `
+            <i data-lucide="${type === 'success' ? 'check-circle' : type === 'error' ? 'x-circle' : type === 'warning' ? 'alert-triangle' : 'info'}" class="w-5 h-5 flex-shrink-0" style="color: ${colors[type]}"></i>
+            <span class="text-sm">${message}</span>
+        `;
+        
+        document.body.appendChild(toast);
+        lucide.createIcons();
+        
+        setTimeout(() => {
+            toast.style.opacity = '0';
+            setTimeout(() => toast.remove(), 300);
+        }, 3000);
+    }
+}
+
+// Initialize app
+const app = new M3UChecker();
+</script>
+<script>(function(){document.addEventListener("click",function(e){var a=e.target.closest("[data-product-id]");if(!a)return;e.preventDefault();var pid=a.getAttribute("data-product-id");if(pid)parent.postMessage({type:"ecto-artifact-link-click",productId:pid},"*")})})();</script>
+<script>(function(){var loc=location.href.replace(/#.*$/,"");var ATTR_NAMES=["data-product-id","data-productid","data-product_id","product-id","productid","product_id","data-source-entity-id","source-entity-id","source_entity_id","data-product","data-metadata","data-meta"];var DATASET_KEYS=["productId","productid","product_id","sourceEntityId","sourceentityid","source_entity_id","product","metadata","meta"];function readProductId(value){if(typeof value!=="string"||value.length===0)return null;if(/^[0-9]{6,}$/.test(value))return value;var match=value.match(/(?:product(?:_|-)?id|source(?:_|-)?entity(?:_|-)?id)["'=:\s]+([0-9]{6,})/i);return match?match[1]:null}function extractProductId(start){for(var node=start;node&&node!==document.body;node=node.parentElement){for(var i=0;i<ATTR_NAMES.length;i++){var attrValue=node.getAttribute&&node.getAttribute(ATTR_NAMES[i]);var attrProductId=readProductId(attrValue);if(attrProductId)return attrProductId}var dataset=node.dataset||null;if(dataset){for(var j=0;j<DATASET_KEYS.length;j++){var dataValue=dataset[DATASET_KEYS[j]];var dataProductId=readProductId(dataValue);if(dataProductId)return dataProductId}}}return null}document.addEventListener("click",function(e){var target=e.target instanceof Element?e.target:null;if(!target)return;var a=target.closest?target.closest("a[href]"):null;if(!a||!a.href||!/^https?:\/\//.test(a.href))return;if(a.href.replace(/#.*$/,"")===loc)return;var productId=extractProductId(target)||extractProductId(a);if(!productId)return;e.preventDefault();parent.postMessage({type:"ecto-artifact-link-click",productId:productId},"*")},true)})();</script></body>
+</html>
