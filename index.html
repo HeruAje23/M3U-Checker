@@ -24,1033 +24,830 @@
 </style>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>M3U IPTV Checker Pro v2.8 FINAL</title>
+<title>M3U IPTV Checker Pro v2.8.1 FINAL</title>
+<script src="https://cdn.tailwindcss.com"></script>
 <script src="https://cdn.jsdelivr.net/npm/hls.js@1.5.8/dist/hls.min.js"></script>
 <style>
-:root {
-  --bg1: #0f0c29;
-  --bg2: #302b63;
-  --bg3: #24243e;
-  --primary: #8b5cf6;
-  --primary-dark: #7c3aed;
-  --secondary: #06b6d4;
-  --success: #10b981;
-  --warning: #f59e0b;
-  --danger: #ef4444;
-  --card: rgba(255,255,255,0.06);
-  --card-border: rgba(255,255,255,0.1);
-  --text: #f1f5f9;
-  --text-dim: #cbd5e1;
-}
-
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-}
-
-body {
-  background: linear-gradient(135deg, var(--bg1), var(--bg2), var(--bg3));
-  color: var(--text);
-  min-height: 100vh;
-  overflow-x: hidden;
-}
-
-.container {
-  max-width: 1400px;
-  margin: 0 auto;
-  padding: 20px;
-}
-
-.header {
-  background: var(--card);
-  backdrop-filter: blur(20px);
-  border: 1px solid var(--card-border);
-  border-radius: 20px;
-  padding: 24px;
-  margin-bottom: 24px;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-  position: relative;
-  overflow: hidden;
-}
-
-.header::before {
-  content: '';
-  position: absolute;
-  top: -50%;
-  left: -50%;
-  width: 200%;
-  height: 200%;
-  background: radial-gradient(circle, rgba(139,92,246,0.15) 0%, transparent 70%);
-  animation: rotate 15s linear infinite;
-}
-
-@keyframes rotate {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
-}
-
-.header-content {
-  position: relative;
-  z-index: 1;
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  flex-wrap: wrap;
-}
-
-.logo {
-  font-size: 2.5rem;
-  filter: drop-shadow(0 0 10px var(--primary));
-}
-
-.header h1 {
-  font-size: 1.8rem;
-  font-weight: 700;
-  background: linear-gradient(90deg, var(--primary), var(--secondary));
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
-
-.header p {
-  color: var(--text-dim);
-  font-size: 0.9rem;
-  margin-top: 4px;
-}
-
-.card {
-  background: var(--card);
-  backdrop-filter: blur(20px);
-  border: 1px solid var(--card-border);
-  border-radius: 16px;
-  padding: 20px;
-  margin-bottom: 20px;
-  box-shadow: 0 8px 32px rgba(0,0,0,0.2);
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
-}
-
-.card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 12px 40px rgba(0,0,0,0.3);
-}
-
-.card-title {
-  font-size: 1.2rem;
-  font-weight: 600;
-  margin-bottom: 16px;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.grid {
-  display: grid;
-  gap: 16px;
-}
-
-.grid-2 {
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-}
-
-.grid-3 {
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-}
-
-.input-group {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-label {
-  font-size: 0.9rem;
-  color: var(--text-dim);
-  font-weight: 500;
-}
-
-input[type="text"], input[type="file"], textarea, input[type="number"], select {
-  background: rgba(0,0,0,0.3);
-  border: 1px solid var(--card-border);
-  border-radius: 10px;
-  padding: 12px;
-  color: var(--text);
-  font-size: 1rem;
-  transition: all 0.3s ease;
-  width: 100%;
-}
-
-input:focus, textarea:focus, select:focus {
-  outline: none;
-  border-color: var(--primary);
-  box-shadow: 0 0 0 3px rgba(139,92,246,0.2);
-}
-
-input[type="range"] {
-  width: 100%;
-  accent-color: var(--primary);
-}
-
-textarea {
-  min-height: 120px;
-  resize: vertical;
-  font-family: 'Courier New', monospace;
-  font-size: 0.85rem;
-}
-
-.btn {
-  background: linear-gradient(145deg, var(--primary), var(--primary-dark));
-  border: none;
-  border-radius: 12px;
-  padding: 12px 24px;
-  color: white;
-  font-weight: 600;
-  font-size: 1rem;
-  cursor: pointer;
-  position: relative;
-  overflow: hidden;
-  transition: all 0.3s ease;
-  box-shadow: 0 6px 20px rgba(139,92,246,0.4), inset 0 1px 0 rgba(255,255,255,0.2);
-  transform: translateY(0);
-}
-
-.btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 25px rgba(139,92,246,0.6), inset 0 1px 0 rgba(255,255,255,0.2);
-}
-
-.btn:active {
-  transform: translateY(0);
-  box-shadow: 0 2px 10px rgba(139,92,246,0.4);
-}
-
-.btn:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-  transform: none;
-}
-
-.btn-secondary {
-  background: linear-gradient(145deg, #475569, #334155);
-  box-shadow: 0 6px 20px rgba(71,85,105,0.4), inset 0 1px 0 rgba(255,255,255,0.1);
-}
-
-.btn-success {
-  background: linear-gradient(145deg, var(--success), #059669);
-  box-shadow: 0 6px 20px rgba(16,185,129,0.4);
-}
-
-.btn-danger {
-  background: linear-gradient(145deg, var(--danger), #dc2626);
-  box-shadow: 0 6px 20px rgba(239,68,68,0.4);
-}
-
-.ripple {
-  position: absolute;
-  border-radius: 50%;
-  background: rgba(255,255,255,0.6);
-  transform: scale(0);
-  animation: ripple 0.6s linear;
-  pointer-events: none;
-}
-
-@keyframes ripple {
-  to {
-    transform: scale(4);
-    opacity: 0;
-  }
-}
-
-.spinner {
-  width: 18px;
-  height: 18px;
-  border: 3px solid rgba(255,255,255,0.3);
-  border-top-color: white;
-  border-radius: 50%;
-  animation: spin 0.8s linear infinite;
-  display: inline-block;
-  vertical-align: middle;
-  margin-right: 8px;
-}
-
-@keyframes spin {
-  to { transform: rotate(360deg); }
-}
-
-.toggle-switch {
-  position: relative;
-  display: inline-block;
-  width: 60px;
-  height: 32px;
-}
-
-.toggle-switch input {
-  opacity: 0;
-  width: 0;
-  height: 0;
-}
-
-.slider {
-  position: absolute;
-  cursor: pointer;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0,0,0,0.4);
-  border: 1px solid var(--card-border);
-  transition: 0.4s;
-  border-radius: 34px;
-}
-
-.slider:before {
-  position: absolute;
-  content: "";
-  height: 24px;
-  width: 24px;
-  left: 4px;
-  bottom: 3px;
-  background: white;
-  transition: 0.4s;
-  border-radius: 50%;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.3);
-}
-
-input:checked + .slider {
-  background: var(--primary);
-}
-
-input:checked + .slider:before {
-  transform: translateX(28px);
-}
-
-.toggle-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-}
-
-.stats {
-  display: flex;
-  gap: 12px;
-  flex-wrap: wrap;
-  margin: 16px 0;
-}
-
-.stat-box {
-  flex: 1 1 120px;
-  background: rgba(0,0,0,0.3);
-  border: 1px solid var(--card-border);
-  border-radius: 12px;
-  padding: 16px;
-  text-align: center;
-}
-
-.stat-value {
-  font-size: 1.8rem;
-  font-weight: 700;
-  margin-bottom: 4px;
-}
-
-.stat-label {
-  font-size: 0.8rem;
-  color: var(--text-dim);
-  text-transform: uppercase;
-}
-
-.progress-bar {
-  width: 100%;
-  height: 8px;
-  background: rgba(0,0,0,0.4);
-  border-radius: 10px;
-  overflow: hidden;
-  margin: 12px 0;
-}
-
-.progress-fill {
-  height: 100%;
-  background: linear-gradient(90deg, var(--primary), var(--secondary));
-  width: 0%;
-  transition: width 0.3s ease;
-  box-shadow: 0 0 10px var(--primary);
-}
-
-.table-wrapper {
-  overflow-x: auto;
-  border-radius: 12px;
-  border: 1px solid var(--card-border);
-}
-
-table {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: 0.9rem;
-}
-
-thead {
-  background: rgba(0,0,0,0.4);
-  position: sticky;
-  top: 0;
-}
-
-th, td {
-  padding: 12px 8px;
-  text-align: left;
-  border-bottom: 1px solid var(--card-border);
-}
-
-th {
-  font-weight: 600;
-  color: var(--text-dim);
-  font-size: 0.8rem;
-  text-transform: uppercase;
-  white-space: nowrap;
-}
-
-tbody tr {
-  transition: background 0.2s ease;
-}
-
-tbody tr:hover {
-  background: rgba(255,255,255,0.05);
-}
-
-.status {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 4px 10px;
-  border-radius: 20px;
-  font-size: 0.8rem;
-  font-weight: 600;
-  white-space: nowrap;
-}
-
-.status-lancar {
-  background: rgba(16,185,129,0.2);
-  color: var(--success);
-  border: 1px solid rgba(16,185,129,0.3);
-}
-
-.status-cors {
-  background: rgba(245,158,11,0.2);
-  color: var(--warning);
-  border: 1px solid rgba(245,158,11,0.3);
-}
-
-.status-mati {
-  background: rgba(239,68,68,0.2);
-  color: var(--danger);
-  border: 1px solid rgba(239,68,68,0.3);
-}
-
-.quality-badge {
-  background: rgba(139,92,246,0.2);
-  color: var(--primary);
-  border: 1px solid rgba(139,92,246,0.3);
-  padding: 2px 8px;
-  border-radius: 6px;
-  font-size: 0.75rem;
-  font-weight: 600;
-}
-
-.checkbox {
-  accent-color: var(--primary);
-  width: 18px;
-  height: 18px;
-}
-
-.filter-row {
-  display: flex;
-  gap: 8px;
-  flex-wrap: wrap;
-  margin-bottom: 16px;
-}
-
-.filter-btn {
-  padding: 8px 16px;
-  border-radius: 8px;
-  border: 1px solid var(--card-border);
-  background: rgba(0,0,0,0.3);
-  color: var(--text-dim);
-  cursor: pointer;
-  font-size: 0.85rem;
-  transition: all 0.3s ease;
-}
-
-.filter-btn.active {
-  background: var(--primary);
-  color: white;
-  border-color: var(--primary);
-}
-
-@media (max-width: 768px) {
-  .header h1 { font-size: 1.4rem; }
-  .logo { font-size: 2rem; }
-  .header-content { justify-content: center; text-align: center; }
-  .container { padding: 12px; }
-  .card { padding: 16px; }
-  th, td { padding: 8px 4px; font-size: 0.8rem; }
-  .btn { padding: 10px 16px; font-size: 0.9rem; }
-  .stat-value { font-size: 1.4rem; }
-}
-
-@media (max-width: 390px) {
-  .header h1 { font-size: 1.2rem; }
-  .grid-2, .grid-3 { grid-template-columns: 1fr; }
-  table { font-size: 0.75rem; }
-}
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+    
+    * {
+        font-family: 'Inter', sans-serif;
+    }
+    
+    body {
+        background: linear-gradient(135deg, #0f0c29 0%, #302b63 50%, #24243e 100%);
+        min-height: 100vh;
+    }
+    
+    .glass {
+        background: rgba(255, 255, 255, 0.05);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    
+    .btn-3d {
+        position: relative;
+        transform-style: preserve-3d;
+        transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.5), 0 2px 4px -1px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255,255,255,0.1);
+    }
+    
+    .btn-3d:not(:disabled):hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.5), 0 4px 6px -2px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255,255,255,0.2);
+    }
+    
+    .btn-3d:not(:disabled):active {
+        transform: translateY(0px);
+        box-shadow: 0 2px 4px -1px rgba(0, 0, 0, 0.5), inset 0 2px 4px rgba(0, 0, 0, 0.2);
+    }
+    
+    .btn-3d:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+    }
+    
+    .ripple {
+        position: absolute;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.6);
+        transform: scale(0);
+        animation: ripple-animation 0.6s ease-out;
+        pointer-events: none;
+    }
+    
+    @keyframes ripple-animation {
+        to {
+            transform: scale(4);
+            opacity: 0;
+        }
+    }
+    
+    .spinner {
+        border: 2px solid rgba(255, 255, 255, 0.3);
+        border-radius: 50%;
+        border-top: 2px solid #fff;
+        width: 16px;
+        height: 16px;
+        animation: spin 0.8s linear infinite;
+    }
+    
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+    
+    .toggle-switch {
+        position: relative;
+        width: 56px;
+        height: 28px;
+    }
+    
+    .toggle-switch input {
+        opacity: 0;
+        width: 0;
+        height: 0;
+    }
+    
+    .toggle-slider {
+        position: absolute;
+        cursor: pointer;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(255, 255, 255, 0.2);
+        transition: 0.3s;
+        border-radius: 34px;
+    }
+    
+    .toggle-slider:before {
+        position: absolute;
+        content: "";
+        height: 20px;
+        width: 20px;
+        left: 4px;
+        bottom: 4px;
+        background: white;
+        transition: 0.3s;
+        border-radius: 50%;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+    }
+    
+    input:checked + .toggle-slider {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    }
+    
+    input:checked + .toggle-slider:before {
+        transform: translateX(28px);
+    }
+    
+    .badge-glow {
+        animation: glow 2s ease-in-out infinite alternate;
+    }
+    
+    @keyframes glow {
+        from { box-shadow: 0 0 10px rgba(102, 126, 234, 0.5); }
+        to { box-shadow: 0 0 20px rgba(118, 75, 162, 0.8); }
+    }
+    
+    @keyframes pulse-border {
+        0%, 100% { border-color: rgba(34, 197, 94, 0.5); }
+        50% { border-color: rgba(34, 197, 94, 1); }
+    }
+    
+    .status-lancar {
+        animation: pulse-border 2s ease-in-out infinite;
+    }
+    
+    input[type="range"]::-webkit-slider-thumb {
+        appearance: none;
+        width: 18px;
+        height: 18px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        cursor: pointer;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.4);
+    }
+    
+    input[type="range"]::-moz-range-thumb {
+        width: 18px;
+        height: 18px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        cursor: pointer;
+        border: none;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.4);
+    }
+    
+    .table-row {
+        transition: all 0.2s ease;
+    }
+    
+    .table-row:hover {
+        background: rgba(255, 255, 255, 0.08) !important;
+    }
+    
+    @media (max-width: 640px) {
+        table { font-size: 0.75rem; }
+        .hide-mobile { display: none; }
+    }
 </style>
 </head>
-<body>
-<div class="container">
-  <div class="header">
-    <div class="header-content">
-      <div class="logo">📡</div>
-      <div>
-        <h1>M3U IPTV Checker Pro v2.8 FINAL</h1>
-        <p>Proxy Toggle • Batch 1000 • Quality Detection • HLS Support</p>
-      </div>
-    </div>
-  </div>
-
-  <div class="card">
-    <div class="card-title">⚙️ Import & Pengaturan</div>
-    <div class="grid grid-2">
-      <div class="input-group">
-        <label>Upload File M3U/M3U8</label>
-        <input type="file" id="fileInput" accept=".m3u,.m3u8">
-      </div>
-      <div class="input-group">
-        <label>Atau Paste URL M3U</label>
-        <input type="text" id="urlInput" placeholder="https://example.com/playlist.m3u">
-      </div>
-    </div>
-    <div class="input-group" style="margin-top: 16px;">
-      <label>Atau Paste Content M3U</label>
-      <textarea id="textInput" placeholder="#EXTM3U&#10;#EXTINF:-1,Channel 1&#10;http://example.com/stream1.m3u8"></textarea>
-    </div>
-  </div>
-
-  <div class="card">
-    <div class="card-title">🚀 Kontrol & Opsi</div>
-    <div class="grid grid-3">
-      <div class="toggle-row">
-        <div>
-          <label style="margin: 0;">Proxy Mode</label>
-          <div style="font-size: 0.75rem; color: var(--text-dim);">Gunakan corsproxy.io</div>
+<body class="text-gray-100">
+    <div class="container mx-auto px-3 sm:px-4 py-4 sm:py-8 max-w-7xl">
+        <!-- Header -->
+        <div class="glass rounded-2xl p-4 sm:p-6 mb-6 shadow-2xl">
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                <div>
+                    <h1 class="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-purple-400 via-pink-400 to-blue-400 bg-clip-text text-transparent">
+                        M3U IPTV Checker Pro
+                    </h1>
+                    <p class="text-xs sm:text-sm text-gray-400 mt-1">v2.8.1 FINAL - Proxy Toggle • Batch 1000 • Bug Fix</p>
+                </div>
+                <div class="flex items-center gap-3">
+                    <div id="proxyBadge" class="hidden items-center gap-2 px-4 py-2 rounded-full badge-glow bg-gradient-to-r from-cyan-500 to-blue-500 font-semibold text-sm">
+                        <span>📡</span>
+                        <span>PROXY ON</span>
+                    </div>
+                </div>
+            </div>
         </div>
-        <label class="toggle-switch">
-          <input type="checkbox" id="proxyToggle">
-          <span class="slider"></span>
-        </label>
-      </div>
-      
-      <div class="input-group">
-        <label>Concurrent Test: <span id="concurrentValue">50</span></label>
-        <input type="range" id="concurrentSlider" min="10" max="1000" value="50" step="10">
-        <input type="number" id="concurrentInput" min="10" max="1000" value="50" style="margin-top: 8px;">
-      </div>
 
-      <div class="input-group">
-        <label>Timeout (detik)</label>
-        <input type="number" id="timeoutInput" value="10" min="5" max="30">
-      </div>
-    </div>
+        <!-- Control Panel -->
+        <div class="glass rounded-2xl p-4 sm:p-6 mb-6 shadow-2xl space-y-4">
+            <!-- File Input & Actions -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-sm font-medium mb-2 text-gray-300">Import M3U File</label>
+                    <input type="file" id="fileInput" accept=".m3u,.m3u8" 
+                        class="w-full text-sm text-gray-300 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-purple-600 file:text-white hover:file:bg-purple-700 file:cursor-pointer cursor-pointer bg-white/5 rounded-lg border border-white/10 p-2">
+                </div>
+                <div class="flex flex-wrap gap-2 items-end">
+                    <button id="startBtn" class="btn-3d flex-1 min-w-[120px] bg-gradient-to-r from-green-500 to-emerald-600 text-white px-4 py-2.5 rounded-lg font-semibold text-sm relative overflow-hidden" disabled>
+                        <span class="btn-text">Start Check</span>
+                    </button>
+                    <button id="stopBtn" class="btn-3d flex-1 min-w-[120px] bg-gradient-to-r from-red-500 to-rose-600 text-white px-4 py-2.5 rounded-lg font-semibold text-sm relative overflow-hidden" disabled>
+                        <span class="btn-text">Stop</span>
+                    </button>
+                    <button id="exportBtn" class="btn-3d flex-1 min-w-[120px] bg-gradient-to-r from-blue-500 to-indigo-600 text-white px-4 py-2.5 rounded-lg font-semibold text-sm relative overflow-hidden" disabled>
+                        <span class="btn-text">Export M3U</span>
+                    </button>
+                </div>
+            </div>
 
-    <div class="grid grid-2" style="margin-top: 16px;">
-      <div class="toggle-row">
-        <label>⚠️ Tandai channel Mati saat Export</label>
-        <label class="toggle-switch">
-          <input type="checkbox" id="markDeadToggle" checked>
-          <span class="slider"></span>
-        </label>
-      </div>
-      <div class="toggle-row">
-        <label>Export hanya Lancar</label>
-        <label class="toggle-switch">
-          <input type="checkbox" id="exportLiveOnly">
-          <span class="slider"></span>
-        </label>
-      </div>
-    </div>
+            <!-- Settings -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 pt-4 border-t border-white/10">
+                <!-- Proxy Toggle -->
+                <div class="space-y-2">
+                    <label class="block text-sm font-medium text-gray-300">Proxy Mode</label>
+                    <div class="flex items-center gap-3">
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="proxyToggle" checked>
+                            <span class="toggle-slider"></span>
+                        </label>
+                        <span id="proxyStatus" class="text-sm font-semibold text-cyan-400">ON</span>
+                    </div>
+                </div>
 
-    <div style="display: flex; gap: 12px; margin-top: 20px; flex-wrap: wrap;">
-      <button class="btn" id="startBtn">
-        <span id="btnText">Mulai Check</span>
-      </button>
-      <button class="btn btn-danger" id="stopBtn" style="display:none;">Stop</button>
-      <button class="btn btn-secondary" id="clearBtn">Clear Data</button>
-    </div>
-  </div>
+                <!-- Concurrent Slider -->
+                <div class="space-y-2 sm:col-span-2">
+                    <div class="flex justify-between items-center">
+                        <label class="block text-sm font-medium text-gray-300">Concurrent Batch</label>
+                        <span id="concurrentValue" class="text-sm font-bold text-purple-400">50</span>
+                    </div>
+                    <input type="range" id="concurrentSlider" min="10" max="1000" value="50" step="10" 
+                        class="w-full h-2 bg-white/10 rounded-lg appearance-none cursor-pointer">
+                    <p class="text-xs text-gray-500">10-1000 • Default 50 • Anti lemot 1000+ channel</p>
+                </div>
 
-  <div class="card" id="progressCard" style="display:none;">
-    <div class="card-title">📊 Progress</div>
-    <div class="stats">
-      <div class="stat-box">
-        <div class="stat-value" id="totalCount">0</div>
-        <div class="stat-label">Total</div>
-      </div>
-      <div class="stat-box">
-        <div class="stat-value" style="color: var(--success)" id="liveCount">0</div>
-        <div class="stat-label">Lancar</div>
-      </div>
-      <div class="stat-box">
-        <div class="stat-value" style="color: var(--warning)" id="corsCount">0</div>
-        <div class="stat-label">CORS</div>
-      </div>
-      <div class="stat-box">
-        <div class="stat-value" style="color: var(--danger)" id="deadCount">0</div>
-        <div class="stat-label">Mati</div>
-      </div>
-      <div class="stat-box">
-        <div class="stat-value" id="checkedCount">0</div>
-        <div class="stat-label">Checked</div>
-      </div>
-    </div>
-    <div class="progress-bar">
-      <div class="progress-fill" id="progressFill"></div>
-    </div>
-    <div style="display: flex; justify-content: space-between; font-size: 0.85rem; color: var(--text-dim); margin-top: 8px;">
-      <span id="progressText">0%</span>
-      <span id="speedText">0 ch/s</span>
-    </div>
-  </div>
+                <!-- Export Options -->
+                <div class="space-y-2">
+                    <label class="block text-sm font-medium text-gray-300">Export Options</label>
+                    <label class="flex items-center gap-2 cursor-pointer">
+                        <input type="checkbox" id="markDeadCheck" class="w-4 h-4 rounded bg-white/10 border-white/20 text-purple-600 focus:ring-purple-500">
+                        <span class="text-sm">⚠️ Tandai channel Mati</span>
+                    </label>
+                    <label class="flex items-center gap-2 cursor-pointer">
+                        <input type="checkbox" id="exportOnlyLiveCheck" class="w-4 h-4 rounded bg-white/10 border-white/20 text-purple-600 focus:ring-purple-500">
+                        <span class="text-sm">Export hanya Lancar</span>
+                    </label>
+                </div>
+            </div>
 
-  <div class="card" id="resultCard" style="display:none;">
-    <div class="card-title">📺 Hasil Test</div>
-    <div class="filter-row">
-      <button class="filter-btn active" data-filter="all">Semua</button>
-      <button class="filter-btn" data-filter="Lancar">Lancar</button>
-      <button class="filter-btn" data-filter="CORS">CORS</button>
-      <button class="filter-btn" data-filter="Mati">Mati</button>
-      <input type="text" id="searchInput" placeholder="Cari channel..." style="flex: 1; min-width: 200px;">
+            <!-- Progress & Stats -->
+            <div class="pt-4 border-t border-white/10">
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 mb-3">
+                    <div class="text-sm">
+                        <span id="progressText" class="font-semibold">Idle</span>
+                        <span class="text-gray-400"> • </span>
+                        <span id="statsText" class="text-gray-400">0 Total • 0 Lancar • 0 CORS • 0 Mati</span>
+                    </div>
+                    <div id="checkingBadge" class="hidden items-center gap-2 px-3 py-1 rounded-full bg-yellow-500/20 text-yellow-300 text-xs font-semibold">
+                        <div class="spinner"></div>
+                        <span>CHECKING...</span>
+                    </div>
+                </div>
+                <div class="w-full bg-white/10 rounded-full h-2.5 overflow-hidden">
+                    <div id="progressBar" class="bg-gradient-to-r from-purple-500 via-pink-500 to-blue-500 h-2.5 rounded-full transition-all duration-300 ease-out" style="width: 0%"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Filter -->
+        <div class="glass rounded-2xl p-4 mb-6 shadow-2xl">
+            <div class="flex flex-wrap gap-2">
+                <button data-filter="all" class="filter-btn btn-3d px-4 py-2 rounded-lg bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-semibold text-sm relative overflow-hidden">
+                    All
+                </button>
+                <button data-filter="lancar" class="filter-btn btn-3d px-4 py-2 rounded-lg bg-white/5 hover:bg-white/10 text-white font-semibold text-sm relative overflow-hidden">
+                    ✅ Lancar
+                </button>
+                <button data-filter="cors" class="filter-btn btn-3d px-4 py-2 rounded-lg bg-white/5 hover:bg-white/10 text-white font-semibold text-sm relative overflow-hidden">
+                    ⚠️ CORS
+                </button>
+                <button data-filter="mati" class="filter-btn btn-3d px-4 py-2 rounded-lg bg-white/5 hover:bg-white/10 text-white font-semibold text-sm relative overflow-hidden">
+                    ❌ Mati
+                </button>
+            </div>
+        </div>
+
+        <!-- Table -->
+        <div class="glass rounded-2xl shadow-2xl overflow-hidden">
+            <div class="overflow-x-auto">
+                <table class="w-full">
+                    <thead class="bg-white/5 border-b border-white/10">
+                        <tr>
+                            <th class="px-3 py-3 text-left text-xs font-semibold text-gray-300 uppercase tracking-wider">#</th>
+                            <th class="px-3 py-3 text-left text-xs font-semibold text-gray-300 uppercase tracking-wider">Channel</th>
+                            <th class="px-3 py-3 text-left text-xs font-semibold text-gray-300 uppercase tracking-wider hide-mobile">Group</th>
+                            <th class="px-3 py-3 text-left text-xs font-semibold text-gray-300 uppercase tracking-wider">Status</th>
+                            <th class="px-3 py-3 text-left text-xs font-semibold text-gray-300 uppercase tracking-wider hide-mobile">Quality</th>
+                            <th class="px-3 py-3 text-left text-xs font-semibold text-gray-300 uppercase tracking-wider">Ping</th>
+                            <th class="px-3 py-3 text-left text-xs font-semibold text-gray-300 uppercase tracking-wider hide-mobile">URL</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tableBody" class="divide-y divide-white/5">
+                        <tr>
+                            <td colspan="7" class="px-3 py-8 text-center text-gray-500">
+                                Upload file M3U untuk mulai checking...
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
     </div>
-    <div class="table-wrapper">
-      <table id="resultTable">
-        <thead>
-          <tr>
-            <th>No</th>
-            <th>Nama Channel</th>
-            <th>Status</th>
-            <th>Quality</th>
-            <th>Bitrate</th>
-            <th>Response</th>
-            <th>URL</th>
-          </tr>
-        </thead>
-        <tbody id="resultBody"></tbody>
-      </table>
-    </div>
-    <div style="display: flex; gap: 12px; margin-top: 16px; flex-wrap: wrap;">
-      <button class="btn btn-success" id="exportBtn">Export M3U</button>
-      <button class="btn btn-secondary" id="exportJsonBtn">Export JSON</button>
-    </div>
-  </div>
-</div>
 
 <script>
-const proxyBase = 'https://corsproxy.io/?';
-let channels = [];
-let results = [];
-let isChecking = false;
-let abortController = null;
-let startTime = 0;
-
-const elements = {
-  fileInput: document.getElementById('fileInput'),
-  urlInput: document.getElementById('urlInput'),
-  textInput: document.getElementById('textInput'),
-  proxyToggle: document.getElementById('proxyToggle'),
-  concurrentSlider: document.getElementById('concurrentSlider'),
-  concurrentInput: document.getElementById('concurrentInput'),
-  concurrentValue: document.getElementById('concurrentValue'),
-  timeoutInput: document.getElementById('timeoutInput'),
-  markDeadToggle: document.getElementById('markDeadToggle'),
-  exportLiveOnly: document.getElementById('exportLiveOnly'),
-  startBtn: document.getElementById('startBtn'),
-  stopBtn: document.getElementById('stopBtn'),
-  clearBtn: document.getElementById('clearBtn'),
-  btnText: document.getElementById('btnText'),
-  progressCard: document.getElementById('progressCard'),
-  resultCard: document.getElementById('resultCard'),
-  resultBody: document.getElementById('resultBody'),
-  totalCount: document.getElementById('totalCount'),
-  liveCount: document.getElementById('liveCount'),
-  corsCount: document.getElementById('corsCount'),
-  deadCount: document.getElementById('deadCount'),
-  checkedCount: document.getElementById('checkedCount'),
-  progressFill: document.getElementById('progressFill'),
-  progressText: document.getElementById('progressText'),
-  speedText: document.getElementById('speedText'),
-  exportBtn: document.getElementById('exportBtn'),
-  exportJsonBtn: document.getElementById('exportJsonBtn'),
-  searchInput: document.getElementById('searchInput')
-};
-
-// Ripple effect
-document.querySelectorAll('.btn').forEach(btn => {
-  btn.addEventListener('click', function(e) {
-    const ripple = document.createElement('span');
-    ripple.classList.add('ripple');
-    const rect = this.getBoundingClientRect();
-    ripple.style.left = e.clientX - rect.left + 'px';
-    ripple.style.top = e.clientY - rect.top + 'px';
-    this.appendChild(ripple);
-    setTimeout(() => ripple.remove(), 600);
-  });
-});
-
-// Concurrent slider sync
-elements.concurrentSlider.addEventListener('input', e => {
-  elements.concurrentInput.value = e.target.value;
-  elements.concurrentValue.textContent = e.target.value;
-});
-elements.concurrentInput.addEventListener('input', e => {
-  let val = Math.min(1000, Math.max(10, e.target.value));
-  elements.concurrentSlider.value = val;
-  elements.concurrentValue.textContent = val;
-  elements.concurrentInput.value = val;
-});
-
-// Parse M3U
-function parseM3U(content) {
-  const lines = content.split(/\r?\n/);
-  const result = [];
-  let currentChannel = null;
-  
-  for (let i = 0; i < lines.length; i++) {
-    const line = lines[i].trim();
-    if (line.startsWith('#EXTINF:')) {
-      const commaIndex = line.indexOf(',');
-      const name = commaIndex > -1 ? line.substring(commaIndex + 1).trim() : 'Unknown';
-      currentChannel = { name, url: '', extinf: line };
-    } else if (line && !line.startsWith('#') && currentChannel) {
-      currentChannel.url = line;
-      result.push(currentChannel);
-      currentChannel = null;
-    }
-  }
-  return result;
-}
-
-// Load file
-elements.fileInput.addEventListener('change', (e) => {
-  const file = e.target.files[0];
-  if (!file) return;
-  const reader = new FileReader();
-  reader.onload = (evt) => elements.textInput.value = evt.target.result;
-  reader.readAsText(file);
-});
-
-// Load URL
-elements.urlInput.addEventListener('blur', async () => {
-  const url = elements.urlInput.value.trim();
-  if (!url) return;
-  try {
-    const fetchUrl = elements.proxyToggle.checked ? proxyBase + encodeURIComponent(url) : url;
-    const res = await fetch(fetchUrl);
-    const text = await res.text();
-    elements.textInput.value = text;
-  } catch (err) {
-    alert('Gagal load URL: ' + err.message);
-  }
-});
-
-// Test single channel
-async function testChannel(channel, timeout, useProxy) {
-  const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), timeout * 1000);
-  const testUrl = useProxy ? proxyBase + encodeURIComponent(channel.url) : channel.url;
-  
-  let result = {
-    ...channel,
-    status: 'Mati',
-    quality: '-',
-    bitrate: '-',
-    responseTime: 0,
-    error: null
-  };
-  
-  const start = performance.now();
-  
-  try {
-    // Test with HLS.js for .m3u8
-    if (channel.url.includes('.m3u8')) {
-      await new Promise((resolve, reject) => {
-        const video = document.createElement('video');
-        const hls = new Hls({ 
-          enableWorker: false,
-          lowLatencyMode: false,
-          backBufferLength: 0
-        });
-        
-        let resolved = false;
-        
-        hls.on(Hls.Events.MANIFEST_PARSED, (event, data) => {
-          if (resolved) return;
-          resolved = true;
-          const levels = data.levels;
-          if (levels && levels.length > 0) {
-            const highest = levels.reduce((prev, curr) => 
-              (curr.height || 0) > (prev.height || 0) ? curr : prev
-            );
-            result.quality = getQualityFromHeight(highest.height);
-            result.bitrate = highest.bitrate ? (highest.bitrate / 1000).toFixed(0) + ' kbps' : '-';
-          }
-          result.status = 'Lancar';
-          result.responseTime = Math.round(performance.now() - start);
-          hls.destroy();
-          resolve();
-        });
-        
-        hls.on(Hls.Events.ERROR, (event, data) => {
-          if (resolved) return;
-          resolved = true;
-          if (data.fatal) {
-            result.error = data.type;
-            result.status = useProxy ? 'Mati' : 'CORS';
-            result.responseTime = Math.round(performance.now() - start);
-            hls.destroy();
-            reject();
-          }
-        });
-        
-        hls.loadSource(testUrl);
-        hls.attachMedia(video);
-      });
-    } else {
-      // Test regular URL
-      const res = await fetch(testUrl, { 
-        method: 'GET',
-        signal: controller.signal,
-        mode: useProxy ? 'cors' : 'no-cors'
-      });
-      
-      result.responseTime = Math.round(performance.now() - start);
-      
-      if (useProxy) {
-        result.status = res.ok ? 'Lancar' : 'Mati';
-      } else {
-        // no-cors mode: if no error, assume Lancar
-        result.status = 'Lancar';
-      }
-      
-      result.quality = 'SD'; // Default for non-HLS
-    }
-  } catch (err) {
-    result.responseTime = Math.round(performance.now() - start);
-    result.error = err.name;
-    if (err.name === 'AbortError') {
-      result.status = 'Mati';
-    } else if (!useProxy) {
-      result.status = 'CORS';
-    } else {
-      result.status = 'Mati';
-    }
-  } finally {
-    clearTimeout(timeoutId);
-  }
-  
-  return result;
-}
-
-function getQualityFromHeight(height) {
-  if (!height) return 'SD';
-  if (height >= 2160) return '4K';
-  if (height >= 1440) return '2K';
-  if (height >= 1080) return 'FHD';
-  if (height >= 720) return 'HD';
-  return 'SD';
-}
-
-// Batch processing
-async function processBatch(batch, timeout, useProxy) {
-  const promises = batch.map(ch => testChannel(ch, timeout, useProxy));
-  return Promise.all(promises);
-}
-
-// Start check
-elements.startBtn.addEventListener('click', async () => {
-  if (isChecking) return;
-  
-  const content = elements.textInput.value.trim();
-  if (!content) {
-    alert('Silakan input M3U terlebih dahulu');
-    return;
-  }
-  
-  channels = parseM3U(content);
-  if (channels.length === 0) {
-    alert('Tidak ada channel ditemukan di M3U');
-    return;
-  }
-  
-  isChecking = true;
-  abortController = new AbortController();
-  results = [];
-  startTime = Date.now();
-  
-  elements.startBtn.disabled = true;
-  elements.stopBtn.style.display = 'inline-block';
-  elements.btnText.innerHTML = '<span class="spinner"></span>Checking...';
-  elements.progressCard.style.display = 'block';
-  elements.resultCard.style.display = 'block';
-  elements.resultBody.innerHTML = '';
-  
-  updateStats();
-  
-  const concurrent = parseInt(elements.concurrentInput.value);
-  const timeout = parseInt(elements.timeoutInput.value);
-  const useProxy = elements.proxyToggle.checked;
-  
-  // Batch processing
-  for (let i = 0; i < channels.length; i += concurrent) {
-    if (!isChecking) break;
+(function() {
+    'use strict';
     
-    const batch = channels.slice(i, i + concurrent);
-    const batchResults = await processBatch(batch, timeout, useProxy);
-    results.push(...batchResults);
+    // State
+    let channels = [];
+    let isChecking = false;
+    let abortController = null;
+    let currentFilter = 'all';
+    let stats = { total: 0, lancar: 0, cors: 0, mati: 0 };
+    let checkedCount = 0;
     
-    batchResults.forEach((res, idx) => renderRow(i + idx, res));
-    updateStats();
-  }
-  
-  stopChecking();
-});
-
-elements.stopBtn.addEventListener('click', () => {
-  isChecking = false;
-  if (abortController) abortController.abort();
-});
-
-function stopChecking() {
-  isChecking = false;
-  elements.startBtn.disabled = false;
-  elements.stopBtn.style.display = 'none';
-  elements.btnText.textContent = 'Mulai Check';
-}
-
-elements.clearBtn.addEventListener('click', () => {
-  channels = [];
-  results = [];
-  elements.textInput.value = '';
-  elements.urlInput.value = '';
-  elements.fileInput.value = '';
-  elements.resultBody.innerHTML = '';
-  elements.progressCard.style.display = 'none';
-  elements.resultCard.style.display = 'none';
-  stopChecking();
-});
-
-function updateStats() {
-  const total = channels.length;
-  const live = results.filter(r => r.status === 'Lancar').length;
-  const cors = results.filter(r => r.status === 'CORS').length;
-  const dead = results.filter(r => r.status === 'Mati').length;
-  const checked = results.length;
-  
-  elements.totalCount.textContent = total;
-  elements.liveCount.textContent = live;
-  elements.corsCount.textContent = cors;
-  elements.deadCount.textContent = dead;
-  elements.checkedCount.textContent = checked;
-  
-  const progress = total > 0 ? (checked / total) * 100 : 0;
-  elements.progressFill.style.width = progress + '%';
-  elements.progressText.textContent = progress.toFixed(1) + '%';
-  
-  const elapsed = (Date.now() - startTime) / 1000;
-  const speed = elapsed > 0 ? (checked / elapsed).toFixed(1) : 0;
-  elements.speedText.textContent = speed + ' ch/s';
-}
-
-function renderRow(index, result) {
-  const row = document.createElement('tr');
-  row.dataset.status = result.status;
-  row.dataset.name = result.name.toLowerCase();
-  
-  const statusClass = result.status === 'Lancar' ? 'status-lancar' : 
-                      result.status === 'CORS' ? 'status-cors' : 'status-mati';
-  
-  row.innerHTML = `
-    <td>${index + 1}</td>
-    <td title="${result.name}">${result.name.length > 30 ? result.name.substring(0, 30) + '...' : result.name}</td>
-    <td><span class="status ${statusClass}">${result.status}</span></td>
-    <td><span class="quality-badge">${result.quality}</span></td>
-    <td>${result.bitrate}</td>
-    <td>${result.responseTime}ms</td>
-    <td style="max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="${result.url}">${result.url}</td>
-  `;
-  elements.resultBody.appendChild(row);
-}
-
-// Filter
-document.querySelectorAll('.filter-btn').forEach(btn => {
-  btn.addEventListener('click', () => {
-    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-    applyFilter();
-  });
-});
-
-elements.searchInput.addEventListener('input', applyFilter);
-
-function applyFilter() {
-  const filter = document.querySelector('.filter-btn.active').dataset.filter;
-  const search = elements.searchInput.value.toLowerCase();
-  
-  document.querySelectorAll('#resultBody tr').forEach(row => {
-    const matchFilter = filter === 'all' || row.dataset.status === filter;
-    const matchSearch = row.dataset.name.includes(search);
-    row.style.display = matchFilter && matchSearch ? '' : 'none';
-  });
-}
-
-// Export
-elements.exportBtn.addEventListener('click', () => {
-  let exportData = results;
-  if (elements.exportLiveOnly.checked) {
-    exportData = results.filter(r => r.status === 'Lancar');
-  }
-  if (exportData.length === 0) {
-    alert('Tidak ada data untuk di-export');
-    return;
-  }
-  
-  let m3u = '#EXTM3U\n';
-  exportData.forEach(r => {
-    if (r.status === 'Mati' && elements.markDeadToggle.checked) {
-      m3u += `#EXTINF:-1,[OFFLINE] ${r.name}\n`;
-    } else {
-      m3u += `${r.extinf || '#EXTINF:-1,' + r.name}\n`;
+    // DOM Elements
+    const fileInput = document.getElementById('fileInput');
+    const startBtn = document.getElementById('startBtn');
+    const stopBtn = document.getElementById('stopBtn');
+    const exportBtn = document.getElementById('exportBtn');
+    const proxyToggle = document.getElementById('proxyToggle');
+    const proxyBadge = document.getElementById('proxyBadge');
+    const proxyStatus = document.getElementById('proxyStatus');
+    const concurrentSlider = document.getElementById('concurrentSlider');
+    const concurrentValue = document.getElementById('concurrentValue');
+    const progressBar = document.getElementById('progressBar');
+    const progressText = document.getElementById('progressText');
+    const statsText = document.getElementById('statsText');
+    const checkingBadge = document.getElementById('checkingBadge');
+    const tableBody = document.getElementById('tableBody');
+    const markDeadCheck = document.getElementById('markDeadCheck');
+    const exportOnlyLiveCheck = document.getElementById('exportOnlyLiveCheck');
+    
+    // Proxy list - bisa diganti sesuai kebutuhan
+    const PROXIES = [
+        'https://corsproxy.io/?',
+        'https://api.allorigins.win/raw?url=',
+        'https://proxy.cors.sh/'
+    ];
+    let proxyIndex = 0;
+    
+    // Ripple effect
+    document.querySelectorAll('.btn-3d').forEach(btn => {
+        btn.addEventListener('click', function(e) {
+            const ripple = document.createElement('span');
+            const rect = this.getBoundingClientRect();
+            const size = Math.max(rect.width, rect.height);
+            const x = e.clientX - rect.left - size / 2;
+            const y = e.clientY - rect.top - size / 2;
+            
+            ripple.style.width = ripple.style.height = size + 'px';
+            ripple.style.left = x + 'px';
+            ripple.style.top = y + 'px';
+            ripple.classList.add('ripple');
+            
+            this.appendChild(ripple);
+            setTimeout(() => ripple.remove(), 600);
+        });
+    });
+    
+    // File input handler
+    fileInput.addEventListener('change', handleFileSelect);
+    startBtn.addEventListener('click', startChecking);
+    stopBtn.addEventListener('click', stopChecking);
+    exportBtn.addEventListener('click', exportM3U);
+    
+    // Proxy toggle
+    proxyToggle.addEventListener('change', () => {
+        if (proxyToggle.checked) {
+            proxyBadge.classList.remove('hidden');
+            proxyBadge.classList.add('flex');
+            proxyStatus.textContent = 'ON';
+            proxyStatus.className = 'text-sm font-semibold text-cyan-400';
+        } else {
+            proxyBadge.classList.add('hidden');
+            proxyBadge.classList.remove('flex');
+            proxyStatus.textContent = 'OFF';
+            proxyStatus.className = 'text-sm font-semibold text-gray-500';
+        }
+    });
+    
+    // Concurrent slider
+    concurrentSlider.addEventListener('input', (e) => {
+        concurrentValue.textContent = e.target.value;
+    });
+    
+    // Filter buttons
+    document.querySelectorAll('.filter-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            document.querySelectorAll('.filter-btn').forEach(b => {
+                b.classList.remove('from-purple-600', 'to-indigo-600');
+                b.classList.add('bg-white/5');
+            });
+            e.target.classList.remove('bg-white/5');
+            e.target.classList.add('from-purple-600', 'to-indigo-600');
+            currentFilter = e.target.dataset.filter;
+            renderTable();
+        });
+    });
+    
+    // Parse M3U
+    function handleFileSelect(e) {
+        const file = e.target.files[0];
+        if (!file) return;
+        
+        const reader = new FileReader();
+        reader.onload = (event) => {
+            channels = parseM3U(event.target.result);
+            stats.total = channels.length;
+            stats.lancar = stats.cors = stats.mati = 0;
+            checkedCount = 0;
+            updateStats();
+            updateProgress();
+            renderTable();
+            startBtn.disabled = channels.length === 0;
+            exportBtn.disabled = true;
+        };
+        reader.readAsText(file);
     }
-    m3u += `${r.url}\n`;
-  });
-  
-  downloadFile(m3u, 'checked_playlist.m3u', 'audio/x-mpegurl');
-});
-
-elements.exportJsonBtn.addEventListener('click', () => {
-  if (results.length === 0) {
-    alert('Tidak ada data untuk di-export');
-    return;
-  }
-  const json = JSON.stringify(results, null, 2);
-  downloadFile(json, 'checked_playlist.json', 'application/json');
-});
-
-function downloadFile(content, filename, type) {
-  const blob = new Blob([content], { type });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = filename;
-  a.click();
-  URL.revokeObjectURL(url);
-}
+    
+    function parseM3U(content) {
+        const lines = content.split('\n').map(l => l.trim()).filter(l => l);
+        const result = [];
+        let current = null;
+        
+        for (let i = 0; i < lines.length; i++) {
+            if (lines[i].startsWith('#EXTINF')) {
+                const info = lines[i];
+                const nameMatch = info.match(/,(.+)$/);
+                const groupMatch = info.match(/group-title="([^"]+)"/);
+                const tvgNameMatch = info.match(/tvg-name="([^"]+)"/);
+                
+                current = {
+                    name: nameMatch ? nameMatch[1] : 'Unknown',
+                    group: groupMatch ? groupMatch[1] : 'Uncategorized',
+                    tvgName: tvgNameMatch ? tvgNameMatch[1] : '',
+                    raw: info,
+                    status: 'pending',
+                    ping: 0,
+                    quality: '-',
+                    bitrate: 0,
+                    width: 0,
+                    height: 0
+                };
+            } else if (current && !lines[i].startsWith('#')) {
+                current.url = lines[i];
+                current.index = result.length + 1;
+                result.push(current);
+                current = null;
+            }
+        }
+        return result;
+    }
+    
+    // Start checking with AbortController
+    async function startChecking() {
+        if (isChecking || channels.length === 0) return;
+        
+        isChecking = true;
+        abortController = new AbortController();
+        startBtn.disabled = true;
+        stopBtn.disabled = false;
+        exportBtn.disabled = true;
+        fileInput.disabled = true;
+        
+        checkingBadge.classList.remove('hidden');
+        checkingBadge.classList.add('flex');
+        
+        // Reset stats
+        channels.forEach(ch => {
+            ch.status = 'pending';
+            ch.ping = 0;
+            ch.quality = '-';
+        });
+        stats.lancar = stats.cors = stats.mati = 0;
+        checkedCount = 0;
+        updateStats();
+        updateProgress();
+        renderTable();
+        
+        const concurrent = parseInt(concurrentSlider.value);
+        const useProxy = proxyToggle.checked;
+        
+        try {
+            // Batch processing
+            for (let i = 0; i < channels.length; i += concurrent) {
+                if (abortController.signal.aborted) break;
+                
+                const batch = channels.slice(i, Math.min(i + concurrent, channels.length));
+                const promises = batch.map(ch => checkChannel(ch, useProxy, abortController.signal));
+                await Promise.allSettled(promises);
+                
+                if (!abortController.signal.aborted) {
+                    updateProgress();
+                }
+            }
+        } catch (err) {
+            console.error('Batch processing error:', err);
+        } finally {
+            finishChecking();
+        }
+    }
+    
+    function stopChecking() {
+        if (abortController) {
+            abortController.abort();
+        }
+        finishChecking();
+    }
+    
+    function finishChecking() {
+        isChecking = false;
+        startBtn.disabled = false;
+        stopBtn.disabled = true;
+        exportBtn.disabled = channels.filter(c => c.status !== 'pending').length === 0;
+        fileInput.disabled = false;
+        checkingBadge.classList.add('hidden');
+        checkingBadge.classList.remove('flex');
+        progressText.textContent = abortController?.signal.aborted ? 'Stopped' : 'Completed';
+        abortController = null;
+    }
+    
+    async function checkChannel(channel, useProxy, signal) {
+        if (signal.aborted) return;
+        
+        const startTime = Date.now();
+        let url = channel.url;
+        
+        if (useProxy) {
+            url = PROXIES[proxyIndex] + encodeURIComponent(channel.url);
+            proxyIndex = (proxyIndex + 1) % PROXIES.length;
+        }
+        
+        try {
+            const result = await testStream(url, channel.url, signal);
+            channel.ping = Date.now() - startTime;
+            channel.status = result.status;
+            channel.quality = result.quality;
+            channel.bitrate = result.bitrate;
+            channel.width = result.width;
+            channel.height = result.height;
+        } catch (err) {
+            if (err.name === 'AbortError') return;
+            
+            // Fallback: try no-cors fetch if proxy OFF
+            if (!useProxy) {
+                try {
+                    await fetch(channel.url, { 
+                        method: 'HEAD', 
+                        mode: 'no-cors',
+                        signal 
+                    });
+                    channel.status = 'cors';
+                } catch {
+                    channel.status = 'mati';
+                }
+            } else {
+                channel.status = 'mati';
+            }
+            channel.ping = Date.now() - startTime;
+        }
+        
+        // Update stats
+        stats[channel.status]++;
+        checkedCount++;
+        updateStats();
+        renderChannelRow(channel);
+    }
+    
+    function testStream(url, originalUrl, signal) {
+        return new Promise((resolve, reject) => {
+            if (signal.aborted) {
+                reject(new DOMException('Aborted', 'AbortError'));
+                return;
+            }
+            
+            const isHLS = originalUrl.includes('.m3u8');
+            
+            if (isHLS && typeof Hls !== 'undefined' && Hls.isSupported()) {
+                const hls = new Hls({ 
+                    maxLoadingDelay: 8000,
+                    maxBufferLength: 10,
+                    testBandwidth: false
+                });
+                const video = document.createElement('video');
+                let resolved = false;
+                
+                const cleanup = () => {
+                    hls.destroy();
+                    video.remove();
+                };
+                
+                const timeout = setTimeout(() => {
+                    if (!resolved) {
+                        resolved = true;
+                        cleanup();
+                        reject(new Error('Timeout'));
+                    }
+                }, 8000);
+                
+                signal.addEventListener('abort', () => {
+                    if (!resolved) {
+                        resolved = true;
+                        clearTimeout(timeout);
+                        cleanup();
+                        reject(new DOMException('Aborted', 'AbortError'));
+                    }
+                });
+                
+                hls.on(Hls.Events.MANIFEST_PARSED, (event, data) => {
+                    if (!resolved) {
+                        resolved = true;
+                        clearTimeout(timeout);
+                        const levels = data.levels;
+                        let quality = 'SD', bitrate = 0, width = 640, height = 360;
+                        
+                        if (levels && levels.length > 0) {
+                            const level = levels[levels.length - 1];
+                            bitrate = level.bitrate;
+                            width = level.width || 0;
+                            height = level.height || 0;
+                            quality = detectQuality(width, height, bitrate);
+                        }
+                        
+                        cleanup();
+                        resolve({ status: 'lancar', quality, bitrate, width, height });
+                    }
+                });
+                
+                hls.on(Hls.Events.ERROR, (event, data) => {
+                    if (!resolved && data.fatal) {
+                        resolved = true;
+                        clearTimeout(timeout);
+                        cleanup();
+                        reject(new Error(data.details));
+                    }
+                });
+                
+                try {
+                    hls.loadSource(url);
+                    hls.attachMedia(video);
+                } catch (e) {
+                    resolved = true;
+                    clearTimeout(timeout);
+                    cleanup();
+                    reject(e);
+                }
+            } else {
+                // Simple video test for non-HLS
+                const video = document.createElement('video');
+                video.muted = true;
+                video.preload = 'metadata';
+                let resolved = false;
+                
+                const timeout = setTimeout(() => {
+                    if (!resolved) {
+                        resolved = true;
+                        video.remove();
+                        reject(new Error('Timeout'));
+                    }
+                }, 6000);
+                
+                signal.addEventListener('abort', () => {
+                    if (!resolved) {
+                        resolved = true;
+                        clearTimeout(timeout);
+                        video.remove();
+                        reject(new DOMException('Aborted', 'AbortError'));
+                    }
+                });
+                
+                video.onloadedmetadata = () => {
+                    if (!resolved) {
+                        resolved = true;
+                        clearTimeout(timeout);
+                        const quality = detectQuality(video.videoWidth, video.videoHeight, 0);
+                        video.remove();
+                        resolve({ 
+                            status: 'lancar', 
+                            quality, 
+                            bitrate: 0,
+                            width: video.videoWidth,
+                            height: video.videoHeight
+                        });
+                    }
+                };
+                
+                video.onerror = () => {
+                    if (!resolved) {
+                        resolved = true;
+                        clearTimeout(timeout);
+                        video.remove();
+                        reject(new Error('Video error'));
+                    }
+                };
+                
+                video.src = url;
+            }
+        });
+    }
+    
+    function detectQuality(width, height, bitrate) {
+        if (height >= 2160 || bitrate > 20000000) return '4K';
+        if (height >= 1440 || bitrate > 10000000) return '2K';
+        if (height >= 1080 || bitrate > 5000000) return 'FHD';
+        if (height >= 720 || bitrate > 2500000) return 'HD';
+        return 'SD';
+    }
+    
+    function updateStats() {
+        statsText.textContent = `${stats.total} Total • ${stats.lancar} Lancar • ${stats.cors} CORS • ${stats.mati} Mati`;
+    }
+    
+    function updateProgress() {
+        const percent = stats.total > 0 ? (checkedCount / stats.total * 100).toFixed(1) : 0;
+        progressBar.style.width = percent + '%';
+        progressText.textContent = isChecking ? `Checking... ${percent}%` : `${percent}%`;
+    }
+    
+    function renderTable() {
+        const filtered = channels.filter(ch => {
+            if (currentFilter === 'all') return true;
+            return ch.status === currentFilter;
+        });
+        
+        if (filtered.length === 0) {
+            tableBody.innerHTML = '<tr><td colspan="7" class="px-3 py-8 text-center text-gray-500">Tidak ada data</td></tr>';
+            return;
+        }
+        
+        tableBody.innerHTML = filtered.map(renderChannelHTML).join('');
+    }
+    
+    function renderChannelRow(channel) {
+        const existing = document.querySelector(`tr[data-id="${channel.index}"]`);
+        if (existing) {
+            existing.outerHTML = renderChannelHTML(channel);
+        }
+    }
+    
+    function renderChannelHTML(ch) {
+        const statusColors = {
+            pending: 'text-gray-500',
+            lancar: 'text-green-400',
+            cors: 'text-yellow-400',
+            mati: 'text-red-400'
+        };
+        
+        const statusIcons = {
+            pending: '⏳',
+            lancar: '✅',
+            cors: '⚠️',
+            mati: '❌'
+        };
+        
+        const statusClass = ch.status === 'lancar' ? 'status-lancar' : '';
+        
+        return `
+            <tr data-id="${ch.index}" class="table-row ${statusClass}">
+                <td class="px-3 py-3 text-xs text-gray-400">${ch.index}</td>
+                <td class="px-3 py-3 text-sm font-medium">${ch.name}</td>
+                <td class="px-3 py-3 text-xs text-gray-400 hide-mobile">${ch.group}</td>
+                <td class="px-3 py-3 text-sm ${statusColors[ch.status]} font-semibold">
+                    ${statusIcons[ch.status]} ${ch.status.toUpperCase()}
+                </td>
+                <td class="px-3 py-3 text-xs hide-mobile">
+                    ${ch.quality !== '-' ? `<span class="px-2 py-1 rounded bg-purple-500/20 text-purple-300">${ch.quality}</span>` : '-'}
+                    ${ch.bitrate > 0 ? `<br><span class="text-gray-500">${(ch.bitrate/1000000).toFixed(1)} Mbps</span>` : ''}
+                </td>
+                <td class="px-3 py-3 text-xs ${ch.ping > 1000 ? 'text-yellow-400' : 'text-green-400'}">
+                    ${ch.ping > 0 ? ch.ping + 'ms' : '-'}
+                </td>
+                <td class="px-3 py-3 text-xs text-gray-500 hide-mobile truncate max-w-[200px]" title="${ch.url}">
+                    ${ch.url}
+                </td>
+            </tr>
+        `;
+    }
+    
+    function exportM3U() {
+        let exportChannels = channels;
+        
+        if (exportOnlyLiveCheck.checked) {
+            exportChannels = channels.filter(c => c.status === 'lancar');
+        }
+        
+        let content = '#EXTM3U\n';
+        
+        exportChannels.forEach(ch => {
+            if (markDeadCheck.checked && ch.status === 'mati') {
+                content += ch.raw + ' (MATI)\n';
+            } else if (ch.status !== 'mati' || !exportOnlyLiveCheck.checked) {
+                content += ch.raw + '\n';
+            }
+            content += ch.url + '\n';
+        });
+        
+        const blob = new Blob([content], { type: 'application/x-mpegurl' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `iptv_checked_${Date.now()}.m3u`;
+        a.click();
+        URL.revokeObjectURL(url);
+    }
+    
+    // Init proxy badge
+    if (proxyToggle.checked) {
+        proxyBadge.classList.remove('hidden');
+        proxyBadge.classList.add('flex');
+    }
+})();
 </script>
 <script>(function(){document.addEventListener("click",function(e){var a=e.target.closest("[data-product-id]");if(!a)return;e.preventDefault();var pid=a.getAttribute("data-product-id");if(pid)parent.postMessage({type:"ecto-artifact-link-click",productId:pid},"*")})})();</script>
 <script>(function(){var loc=location.href.replace(/#.*$/,"");var ATTR_NAMES=["data-product-id","data-productid","data-product_id","product-id","productid","product_id","data-source-entity-id","source-entity-id","source_entity_id","data-product","data-metadata","data-meta"];var DATASET_KEYS=["productId","productid","product_id","sourceEntityId","sourceentityid","source_entity_id","product","metadata","meta"];function readProductId(value){if(typeof value!=="string"||value.length===0)return null;if(/^[0-9]{6,}$/.test(value))return value;var match=value.match(/(?:product(?:_|-)?id|source(?:_|-)?entity(?:_|-)?id)["'=:\s]+([0-9]{6,})/i);return match?match[1]:null}function extractProductId(start){for(var node=start;node&&node!==document.body;node=node.parentElement){for(var i=0;i<ATTR_NAMES.length;i++){var attrValue=node.getAttribute&&node.getAttribute(ATTR_NAMES[i]);var attrProductId=readProductId(attrValue);if(attrProductId)return attrProductId}var dataset=node.dataset||null;if(dataset){for(var j=0;j<DATASET_KEYS.length;j++){var dataValue=dataset[DATASET_KEYS[j]];var dataProductId=readProductId(dataValue);if(dataProductId)return dataProductId}}}return null}document.addEventListener("click",function(e){var target=e.target instanceof Element?e.target:null;if(!target)return;var a=target.closest?target.closest("a[href]"):null;if(!a||!a.href||!/^https?:\/\//.test(a.href))return;if(a.href.replace(/#.*$/,"")===loc)return;var productId=extractProductId(target)||extractProductId(a);if(!productId)return;e.preventDefault();parent.postMessage({type:"ecto-artifact-link-click",productId:productId},"*")},true)})();</script></body>
